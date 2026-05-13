@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 3: Principios del álgebra - Matemática básica para ciencia de datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">16</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Principios del álgebra</h1>
+            <p class="cover-subtitle">Semana 3: manipulación simbólica con SymPy</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de hoy</h2>
+                <p class="slide-subtitle">De la teoría al código</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. SymPy 1.14.0: instalación y conceptos básicos</h4>
+                        <p>Álgebra simbólica en Python</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Crear símbolos y expresiones</h4>
+                        <p>Variables matemáticas en código</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Expandir y simplificar expresiones</h4>
+                        <p>Productos notables automáticamente</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Resolver ecuaciones</h4>
+                        <p>solve() y solveset()</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>5. Aplicaciones en ML: derivación simbólica</h4>
+                    <p>Calcular gradientes para gradient descent</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Introducción a SymPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Qué es SymPy?</h2>
+                <p class="slide-subtitle">Matemática simbólica en Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Librería de álgebra computacional</h3>
+                    <p>SymPy permite hacer operaciones matemáticas SIMBÓLICAS (no numéricas). Manipula expresiones algebraicas como lo harías en papel, pero sin errores.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">1.14.0</div>
+                        <div class="stat-label">Versión actual (abril 2025)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Python puro (sin dependencias)</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>NumPy (numérico)</th>
+                                <th>SymPy (simbólico)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tipo de cálculo</strong></td>
+                                <td>Aproximado (punto flotante)</td>
+                                <td>Exacto (simbólico)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>√2</strong></td>
+                                <td>1.41421356...</td>
+                                <td>√2 (mantiene símbolo)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uso ideal</strong></td>
+                                <td>Datos, arrays, cálculos rápidos</td>
+                                <td>Álgebra, ecuaciones, derivadas</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>SymPy es perfecto para verificar trabajo algebraico manual y derivar fórmulas sin errores.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Instalación y configuración -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Instalación en Google Colab</h2>
+                <p class="slide-subtitle">Setup inicial</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># Ya viene instalado en Colab, pero para actualizarlo:</span>
+<span class="keyword">!</span>pip install sympy --upgrade
+
+<span class="comment"># Importar librería completa</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="comment"># Configurar visualización bonita (LaTeX)</span>
+<span class="keyword">init_printing</span>(use_latex=<span class="string">'mathjax'</span>)
+
+<span class="comment"># Verificar versión</span>
+<span class="keyword">import</span> sympy
+<span class="keyword">print</span>(<span class="string">f"Versión de SymPy: </span>{sympy.<span class="keyword">__version__</span>}<span class="string">"</span>)
+
+<span class="comment"># Salida esperada: 1.14.0 o superior</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Nota: En este curso usaremos "from sympy import *" para simplificar, pero en producción es mejor importar solo lo necesario.</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>¿Por qué init_printing()?</h3>
+                    <p>Esta función hace que las expresiones se muestren con formato matemático bonito (como en LaTeX) en lugar de texto plano. Transforma "x**2 + 3*x" en "x² + 3x".</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Crear símbolos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Crear símbolos: el primer paso</h2>
+                <p class="slide-subtitle">Variables matemáticas en Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Método 1: Un símbolo</span>
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+<span class="keyword">print</span>(<span class="keyword">type</span>(x))  
+<span class="comment"># &lt;class 'sympy.core.symbol.Symbol'&gt;</span>
+
+<span class="comment"># Método 2: Varios símbolos</span>
+<span class="keyword">x</span>, <span class="keyword">y</span>, <span class="keyword">z</span> = <span class="keyword">symbols</span>(<span class="string">'x y z'</span>)
+
+<span class="comment"># Método 3: Con restricciones</span>
+<span class="keyword">n</span> = <span class="keyword">Symbol</span>(<span class="string">'n'</span>, 
+           integer=<span class="keyword">True</span>, 
+           positive=<span class="keyword">True</span>)
+
+<span class="keyword">theta</span> = <span class="keyword">Symbol</span>(<span class="string">'theta'</span>, 
+               real=<span class="keyword">True</span>)
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Método 4: Secuencias</span>
+<span class="keyword">x1</span>, <span class="keyword">x2</span>, <span class="keyword">x3</span> = <span class="keyword">symbols</span>(<span class="string">'x1:4'</span>)
+<span class="comment"># Crea x1, x2, x3</span>
+
+<span class="keyword">a</span>, <span class="keyword">b</span>, <span class="keyword">c</span> = <span class="keyword">symbols</span>(<span class="string">'a:d'</span>)
+<span class="comment"># Crea a, b, c</span>
+
+<span class="comment"># Crear 10 coeficientes</span>
+<span class="keyword">coefs</span> = <span class="keyword">symbols</span>(<span class="string">'c0:10'</span>)
+<span class="keyword">print</span>(coefs)
+<span class="comment"># (c0, c1, c2, ..., c9)</span>
+                    </div>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>Importante: diferencia entre símbolo y variable de Python</h4>
+                    <p>En "x = symbols('x')", la variable de Python 'x' contiene un símbolo matemático 'x'. El nombre no tiene que coincidir: podrías hacer "variable = symbols('x')", pero sería confuso.</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Ejemplo de uso con símbolos creados</span>
+<span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+
+<span class="comment"># Ahora x e y son símbolos matemáticos</span>
+<span class="keyword">expresion</span> = x**<span class="number">2</span> + <span class="number">3</span>*x + y
+<span class="keyword">print</span>(expresion)
+<span class="comment"># Salida: x² + 3x + y (con formato bonito si usaste init_printing)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Expandir expresiones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Expandir expresiones</h2>
+                <p class="slide-subtitle">Productos notables automáticamente</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 1. EXPANDIR: (a+b)² → a² + 2ab + b²</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr1</span> = (x + <span class="number">3</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="string">"Original:"</span>, expr1)       <span class="comment"># (x + 3)²</span>
+<span class="keyword">print</span>(<span class="string">"Expandido:"</span>, <span class="keyword">expand</span>(expr1))  <span class="comment"># x² + 6x + 9</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 2. CUADRADO DE DIFERENCIA</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr2</span> = (x - <span class="number">5</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr2))  <span class="comment"># x² - 10x + 25</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 3. DIFERENCIA DE CUADRADOS</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr3</span> = (x + y) * (x - y)
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr3))  <span class="comment"># x² - y²</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 4. CUBO DE SUMA</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr4</span> = (x + <span class="number">2</span>)**<span class="number">3</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr4))  <span class="comment"># x³ + 6x² + 12x + 8</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>expand() aplica todas las reglas algebraicas para escribir la expresión en su forma más desarrollada.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Factorizar expresiones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Factorizar expresiones</h2>
+                <p class="slide-subtitle">El proceso inverso de expandir</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 1. DIFERENCIA DE CUADRADOS</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr1</span> = x**<span class="number">2</span> - <span class="number">4</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr1))  <span class="comment"># (x - 2)(x + 2)</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 2. TRINOMIO CUADRADO PERFECTO</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr2</span> = x**<span class="number">2</span> + <span class="number">6</span>*x + <span class="number">9</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr2))  <span class="comment"># (x + 3)²</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 3. FACTORIZACIÓN GENERAL</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr3</span> = x**<span class="number">3</span> - x**<span class="number">2</span> + x - <span class="number">1</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr3))  <span class="comment"># (x - 1)(x² + 1)</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 4. FACTORIZAR COMPLETAMENTE</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr4</span> = x**<span class="number">4</span> - <span class="number">16</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr4))  
+<span class="comment"># (x - 2)(x + 2)(x² + 4)</span>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="key-point">
+                        <h4>expand() vs factor()</h4>
+                        <p>Son operaciones inversas. expand() desarrolla productos, factor() encuentra factores comunes.</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Verificar que son inversos</span>
+<span class="keyword">original</span> = (x + <span class="number">3</span>)**<span class="number">2</span>
+<span class="keyword">expandida</span> = <span class="keyword">expand</span>(original)
+<span class="keyword">de_vuelta</span> = <span class="keyword">factor</span>(expandida)
+
+<span class="keyword">print</span>(original == de_vuelta)  
+<span class="comment"># True</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Simplificar expresiones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Simplificar expresiones</h2>
+                <p class="slide-subtitle">Reducir a la forma más simple</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 1. SIMPLIFICAR IDENTIDADES TRIGONOMÉTRICAS</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr1</span> = <span class="keyword">sin</span>(x)**<span class="number">2</span> + <span class="keyword">cos</span>(x)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">simplify</span>(expr1))  <span class="comment"># 1</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 2. SIMPLIFICAR FRACCIONES</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr2</span> = (x**<span class="number">2</span> - <span class="number">1</span>) / (x - <span class="number">1</span>)
+<span class="keyword">print</span>(<span class="keyword">simplify</span>(expr2))  <span class="comment"># x + 1</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 3. SIMPLIFICAR EXPONENTES</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">expr3</span> = x**<span class="number">3</span> * x**<span class="number">4</span> / x**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">simplify</span>(expr3))  <span class="comment"># x⁵</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 4. SIMPLIFICACIÓN ESPECÍFICA</span>
+<span class="comment"># ===================================</span>
+
+<span class="comment"># trigsimp: solo trigonometría</span>
+<span class="keyword">print</span>(<span class="keyword">trigsimp</span>(<span class="keyword">sin</span>(x)**<span class="number">2</span> + <span class="keyword">cos</span>(x)**<span class="number">2</span>))  <span class="comment"># 1</span>
+
+<span class="comment"># radsimp: racionalizar denominadores</span>
+<span class="keyword">expr4</span> = <span class="number">1</span> / (<span class="keyword">sqrt</span>(<span class="number">2</span>) + <span class="keyword">sqrt</span>(<span class="number">3</span>))
+<span class="keyword">print</span>(<span class="keyword">radsimp</span>(expr4))  <span class="comment"># -√2 + √3</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>simplify() intenta varias estrategias y devuelve la expresión más simple. Es "inteligente" pero puede ser lento con expresiones grandes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Resolver ecuaciones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resolver ecuaciones</h2>
+                <p class="slide-subtitle">solve() y solveset()</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># MÉTODO TRADICIONAL: solve()</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># Ecuación: x² - 4 = 0</span>
+<span class="keyword">sol</span> = <span class="keyword">solve</span>(x**<span class="number">2</span> - <span class="number">4</span>, x)
+<span class="keyword">print</span>(sol)  
+<span class="comment"># [-2, 2]</span>
+
+<span class="comment"># Sistema de ecuaciones</span>
+<span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'y'</span>)
+<span class="keyword">sistema</span> = <span class="keyword">solve</span>([
+    x + y - <span class="number">5</span>,
+    x - y - <span class="number">1</span>
+], [x, y])
+
+<span class="keyword">print</span>(sistema)  
+<span class="comment"># {x: 3, y: 2}</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># MÉTODO MODERNO: solveset()</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># Retorna conjunto</span>
+<span class="keyword">sol</span> = <span class="keyword">solveset</span>(
+    x**<span class="number">2</span> - <span class="number">4</span>, 
+    x, 
+    domain=S.Reals
+)
+<span class="keyword">print</span>(sol)  
+<span class="comment"># FiniteSet(-2, 2)</span>
+
+<span class="comment"># Maneja infinitas mejor</span>
+<span class="keyword">sol2</span> = <span class="keyword">solveset</span>(
+    <span class="keyword">sin</span>(x), 
+    x,
+    domain=S.Reals
+)
+<span class="comment"># ImageSet con ∞ soluciones</span>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Diferencias clave</h3>
+                    <p><strong>solve():</strong> Retorna lista, puede resolver sistemas (múltiples variables). Usa para sistemas de ecuaciones.</p>
+                    <p style="margin-top: 10px;"><strong>solveset():</strong> Retorna conjunto matemático, una variable solamente, maneja mejor casos con infinitas soluciones. Más moderno y recomendado para ecuaciones simples.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Derivación simbólica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Derivación simbólica</h2>
+                <p class="slide-subtitle">Calcular derivadas exactas</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 1. DERIVADA SIMPLE</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">f</span> = x**<span class="number">3</span> + <span class="number">2</span>*x**<span class="number">2</span> + <span class="number">5</span>
+<span class="keyword">df</span> = <span class="keyword">diff</span>(f, x)
+<span class="keyword">print</span>(<span class="string">f"f(x) = </span>{f}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"f'(x) = </span>{df}<span class="string">"</span>)
+<span class="comment"># f'(x) = 3x² + 4x</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 2. SEGUNDA DERIVADA</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">ddf</span> = <span class="keyword">diff</span>(f, x, <span class="number">2</span>)  <span class="comment"># Derivar 2 veces</span>
+<span class="keyword">print</span>(<span class="string">f"f''(x) = </span>{ddf}<span class="string">"</span>)
+<span class="comment"># f''(x) = 6x + 4</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 3. DERIVADAS PARCIALES</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+<span class="keyword">g</span> = x**<span class="number">2</span> * y + <span class="number">3</span>*x*y**<span class="number">2</span>
+
+<span class="keyword">dgdx</span> = <span class="keyword">diff</span>(g, x)  <span class="comment"># ∂g/∂x</span>
+<span class="keyword">dgdy</span> = <span class="keyword">diff</span>(g, y)  <span class="comment"># ∂g/∂y</span>
+
+<span class="keyword">print</span>(<span class="string">f"∂g/∂x = </span>{dgdx}<span class="string">"</span>)  <span class="comment"># 2xy + 3y²</span>
+<span class="keyword">print</span>(<span class="string">f"∂g/∂y = </span>{dgdy}<span class="string">"</span>)  <span class="comment"># x² + 6xy</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>diff() calcula derivadas EXACTAS. No hay errores de aproximación numérica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Aplicación ML - Gradient descent -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: derivar función de pérdida MSE</h2>
+                <p class="slide-subtitle">Gradientes para gradient descent</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="comment"># Definir símbolos</span>
+<span class="keyword">x</span>, <span class="keyword">y</span>, <span class="keyword">m</span>, <span class="keyword">b</span> = <span class="keyword">symbols</span>(<span class="string">'x y m b'</span>)
+
+<span class="comment"># Modelo de predicción lineal: ŷ = mx + b</span>
+<span class="keyword">y_pred</span> = m * x + b
+
+<span class="comment"># Error cuadrático para UN punto: (y - ŷ)²</span>
+<span class="keyword">error</span> = (y - y_pred)**<span class="number">2</span>
+
+<span class="keyword">print</span>(<span class="string">"Error cuadrático:"</span>)
+<span class="keyword">print</span>(<span class="keyword">expand</span>(error))
+<span class="comment"># Salida: b² + 2bm·x + m²x² - 2by - 2mxy + y²</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># DERIVADAS PARCIALES (GRADIENTES)</span>
+<span class="comment"># ===================================</span>
+
+<span class="comment"># ∂Error/∂m (gradiente respecto a pendiente)</span>
+<span class="keyword">d_error_dm</span> = <span class="keyword">diff</span>(error, m)
+<span class="keyword">print</span>(<span class="string">"
+∂Error/∂m ="</span>)
+<span class="keyword">print</span>(<span class="keyword">simplify</span>(d_error_dm))
+<span class="comment"># 2x(b + mx - y)</span>
+
+<span class="comment"># ∂Error/∂b (gradiente respecto a intercepto)</span>
+<span class="keyword">d_error_db</span> = <span class="keyword">diff</span>(error, b)
+<span class="keyword">print</span>(<span class="string">"
+∂Error/∂b ="</span>)
+<span class="keyword">print</span>(<span class="keyword">simplify</span>(d_error_db))
+<span class="comment"># 2(b + mx - y)</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># CONVERTIR A FUNCIÓN NUMÉRICA</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># lambdify convierte expresión simbólica → función Python</span>
+<span class="keyword">grad_m_func</span> = <span class="keyword">lambdify</span>([x, y, m, b], d_error_dm, <span class="string">"numpy"</span>)
+<span class="keyword">grad_b_func</span> = <span class="keyword">lambdify</span>([x, y, m, b], d_error_db, <span class="string">"numpy"</span>)
+
+<span class="comment"># Usar con datos reales</span>
+<span class="keyword">X_data</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])
+<span class="keyword">y_data</span> = np.<span class="keyword">array</span>([<span class="number">2</span>, <span class="number">4</span>, <span class="number">6</span>, <span class="number">8</span>, <span class="number">10</span>])
+<span class="keyword">m_val</span>, <span class="keyword">b_val</span> = <span class="number">1.5</span>, <span class="number">0.5</span>
+
+<span class="keyword">gradientes_m</span> = <span class="keyword">grad_m_func</span>(X_data, y_data, m_val, b_val)
+<span class="keyword">gradientes_b</span> = <span class="keyword">grad_b_func</span>(X_data, y_data, m_val, b_val)
+
+<span class="keyword">print</span>(<span class="string">f"
+Gradiente promedio ∂E/∂m: </span>{np.<span class="keyword">mean</span>(gradientes_m):<span class="string">.3f</span>}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"Gradiente promedio ∂E/∂b: </span>{np.<span class="keyword">mean</span>(gradientes_b):<span class="string">.3f</span>}<span class="string">"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: lambdify: Convertir símbolos a funciones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">lambdify: de símbolos a funciones ejecutables</h2>
+                <p class="slide-subtitle">Puente entre SymPy y NumPy</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué hace lambdify?</h3>
+                    <p>Convierte expresiones simbólicas de SymPy en funciones de Python que pueden evaluarse con NumPy (rápido, vectorizado).</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 1. CREAR EXPRESIÓN SIMBÓLICA</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+<span class="keyword">expr</span> = <span class="keyword">sin</span>(x) * <span class="keyword">cos</span>(x)
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 2. CONVERTIR A FUNCIÓN NUMPY</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">f_numpy</span> = <span class="keyword">lambdify</span>(x, expr, <span class="string">"numpy"</span>)
+
+<span class="comment"># Ahora f_numpy es una función Python normal</span>
+<span class="keyword">print</span>(<span class="keyword">type</span>(f_numpy))  <span class="comment"># &lt;class 'function'&gt;</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 3. EVALUAR EN ARRAYS (VECTORIZADO)</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">x_vals</span> = np.<span class="keyword">linspace</span>(<span class="number">0</span>, <span class="number">2</span>*np.pi, <span class="number">1000</span>)
+<span class="keyword">y_vals</span> = <span class="keyword">f_numpy</span>(x_vals)  <span class="comment"># ¡Muy rápido!</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># 4. GRAFICAR</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">plt</span>.<span class="keyword">figure</span>(figsize=(<span class="number">10</span>, <span class="number">5</span>))
+<span class="keyword">plt</span>.<span class="keyword">plot</span>(x_vals, y_vals, color=<span class="string">'#FF8C00'</span>, linewidth=<span class="number">2</span>)
+<span class="keyword">plt</span>.<span class="keyword">title</span>(<span class="string">'f(x) = sin(x)·cos(x)'</span>, fontsize=<span class="number">14</span>)
+<span class="keyword">plt</span>.<span class="keyword">xlabel</span>(<span class="string">'x'</span>)
+<span class="keyword">plt</span>.<span class="keyword">ylabel</span>(<span class="string">'f(x)'</span>)
+<span class="keyword">plt</span>.<span class="keyword">grid</span>(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+<span class="keyword">plt</span>.<span class="keyword">show</span>()
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>lambdify es esencial cuando necesitas evaluar expresiones simbólicas millones de veces (como en ML).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Ejercicio práctico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejercicio práctico guiado</h2>
+                <p class="slide-subtitle">Verificar productos notables con SymPy</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Desafío</h3>
+                    <p>Abre Google Colab y verifica estos 4 productos notables usando SymPy. ¿Cuál es el resultado expandido de cada uno?</p>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="feature-card">
+                        <h4>1. (x + 7)²</h4>
+                        <p>Resultado esperado: x² + 14x + 49</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>2. (2x - 3)²</h4>
+                        <p>Resultado esperado: 4x² - 12x + 9</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>3. (x + 5)(x - 5)</h4>
+                        <p>Resultado esperado: x² - 25</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>4. (x + 1)³</h4>
+                        <p>Resultado esperado: x³ + 3x² + 3x + 1</p>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Template de código (copia y modifica)</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># Ejercicio 1</span>
+<span class="keyword">expr1</span> = (x + <span class="number">7</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="string">"1. (x+7)² ="</span>, <span class="keyword">expand</span>(expr1))
+
+<span class="comment"># Ejercicio 2</span>
+<span class="keyword">expr2</span> = (<span class="number">2</span>*x - <span class="number">3</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="string">"2. (2x-3)² ="</span>, <span class="keyword">expand</span>(expr2))
+
+<span class="comment"># Ejercicio 3</span>
+<span class="keyword">expr3</span> = (x + <span class="number">5</span>) * (x - <span class="number">5</span>)
+<span class="keyword">print</span>(<span class="string">"3. (x+5)(x-5) ="</span>, <span class="keyword">expand</span>(expr3))
+
+<span class="comment"># Ejercicio 4</span>
+<span class="keyword">expr4</span> = (x + <span class="number">1</span>)**<span class="number">3</span>
+<span class="keyword">print</span>(<span class="string">"4. (x+1)³ ="</span>, <span class="keyword">expand</span>(expr4))
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Comparativa con otras herramientas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">SymPy vs otras herramientas</h2>
+                <p class="slide-subtitle">¿Cuándo usar cada una?</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="feature-card">
+                        <h4>SymPy</h4>
+                        <p><strong>Costo:</strong> Gratis</p>
+                        <p><strong>Instalación:</strong> pip install</p>
+                        <p><strong>Python:</strong> Nativo</p>
+                        <p><strong>Velocidad:</strong> Moderada</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>SageMath</h4>
+                        <p><strong>Costo:</strong> Gratis</p>
+                        <p><strong>Instalación:</strong> Compleja</p>
+                        <p><strong>Python:</strong> Buena</p>
+                        <p><strong>Velocidad:</strong> Alta</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Mathematica</h4>
+                        <p><strong>Costo:</strong> $$$</p>
+                        <p><strong>Instalación:</strong> Sencilla</p>
+                        <p><strong>Python:</strong> Limitada</p>
+                        <p><strong>Velocidad:</strong> Muy alta</p>
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="key-point">
+                        <h4>Ventajas de SymPy para este curso</h4>
+                        <p>Instalación trivial en Google Colab, integración perfecta con NumPy, Pandas y Matplotlib, curva de aprendizaje suave.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Limitaciones de SymPy</h4>
+                        <p>No tan rápido como Mathematica, limitado para álgebra computacional muy avanzada, no tiene interfaz gráfica nativa.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Para ciencia de datos y machine learning, SymPy es la opción ideal por su integración nativa con el ecosistema Python.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Recursos adicionales -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Recursos para profundizar</h2>
+                <p class="slide-subtitle">Documentación y tutoriales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Documentación oficial</h3>
+                        <ul>
+                            <li><strong>SymPy Tutorial:</strong> docs.sympy.org/latest/tutorials</li>
+                            <li><strong>API Reference:</strong> docs.sympy.org/latest/reference</li>
+                            <li><strong>Examples Gallery:</strong> Ejemplos por categoría</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Tutoriales interactivos</h3>
+                        <ul>
+                            <li><strong>SymPy Live:</strong> live.sympy.org (ejecutar código online)</li>
+                            <li><strong>Real Python:</strong> Tutoriales de SymPy aplicado</li>
+                            <li><strong>DataCamp:</strong> Curso de álgebra computacional</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Libros de referencia</h3>
+                    <ul>
+                        <li><strong>Instant SymPy Starter</strong> - Johansson, Robert (Packt, 2013). Breve introducción práctica.</li>
+                        <li><strong>SymPy: Symbolic Computing in Python</strong> - Meurer et al. (PeerJ, 2017). Paper académico oficial.</li>
+                        <li><strong>STEWART, James.</strong> Pre-cálculo. Matemática para cálculo (6ª ed.). Cengage, 2012. Base teórica matemática.</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>La documentación oficial de SymPy es excelente. Empieza por el tutorial interactivo en docs.sympy.org.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Resumen y próxima semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen y próximos pasos</h2>
+                <p class="slide-subtitle">Lo que aprendimos hoy</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Algebra simbólica vs numérica</h4>
+                    <p>SymPy manipula expresiones matemáticas EXACTAS, sin errores de redondeo. Perfecto para verificar trabajo manual y derivar fórmulas.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Flujo de trabajo típico</h4>
+                    <p>1. Crear símbolos → 2. Definir expresión → 3. Manipular (expand/factor/simplify) → 4. Resolver o derivar → 5. Convertir a NumPy con lambdify.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Aplicación en ML</h4>
+                    <p>Usamos SymPy para derivar gradientes analíticamente. Esto nos permite entender MATEMÁTICAMENTE qué hace el gradient descent, no solo implementarlo a ciegas.</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Próxima semana: álgebra parte II</h3>
+                    <p>Productos notables avanzados, factorización completa, división de polinomios (división sintética), teorema fundamental del álgebra, ceros de polinomios. Todo con SymPy.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Tarea moral: practica expandir y factorizar al menos 10 expresiones diferentes en Google Colab. Dominar SymPy te ahorrará HORAS en el futuro.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 1: Introducción a Python - Matemática Básica para Ciencia de Datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Matemática básica para ciencia de datos</h1>
+            <p class="cover-subtitle">Semana 1: introducción a Python</p>
+            <div class="cover-info">
+                <p>TTCT0023<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda de la semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de la semana 1</h2>
+                <p class="slide-subtitle">¿Qué veremos hoy?</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. Presentación del curso</h4>
+                        <p>Revisión del sílabo, objetivos, metodología y sistema de evaluación</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. ¿Qué es Python?</h4>
+                        <p>El lenguaje líder para ciencia de datos en 2026</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Entorno Google Colab</h4>
+                        <p>Plataforma en la nube para programación sin instalación</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Variables y tipos de datos</h4>
+                        <p>Fundamentos de programación con sintaxis moderna</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>5. Listas y operaciones</h4>
+                        <p>Estructuras de datos fundamentales</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>6. Funciones básicas</h4>
+                        <p>Creación de código reutilizable</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: ¿Qué es Python? -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Qué es Python?</h2>
+                <p class="slide-subtitle">El lenguaje líder para ciencia de datos en 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Características principales</h3>
+                    <ul>
+                        <li><strong>Lenguaje interpretado:</strong> No requiere compilación, ejecución línea por línea</li>
+                        <li><strong>Sintaxis clara y legible:</strong> Similar al inglés, ideal para principiantes</li>
+                        <li><strong>Multiplataforma:</strong> Funciona en Windows, macOS, Linux</li>
+                        <li><strong>Propósito general:</strong> Web, análisis de datos, IA, automatización, ciencia</li>
+                        <li><strong>Ecosistema masivo:</strong> Miles de librerías especializadas disponibles</li>
+                    </ul>
+                </div>
+                <div class="three-columns" style="margin-top: 20px;">
+                    <div class="stat-box">
+                        <div class="stat-number">#1</div>
+                        <div class="stat-label">Lenguaje más popular (TIOBE 2026)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">57.9%</div>
+                        <div class="stat-label">Desarrolladores lo usan (Stack Overflow 2025)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">78%</div>
+                        <div class="stat-label">Presente en empleos de data science</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Python 3.14 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Python 3.14: versión actual</h2>
+                <p class="slide-subtitle">Innovaciones revolucionarias para 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>Descripción</th>
+                                <th>Impacto en data science</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Free-threaded Python</strong></td>
+                                <td>Elimina el GIL (Global Interpreter Lock)</td>
+                                <td>Verdadera concurrencia multi-hilo</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Compilador JIT</strong></td>
+                                <td>Compilación Just-In-Time experimental</td>
+                                <td>Mejoras significativas de rendimiento</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Template strings</strong></td>
+                                <td>Nueva sintaxis t-strings</td>
+                                <td>Generación dinámica de reportes</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Módulo compression.zstd</strong></td>
+                                <td>Soporte nativo para Zstandard</td>
+                                <td>Manejo eficiente de datasets grandes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Python 3.14.2 (lanzada el 5 de diciembre de 2025) es la versión estable más reciente y la que usaremos en este curso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Por qué Python para matemáticas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Por qué Python para matemáticas?</h2>
+                <p class="slide-subtitle">La combinación perfecta</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Ventajas para matemática computacional</h3>
+                        <ul>
+                            <li>Librerías especializadas: NumPy, SymPy, SciPy</li>
+                            <li>Visualización potente: Matplotlib, Plotly</li>
+                            <li>Sintaxis matemática natural</li>
+                            <li>Integración con cálculo simbólico</li>
+                            <li>Rendimiento superior a Excel</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Comparación con alternativas</h3>
+                        <ul>
+                            <li><strong>vs. R:</strong> Más versátil, mejor para producción</li>
+                            <li><strong>vs. MATLAB:</strong> Gratuito, código abierto</li>
+                            <li><strong>vs. Excel:</strong> Escalable, reproducible</li>
+                            <li><strong>vs. Julia:</strong> Ecosistema más maduro</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Python permite ver la matemática cobrar vida: desde ecuaciones simbólicas hasta visualizaciones interactivas y aplicaciones reales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Google Colab -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Google Colab: nuestro entorno de trabajo</h2>
+                <p class="slide-subtitle">Plataforma AI-first renovada en 2025</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué es Google Colab?</h3>
+                    <p>Plataforma gratuita de Google que permite escribir y ejecutar Python en el navegador sin instalación. Basada en Jupyter Notebooks, ofrece acceso a GPUs/TPUs y está optimizada para aprendizaje automático y ciencia de datos.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="feature-card">
+                        <h4>Ventajas principales</h4>
+                        <p>• Sin instalación necesaria<br>
+                        • Acceso desde cualquier dispositivo<br>
+                        • GPUs/TPUs gratuitas<br>
+                        • Colaboración en tiempo real<br>
+                        • Librerías pre-instaladas</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Novedades 2025-2026</h4>
+                        <p>• Data Science Agent con Gemini<br>
+                        • Corrección inteligente de errores<br>
+                        • Modo Slideshow interactivo<br>
+                        • Python actualizado a 3.12<br>
+                        • Terminal para todos los usuarios</p>
+                    </div>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>Acceso al curso</h4>
+                    <p>Enlace: <strong>colab.research.google.com</strong> - Necesitas una cuenta de Google (Gmail)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Primeros pasos en Colab -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Primeros pasos en Google Colab</h2>
+                <p class="slide-subtitle">Estructura y uso básico</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Elementos de un notebook</h3>
+                    <ul>
+                        <li><strong>Celdas de código:</strong> Donde escribimos Python para ejecutar</li>
+                        <li><strong>Celdas de texto:</strong> Documentación con formato Markdown</li>
+                        <li><strong>Salidas:</strong> Resultados de la ejecución (texto, gráficas, tablas)</li>
+                        <li><strong>Menú superior:</strong> Guardar, compartir, configuración de runtime</li>
+                    </ul>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="key-point">
+                        <h4>Atajos de teclado útiles</h4>
+                        <p>• <strong>Ctrl + Enter:</strong> Ejecutar celda actual<br>
+                        • <strong>Shift + Enter:</strong> Ejecutar y avanzar<br>
+                        • <strong>Ctrl + M B:</strong> Nueva celda abajo<br>
+                        • <strong>Ctrl + M D:</strong> Eliminar celda</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Mejores prácticas</h4>
+                        <p>• Guardar frecuentemente<br>
+                        • Comentar el código<br>
+                        • Usar celdas de texto para explicar<br>
+                        • Nombrar notebooks descriptivamente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Variables y tipos de datos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Variables y tipos de datos</h2>
+                <p class="slide-subtitle">Fundamentos de programación</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué es una variable?</h3>
+                    <p>Una variable es un contenedor que almacena un valor. En Python, no necesitas declarar el tipo de dato explícitamente (tipado dinámico).</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Tipos básicos de datos</span>
+<span class="keyword">edad</span> = <span class="number">28</span>                    <span class="comment"># int (entero)</span>
+<span class="keyword">precio</span> = <span class="number">19.99</span>               <span class="comment"># float (decimal)</span>
+<span class="keyword">nombre</span> = <span class="string">"Dataset"</span>            <span class="comment"># str (cadena de texto)</span>
+<span class="keyword">activo</span> = <span class="keyword">True</span>                 <span class="comment"># bool (booleano)</span>
+<span class="keyword">resultado</span> = <span class="keyword">None</span>             <span class="comment"># NoneType (valor nulo)</span>
+
+<span class="comment"># Python 3.10+ permite combinar tipos</span>
+<span class="keyword">valor</span>: <span class="keyword">int</span> | <span class="keyword">float</span> = <span class="number">3.14</span>  <span class="comment"># Union type</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>En Python, las variables se crean al momento de asignarles un valor. No necesitas declarar el tipo previamente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Type hints modernos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Type hints modernos (Python 3.12+)</h2>
+                <p class="slide-subtitle">Código más claro y profesional</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Por qué usar type hints?</h3>
+                    <ul>
+                        <li>Mejora la legibilidad del código</li>
+                        <li>Facilita el trabajo en equipo</li>
+                        <li>Ayuda a detectar errores antes de ejecutar</li>
+                        <li>Estándar en código profesional de ciencia de datos</li>
+                    </ul>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Type hints en variables</span>
+<span class="keyword">edad</span>: <span class="keyword">int</span> = <span class="number">28</span>
+<span class="keyword">precio</span>: <span class="keyword">float</span> = <span class="number">19.99</span>
+<span class="keyword">nombre</span>: <span class="keyword">str</span> = <span class="string">"Dataset"</span>
+
+<span class="comment"># Guiones bajos para legibilidad en números grandes</span>
+<span class="keyword">poblacion</span>: <span class="keyword">int</span> = <span class="number">5_200_000</span>  <span class="comment"># 5.2 millones</span>
+
+<span class="comment"># Union types (Python 3.10+)</span>
+<span class="keyword">dato</span>: <span class="keyword">str</span> | <span class="keyword">None</span> = <span class="keyword">None</span>  <span class="comment"># Puede ser string o None</span>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>Recomendación</h4>
+                    <p>Aunque Python no requiere type hints, usarlos desde el inicio te ayudará a escribir código más profesional y prepararte para proyectos reales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Operaciones básicas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Operaciones básicas con números</h2>
+                <p class="slide-subtitle">Matemática fundamental en Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Operaciones aritméticas</span>
+<span class="keyword">suma</span> = <span class="number">10</span> + <span class="number">5</span>           <span class="comment"># 15</span>
+<span class="keyword">resta</span> = <span class="number">10</span> - <span class="number">5</span>          <span class="comment"># 5</span>
+<span class="keyword">multiplicacion</span> = <span class="number">10</span> * <span class="number">5</span>  <span class="comment"># 50</span>
+<span class="keyword">division</span> = <span class="number">10</span> / <span class="number">5</span>       <span class="comment"># 2.0</span>
+
+<span class="comment"># Operaciones avanzadas</span>
+<span class="keyword">potencia</span> = <span class="number">2</span> ** <span class="number">3</span>       <span class="comment"># 8</span>
+<span class="keyword">modulo</span> = <span class="number">10</span> % <span class="number">3</span>        <span class="comment"># 1 (residuo)</span>
+<span class="keyword">division_entera</span> = <span class="number">10</span> // <span class="number">3</span> <span class="comment"># 3</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Operaciones combinadas</span>
+<span class="keyword">x</span> = <span class="number">10</span>
+<span class="keyword">x</span> += <span class="number">5</span>    <span class="comment"># x = x + 5 → 15</span>
+<span class="keyword">x</span> -= <span class="number">3</span>    <span class="comment"># x = x - 3 → 12</span>
+<span class="keyword">x</span> *= <span class="number">2</span>    <span class="comment"># x = x * 2 → 24</span>
+<span class="keyword">x</span> /= <span class="number">4</span>    <span class="comment"># x = x / 4 → 6.0</span>
+
+<span class="comment"># Funciones matemáticas básicas</span>
+<span class="keyword">abs</span>(<span class="number">-10</span>)      <span class="comment"># 10 (valor absoluto)</span>
+<span class="keyword">round</span>(<span class="number">3.7</span>)    <span class="comment"># 4 (redondeo)</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Nota: La división (/) siempre devuelve float, mientras que la división entera (//) devuelve int.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Listas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Listas: estructuras de datos fundamentales</h2>
+                <p class="slide-subtitle">Colecciones ordenadas y modificables</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué es una lista?</h3>
+                    <p>Una lista es una colección ordenada de elementos que puede contener diferentes tipos de datos. Se define con corchetes [ ].</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Creación de listas</span>
+<span class="keyword">numeros</span>: <span class="keyword">list</span>[<span class="keyword">int</span>] = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
+<span class="keyword">nombres</span>: <span class="keyword">list</span>[<span class="keyword">str</span>] = [<span class="string">"Ana"</span>, <span class="string">"Juan"</span>, <span class="string">"María"</span>]
+<span class="keyword">mixta</span>: <span class="keyword">list</span>[<span class="keyword">str</span> | <span class="keyword">int</span>] = [<span class="string">"a"</span>, <span class="number">1</span>, <span class="string">"b"</span>, <span class="number">2</span>]
+
+<span class="comment"># Acceso a elementos (índice empieza en 0)</span>
+<span class="keyword">primer_elemento</span> = <span class="keyword">numeros</span>[<span class="number">0</span>]        <span class="comment"># 1</span>
+<span class="keyword">ultimo_elemento</span> = <span class="keyword">numeros</span>[<span class="number">-1</span>]       <span class="comment"># 5 (índice negativo desde el final)</span>
+
+<span class="comment"># Longitud de una lista</span>
+<span class="keyword">len</span>(<span class="keyword">numeros</span>)                        <span class="comment"># 5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Operaciones con listas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Operaciones comunes con listas</h2>
+                <p class="slide-subtitle">Modificación y manipulación</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Añadir elementos</span>
+<span class="keyword">numeros</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]
+<span class="keyword">numeros</span>.<span class="keyword">append</span>(<span class="number">4</span>)      <span class="comment"># [1, 2, 3, 4]</span>
+<span class="keyword">numeros</span>.<span class="keyword">extend</span>([<span class="number">5</span>, <span class="number">6</span>]) <span class="comment"># [1, 2, 3, 4, 5, 6]</span>
+
+<span class="comment"># Remover elementos</span>
+<span class="keyword">numeros</span>.<span class="keyword">remove</span>(<span class="number">3</span>)     <span class="comment"># Elimina el 3</span>
+<span class="keyword">ultimo</span> = <span class="keyword">numeros</span>.<span class="keyword">pop</span>() <span class="comment"># Elimina y retorna el último</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Slicing (rebanadas)</span>
+<span class="keyword">nums</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
+<span class="keyword">primeros_tres</span> = <span class="keyword">nums</span>[:<span class="number">3</span>]    <span class="comment"># [1, 2, 3]</span>
+<span class="keyword">ultimos_dos</span> = <span class="keyword">nums</span>[<span class="number">-2</span>:]     <span class="comment"># [4, 5]</span>
+<span class="keyword">cada_dos</span> = <span class="keyword">nums</span>[::<span class="number">2</span>]        <span class="comment"># [1, 3, 5]</span>
+<span class="keyword">reverso</span> = <span class="keyword">nums</span>[::<span class="number">-1</span>]        <span class="comment"># [5, 4, 3, 2, 1]</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Slicing usa la sintaxis [inicio:fin:paso]. Si omites inicio, empieza en 0. Si omites fin, llega hasta el final.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: List comprehensions -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">List comprehensions</h2>
+                <p class="slide-subtitle">Creación elegante de listas</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué son las list comprehensions?</h3>
+                    <p>Una forma concisa y Pythónica de crear listas basadas en secuencias existentes. Son más rápidas y legibles que los loops tradicionales.</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Sintaxis básica: [expresión for item in secuencia]</span>
+<span class="keyword">cuadrados</span> = [<span class="keyword">x</span> ** <span class="number">2</span> <span class="keyword">for</span> <span class="keyword">x</span> <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">10</span>)]
+<span class="comment"># [0, 1, 4, 9, 16, 25, 36, 49, 64, 81]</span>
+
+<span class="comment"># Con filtro: [expresión for item in secuencia if condición]</span>
+<span class="keyword">pares</span> = [<span class="keyword">x</span> <span class="keyword">for</span> <span class="keyword">x</span> <span class="keyword">in</span> <span class="keyword">range</span>(<span class="number">20</span>) <span class="keyword">if</span> <span class="keyword">x</span> % <span class="number">2</span> == <span class="number">0</span>]
+<span class="comment"># [0, 2, 4, 6, 8, 10, 12, 14, 16, 18]</span>
+
+<span class="comment"># Con transformación</span>
+<span class="keyword">nombres</span> = [<span class="string">"ana"</span>, <span class="string">"juan"</span>, <span class="string">"maria"</span>]
+<span class="keyword">mayusculas</span> = [<span class="keyword">n</span>.<span class="keyword">upper</span>() <span class="keyword">for</span> <span class="keyword">n</span> <span class="keyword">in</span> <span class="keyword">nombres</span>]
+<span class="comment"># ["ANA", "JUAN", "MARIA"]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Funciones básicas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Funciones básicas</h2>
+                <p class="slide-subtitle">Código reutilizable y organizado</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Qué es una función?</h3>
+                    <p>Bloque de código reutilizable que realiza una tarea específica. Puede recibir parámetros (inputs) y devolver resultados (outputs).</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Función básica sin parámetros</span>
+<span class="keyword">def</span> <span class="keyword">saludar</span>():
+    <span class="keyword">print</span>(<span class="string">"Hola, bienvenido al curso"</span>)
+
+<span class="keyword">saludar</span>()  <span class="comment"># Llamada a la función</span>
+
+<span class="comment"># Función con parámetros y return</span>
+<span class="keyword">def</span> <span class="keyword">sumar</span>(<span class="keyword">a</span>: <span class="keyword">float</span>, <span class="keyword">b</span>: <span class="keyword">float</span>) -> <span class="keyword">float</span>:
+    <span class="keyword">resultado</span> = <span class="keyword">a</span> + <span class="keyword">b</span>
+    <span class="keyword">return</span> <span class="keyword">resultado</span>
+
+<span class="keyword">total</span> = <span class="keyword">sumar</span>(<span class="number">10</span>, <span class="number">5</span>)  <span class="comment"># 15</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Funciones con valores por defecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Funciones avanzadas</h2>
+                <p class="slide-subtitle">Parámetros opcionales y documentación</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># Función con valores por defecto</span>
+<span class="keyword">def</span> <span class="keyword">calcular_area_rectangulo</span>(
+    <span class="keyword">base</span>: <span class="keyword">float</span>,
+    <span class="keyword">altura</span>: <span class="keyword">float</span> = <span class="number">1.0</span>
+) -> <span class="keyword">float</span>:
+    <span class="string">"""Calcula el área de un rectángulo.
+    
+    Args:
+        base: Longitud de la base del rectángulo
+        altura: Altura del rectángulo (default: 1.0)
+    
+    Returns:
+        Área del rectángulo
+    """</span>
+    <span class="keyword">return</span> <span class="keyword">base</span> * <span class="keyword">altura</span>
+
+<span class="comment"># Uso</span>
+<span class="keyword">area1</span> = <span class="keyword">calcular_area_rectangulo</span>(<span class="number">5</span>)         <span class="comment"># 5.0 (altura = 1.0)</span>
+<span class="keyword">area2</span> = <span class="keyword">calcular_area_rectangulo</span>(<span class="number">5</span>, <span class="number">3</span>)      <span class="comment"># 15.0</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Las docstrings ("""texto""") documentan las funciones. Es una práctica profesional esencial que veremos durante todo el curso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: NumPy vs Listas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Listas vs NumPy arrays</h2>
+                <p class="slide-subtitle">¿Cuándo usar cada uno?</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>Listas Python</th>
+                                <th>NumPy Arrays</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tipos de datos</strong></td>
+                                <td>Heterogéneos (mixtos)</td>
+                                <td>Homogéneos (un solo tipo)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Memoria</strong></td>
+                                <td>Dispersa (punteros)</td>
+                                <td>Contigua (bloque)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Velocidad numérica</strong></td>
+                                <td>Lenta (loops Python)</td>
+                                <td>20-50x más rápida</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Operaciones matemáticas</strong></td>
+                                <td>Requiere loops</td>
+                                <td>Vectorizadas</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uso ideal</strong></td>
+                                <td>Datos mixtos, <10k elementos</td>
+                                <td>Cálculos, datasets grandes</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Para este curso: usaremos listas para lo básico y NumPy para operaciones matemáticas intensivas. Aprenderemos NumPy en la Semana 2.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Resumen y próximos pasos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen de la semana 1</h2>
+                <p class="slide-subtitle">¿Qué aprendimos hoy?</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Python en 2026</h4>
+                        <p>Lenguaje #1 para ciencia de datos, Python 3.14 con mejoras revolucionarias</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Google Colab</h4>
+                        <p>Plataforma gratuita en la nube, no requiere instalación, ideal para aprender</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Variables y tipos</h4>
+                        <p>int, float, str, bool. Type hints para código profesional</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Listas</h4>
+                        <p>Estructuras fundamentales, operaciones, slicing, comprehensions</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>Funciones</h4>
+                    <p>Código reutilizable, parámetros, return, documentación con docstrings</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Próxima semana: sistemas numéricos</h3>
+                    <p>Interpretación geométrica, recta numérica, propiedades del orden, forma científica y representación en NumPy.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Actividad práctica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad práctica</h2>
+                <p class="slide-subtitle">Ejercicios para la semana</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Ejercicio 1: primeros pasos en Colab</h3>
+                    <p>Crea un notebook en Google Colab llamado "Semana1_TuNombre" y completa:</p>
+                    <ul>
+                        <li>Crea variables de cada tipo (int, float, str, bool)</li>
+                        <li>Realiza operaciones aritméticas básicas</li>
+                        <li>Crea una lista con 10 números y calcula su promedio</li>
+                    </ul>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Ejercicio 2: funciones matemáticas</h3>
+                    <p>Crea las siguientes funciones con type hints y docstrings:</p>
+                    <ul>
+                        <li><strong>calcular_promedio(lista):</strong> Recibe una lista de números y retorna el promedio</li>
+                        <li><strong>es_par(numero):</strong> Recibe un número y retorna True si es par</li>
+                        <li><strong>area_circulo(radio):</strong> Calcula el área de un círculo (π ≈ 3.14159)</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Comparte tu notebook con el profesor antes de la próxima clase. Formato: colab.research.google.com/drive/tu_notebook</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Recursos adicionales -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Recursos adicionales</h2>
+                <p class="slide-subtitle">Para profundizar en los temas</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Documentación oficial</h3>
+                        <ul>
+                            <li><strong>Python.org:</strong> python.org/doc</li>
+                            <li><strong>Google Colab:</strong> colab.research.google.com</li>
+                            <li><strong>NumPy:</strong> numpy.org/doc</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Tutoriales recomendados</h3>
+                        <ul>
+                            <li><strong>Real Python:</strong> realpython.com</li>
+                            <li><strong>DataCamp:</strong> datacamp.com</li>
+                            <li><strong>Python Tutor:</strong> pythontutor.com</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Libros de referencia del curso</h3>
+                    <ul>
+                        <li><strong>STEWART, James.</strong> Pre-cálculo. Matemática para cálculo (6ª ed.). Cengage Learning, 2012</li>
+                        <li><strong>VANDERPLAS, Jake.</strong> Python Data Science Handbook. O'Reilly Media, 2016</li>
+                        <li><strong>JOHANSSON, Robert.</strong> Numerical Python (2ª ed.). Apress, 2019</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Conclusión -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conclusiones de la semana 1</h2>
+                <p class="slide-subtitle">Preparados para el viaje</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Python: la herramienta perfecta para matemáticas</h4>
+                    <p>Combina sintaxis clara, librerías potentes y un ecosistema maduro. Es la elección indiscutible para ciencia de datos en 2026.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Google Colab: sin barreras para empezar</h4>
+                    <p>No necesitas instalar nada. Solo tu navegador y ganas de aprender. Acceso a recursos computacionales potentes gratuitamente.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Fundamentos sólidos</h4>
+                    <p>Variables, listas y funciones son los bloques de construcción. Dominarlos ahora facilitará todo lo que viene después.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="text-align: center; font-size: 24px;">La matemática cobra vida cuando la programas. Bienvenidos al curso.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 10: Funciones polinomiales con Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string  { color: #ce9178; }
+        .code-box .number  { color: #b5cea8; }
+        .code-box .func    { color: #dcdcaa; }
+        .code-box .orange  { color: #FF8C00; font-weight: bold; }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 58px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 22px;
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ml-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 14px;
+            padding: 18px;
+            color: white;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .ml-card h4 {
+            color: #FF8C00;
+            font-size: 17px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ml-card p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 14px 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .step-text h5 {
+            font-size: 16px;
+            color: #2d2d2d;
+            margin-bottom: 2px;
+        }
+
+        .step-text p {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        .arrow-connector {
+            text-align: center;
+            font-size: 22px;
+            color: #FF8C00;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+        .section-divider {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px 140px 80px;
+        }
+
+        .section-divider .section-label {
+            font-size: 18px;
+            color: #FF8C00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-divider .section-title {
+            font-size: 52px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .section-divider .section-subtitle {
+            font-size: 22px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+
+        .warning-box {
+            background: linear-gradient(135deg, #fff0f0, #ffffff);
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .warning-box p {
+            font-size: 15px;
+            color: #2d2d2d;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">14</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1: PORTADA ==================== -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Funciones polinomiales en Python</h1>
+            <p class="cover-subtitle">Semana 10: de los ceros a la regresi&oacute;n polinomial</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matem&aacute;tica b&aacute;sica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: PUENTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos en el iPad, ahora en c&oacute;digo</h2>
+                <p class="slide-subtitle">El puente entre la teor&iacute;a polinomial y la programaci&oacute;n</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">Polynomial</div>
+                        <div class="stat-label">API moderna de NumPy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">PolynomialFeatures</div>
+                        <div class="stat-label">Regresi&oacute;n con sklearn</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Overfitting</div>
+                        <div class="stat-label">El peligro del grado alto</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matem&aacute;tico</th>
+                                <th>Herramienta Python</th>
+                                <th>Aplicaci&oacute;n en DS/ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>f(x) = a_n*x^n + ... + a_0</td>
+                                <td><code>Polynomial([a0, a1, ..., an])</code></td>
+                                <td>Representar y evaluar modelos</td>
+                            </tr>
+                            <tr>
+                                <td>Ceros reales (ra&iacute;ces)</td>
+                                <td><code>p.roots()</code> / <code>sympy.solve()</code></td>
+                                <td>Puntos de equilibrio, umbrales</td>
+                            </tr>
+                            <tr>
+                                <td>Comportamiento en extremos</td>
+                                <td>Evaluaci&oacute;n en valores grandes</td>
+                                <td>Limitaciones de extrapolaci&oacute;n</td>
+                            </tr>
+                            <tr>
+                                <td>Ajuste polinomial de grado n</td>
+                                <td><code>PolynomialFeatures + Ridge</code></td>
+                                <td>Regresi&oacute;n polinomial regularizada</td>
+                            </tr>
+                            <tr>
+                                <td>R&sup2;, R&sup2; ajustado</td>
+                                <td><code>model.score()</code> / <code>cross_val_score</code></td>
+                                <td>Selecci&oacute;n del grado &oacute;ptimo</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Hoy cubriremos c&oacute;mo representar polinomios con NumPy moderno, encontrar ra&iacute;ces computacionalmente, y aplicar regresi&oacute;n polinomial con datos reales de Costa Rica. El tema central: c&oacute;mo elegir el grado correcto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: DIVISOR ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Parte 1</p>
+            <h2 class="section-title">Polinomios en NumPy y SymPy</h2>
+            <p class="section-subtitle">La API moderna: numpy.polynomial.Polynomial</p>
+        </div>
+
+        <!-- ==================== SLIDE 4: Polynomial API ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">numpy.polynomial.Polynomial</h2>
+                <p class="slide-subtitle">La forma recomendada de trabajar con polinomios en NumPy 2.4</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> numpy.polynomial <span class="keyword">import</span> Polynomial
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># === Crear polinomios ===</span>
+<span class="comment"># Coeficientes de MENOR a MAYOR grado</span>
+<span class="comment"># f(x) = 3 + 2x + x^2</span>
+p = Polynomial([<span class="number">3</span>, <span class="number">2</span>, <span class="number">1</span>])
+<span class="keyword">print</span>(p)  <span class="comment"># 3.0 + 2.0 x + 1.0 x**2</span>
+
+<span class="comment"># Crear desde ra&iacute;ces conocidas</span>
+<span class="comment"># (x+1)(x-2)(x-3) = ceros en -1, 2, 3</span>
+q = Polynomial.fromroots([-<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="keyword">print</span>(q.convert().coef)
+<span class="comment"># [6., -5., -2., 1.]  = 6 - 5x - 2x^2 + x^3</span>
+
+<span class="comment"># === Evaluar ===</span>
+<span class="keyword">print</span>(p(<span class="number">0</span>))    <span class="comment"># 3.0  (termino constante)</span>
+<span class="keyword">print</span>(p(<span class="number">2</span>))    <span class="comment"># 11.0</span>
+
+<span class="comment"># Evaluaci&oacute;n masiva con arrays</span>
+x = np.linspace(-<span class="number">3</span>, <span class="number">5</span>, <span class="number">500</span>)
+y = q(x)  <span class="comment"># 500 evaluaciones instant&aacute;neas</span>
+
+<span class="comment"># === Operaciones ===</span>
+dp = p.deriv()     <span class="comment"># Derivada: 2 + 2x</span>
+ip = p.integ()     <span class="comment"># Integral: 3x + x^2 + x^3/3</span>
+raices = q.roots() <span class="comment"># [-1., 2., 3.]</span>
+<span class="keyword">print</span>(<span class="string">f"Grado: {q.degree()}"</span>)  <span class="comment"># 3</span>
+                    </div>
+                    <div>
+                        <div class="warning-box">
+                            <p>Cuidado: el orden de coeficientes est&aacute; INVERTIDO respecto a np.polyfit. En Polynomial, el coeficiente de menor grado va primero: [a0, a1, ..., an].</p>
+                        </div>
+                        <div class="comparison-table" style="margin-top: 12px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>M&eacute;todo</th>
+                                        <th>Qu&eacute; hace</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>Polynomial([a0,...,an])</code></td>
+                                        <td>Crear desde coeficientes</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.fromroots([r1,...,rn])</code></td>
+                                        <td>Crear desde ra&iacute;ces</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.fit(x, y, deg)</code></td>
+                                        <td>Ajustar a datos (regresi&oacute;n)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.roots()</code></td>
+                                        <td>Encontrar ceros</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.deriv()</code> / <code>.integ()</code></td>
+                                        <td>Derivada / integral</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.convert()</code></td>
+                                        <td>Coeficientes sin escalado</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Polynomial.fit() usa escalado interno para estabilidad num&eacute;rica. Usar .convert() para obtener los coeficientes en el dominio original de los datos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: RAICES ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Encontrar ceros con SymPy y NumPy</h2>
+                <p class="slide-subtitle">Del Teorema de ceros racionales al c&aacute;lculo computacional</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, Poly, factor, solve
+<span class="keyword">from</span> numpy.polynomial <span class="keyword">import</span> Polynomial
+
+x = symbols(<span class="string">'x'</span>)
+
+<span class="comment"># === SymPy: enfoque simb&oacute;lico exacto ===</span>
+f = <span class="number">2</span>*x**<span class="number">3</span> - <span class="number">3</span>*x**<span class="number">2</span> - <span class="number">8</span>*x + <span class="number">12</span>
+
+<span class="comment"># Factorizar</span>
+<span class="keyword">print</span>(factor(f))
+<span class="comment"># (x - 2)*(2*x - 3)*(x + 2)</span>
+
+<span class="comment"># Encontrar ceros exactos</span>
+ceros = solve(f, x)
+<span class="keyword">print</span>(ceros)  <span class="comment"># [-2, 3/2, 2]</span>
+
+<span class="comment"># Objeto Poly: informaci&oacute;n completa</span>
+p = Poly(f, x)
+<span class="keyword">print</span>(<span class="string">f"Grado: {p.degree()}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Coeficientes: {p.all_coeffs()}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Ra&iacute;ces: {p.all_roots()}"</span>)
+
+<span class="comment"># === NumPy: enfoque num&eacute;rico r&aacute;pido ===</span>
+<span class="comment"># Mismo polinomio: 12 - 8x - 3x^2 + 2x^3</span>
+p_np = Polynomial([<span class="number">12</span>, -<span class="number">8</span>, -<span class="number">3</span>, <span class="number">2</span>])
+raices_np = p_np.roots()
+<span class="keyword">print</span>(raices_np)
+<span class="comment"># [-2.   1.5  2. ]</span>
+                    </div>
+                    <div>
+                        <div class="three-columns" style="margin-bottom: 12px;">
+                            <div class="ml-card">
+                                <div class="badge">SymPy</div>
+                                <h4>solve(f, x)</h4>
+                                <p>Ra&iacute;ces exactas. Valores simb&oacute;licos como 3/2. Ideal para verificar.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">SymPy</div>
+                                <h4>factor(f)</h4>
+                                <p>Factorizaci&oacute;n completa. Muestra multiplicidades expl&iacute;citamente.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">NumPy</div>
+                                <h4>p.roots()</h4>
+                                <p>Ra&iacute;ces num&eacute;ricas (float). R&aacute;pido para polinomios de alto grado.</p>
+                            </div>
+                        </div>
+                        <div class="key-point">
+                            <h4>Cu&aacute;ndo usar cada herramienta</h4>
+                            <p>SymPy para verificaci&oacute;n exacta, factorizaci&oacute;n y manipulaci&oacute;n algebraica. NumPy para c&aacute;lculo num&eacute;rico r&aacute;pido y graficaci&oacute;n. En la pr&aacute;ctica de DS, se usa NumPy/scipy casi exclusivamente.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Conexi&oacute;n con el iPad: el Teorema de ceros racionales nos da candidatos; SymPy los verifica autom&aacute;ticamente con solve(). Es la misma matem&aacute;tica, automatizada.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: GRAFICAR ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Graficar polinomios con Matplotlib</h2>
+                <p class="slide-subtitle">Los 6 pasos del iPad, ahora automatizados</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> numpy.polynomial <span class="keyword">import</span> Polynomial
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># f(x) = -x^4 + 5x^2 - 4 = -(x-2)(x-1)(x+1)(x+2)</span>
+p = Polynomial.fromroots([-<span class="number">2</span>, -<span class="number">1</span>, <span class="number">1</span>, <span class="number">2</span>])    <span class="comment"># crea (x+2)(x+1)(x-1)(x-2)</span>
+p = Polynomial([-<span class="number">1</span>] * <span class="number">1</span>) * p                  <span class="comment"># multiplicar por -1</span>
+<span class="comment"># M&aacute;s directo: definir por coeficientes</span>
+p = Polynomial([-<span class="number">4</span>, <span class="number">0</span>, <span class="number">5</span>, <span class="number">0</span>, -<span class="number">1</span>])             <span class="comment"># -4 + 5x^2 - x^4</span>
+
+x = np.linspace(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">500</span>)
+y = p(x)
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">6</span>), layout=<span class="string">'constrained'</span>)
+ax.plot(x, y, color=<span class="string">'#FF8C00'</span>, linewidth=<span class="number">2.5</span>, label=<span class="string">r'$f(x) = -x^4 + 5x^2 - 4$'</span>)
+
+<span class="comment"># Marcar ceros</span>
+raices = p.roots().real
+ax.scatter(raices, [<span class="number">0</span>]*<span class="func">len</span>(raices), color=<span class="string">'red'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>, label=<span class="string">'Ceros'</span>)
+
+<span class="comment"># Marcar intercepto y</span>
+ax.scatter([<span class="number">0</span>], [p(<span class="number">0</span>)], color=<span class="string">'steelblue'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>, label=<span class="string">f'f(0) = {p(0):.0f}'</span>)
+
+<span class="comment"># Puntos cr&iacute;ticos (derivada = 0)</span>
+dp = p.deriv()
+criticos = dp.roots().real
+ax.scatter(criticos, p(criticos), color=<span class="string">'green'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>, marker=<span class="string">'D'</span>, label=<span class="string">'Puntos cr&iacute;ticos'</span>)
+
+ax.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>); ax.axvline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>)
+ax.set_title(<span class="string">'Gr&aacute;fica completa de un polinomio de grado 4'</span>); ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Con p.deriv().roots() encontramos autom&aacute;ticamente los puntos cr&iacute;ticos (m&aacute;ximos y m&iacute;nimos locales). Esto es un adelanto de lo que formalizar&aacute;n en c&aacute;lculo diferencial.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: DIVISOR ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Parte 2</p>
+            <h2 class="section-title">Regresi&oacute;n polinomial</h2>
+            <p class="section-subtitle">De y = mx + b a y = &beta;_0 + &beta;_1 x + &beta;_2 x&sup2; + ... + &beta;_n x^n</p>
+        </div>
+
+        <!-- ==================== SLIDE 8: REGRESION POLINOMIAL ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regresi&oacute;n polinomial con scikit-learn</h2>
+                <p class="slide-subtitle">PolynomialFeatures + LinearRegression = regresi&oacute;n de grado n</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Datos de ejemplo</span>
+x = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>], dtype=float)
+y = np.array([<span class="number">2</span>,<span class="number">5</span>,<span class="number">10</span>,<span class="number">15</span>,<span class="number">18</span>,<span class="number">19</span>,<span class="number">17</span>,<span class="number">12</span>], dtype=float)
+X = x.reshape(-<span class="number">1</span>, <span class="number">1</span>)
+
+<span class="comment"># === Pipeline: PolynomialFeatures + Regresi&oacute;n ===</span>
+grado = <span class="number">3</span>
+modelo = make_pipeline(
+    PolynomialFeatures(grado, include_bias=<span class="keyword">False</span>),
+    LinearRegression()
+)
+modelo.fit(X, y)
+
+<span class="comment"># Resultados</span>
+<span class="keyword">print</span>(<span class="string">f"R&sup2; = {modelo.score(X, y):.4f}"</span>)
+
+<span class="comment"># Graficar</span>
+x_plot = np.linspace(<span class="number">0</span>, <span class="number">9</span>, <span class="number">200</span>).reshape(-<span class="number">1</span>, <span class="number">1</span>)
+y_plot = modelo.predict(x_plot)
+
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+fig, ax = plt.subplots(figsize=(<span class="number">9</span>,<span class="number">5</span>),
+                       layout=<span class="string">'constrained'</span>)
+ax.scatter(x, y, c=<span class="string">'#2d2d2d'</span>, s=<span class="number">60</span>, zorder=<span class="number">5</span>,
+           label=<span class="string">'Datos'</span>)
+ax.plot(x_plot, y_plot, c=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>,
+        label=<span class="string">f'Grado {grado}'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Regresi&oacute;n polinomial grado 3'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Insight fundamental</h4>
+                            <p>La regresi&oacute;n polinomial ES regresi&oacute;n lineal m&uacute;ltiple. PolynomialFeatures transforma x en [x, x&sup2;, x&sup3;], y LinearRegression ajusta un modelo lineal sobre esas features.</p>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                            <div class="step-row">
+                                <div class="step-number">1</div>
+                                <div class="step-text">
+                                    <h5>PolynomialFeatures(3)</h5>
+                                    <p>Transforma [x] en [x, x&sup2;, x&sup3;]</p>
+                                </div>
+                            </div>
+                            <div class="arrow-connector">&#x2193;</div>
+                            <div class="step-row">
+                                <div class="step-number">2</div>
+                                <div class="step-text">
+                                    <h5>LinearRegression().fit()</h5>
+                                    <p>Ajusta y = &beta;0 + &beta;1*x + &beta;2*x&sup2; + &beta;3*x&sup3;</p>
+                                </div>
+                            </div>
+                            <div class="arrow-connector">&#x2193;</div>
+                            <div class="step-row">
+                                <div class="step-number">3</div>
+                                <div class="step-text">
+                                    <h5>modelo.predict(X_nuevo)</h5>
+                                    <p>Predicci&oacute;n sobre datos nuevos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="highlight-box">
+                            <p>make_pipeline() encadena las transformaciones autom&aacute;ticamente. Es la composici&oacute;n de funciones que vimos en semanas 7-8, aplicada a ML.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: COMPARAR GRADOS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Comparar grados: el riesgo del sobreajuste</h2>
+                <p class="slide-subtitle">Subajuste vs ajuste &oacute;ptimo vs sobreajuste</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> r2_score
+
+<span class="comment"># Datos (ejemplo: producción mensual en unidades)</span>
+x = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>], dtype=float)
+y = np.array([<span class="number">3</span>,<span class="number">7</span>,<span class="number">12</span>,<span class="number">14</span>,<span class="number">16</span>,<span class="number">17</span>,<span class="number">15</span>,<span class="number">13</span>,<span class="number">10</span>,<span class="number">6</span>], dtype=float)
+X = x.reshape(-<span class="number">1</span>, <span class="number">1</span>)
+x_plot = np.linspace(<span class="number">0</span>, <span class="number">11</span>, <span class="number">300</span>).reshape(-<span class="number">1</span>, <span class="number">1</span>)
+
+fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">10</span>), layout=<span class="string">'constrained'</span>)
+<span class="keyword">for</span> ax, grado <span class="keyword">in</span> <span class="func">zip</span>(axes.flat, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">9</span>]):
+    modelo = make_pipeline(PolynomialFeatures(grado), LinearRegression())
+    modelo.fit(X, y)
+    r2 = modelo.score(X, y)
+    ax.scatter(x, y, c=<span class="string">'#2d2d2d'</span>, s=<span class="number">60</span>, zorder=<span class="number">5</span>)
+    ax.plot(x_plot, modelo.predict(x_plot), c=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+    ax.set_title(<span class="string">f'Grado {grado} — R&sup2; = {r2:.4f}'</span>)
+    ax.set_ylim(-<span class="number">5</span>, <span class="number">25</span>); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.suptitle(<span class="string">'Efecto del grado en el ajuste polinomial'</span>, fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+plt.show()
+                </div>
+                <div class="three-columns" style="margin-top: 10px;">
+                    <div class="feature-card">
+                        <h4>Grado 1: subajuste</h4>
+                        <p>Demasiado simple. No captura la curvatura. R&sup2; bajo. El modelo tiene <strong>sesgo alto</strong>.</p>
+                    </div>
+                    <div class="feature-card" style="border-color: #FF8C00;">
+                        <h4>Grado 2-3: &oacute;ptimo</h4>
+                        <p>Captura el patr&oacute;n real sin memorizar ruido. Buen equilibrio sesgo-varianza.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Grado 9: sobreajuste</h4>
+                        <p>R&sup2; = 1.0 en entrenamiento pero oscilaciones salvajes. <strong>Varianza alta</strong>. Predicciones in&uacute;tiles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 10: BIAS-VARIANCE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El tradeoff sesgo-varianza</h2>
+                <p class="slide-subtitle">El concepto m&aacute;s importante que conecta polinomios con machine learning</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px; font-size: 18px;">
+                            Error = Sesgo&sup2; + Varianza + Ruido irreducible
+                        </div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspecto</th>
+                                        <th>Grado bajo (1-2)</th>
+                                        <th>Grado &oacute;ptimo</th>
+                                        <th>Grado alto (9+)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Sesgo</td>
+                                        <td>Alto</td>
+                                        <td>Equilibrado</td>
+                                        <td>Bajo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Varianza</td>
+                                        <td>Baja</td>
+                                        <td>Equilibrada</td>
+                                        <td>Alta</td>
+                                    </tr>
+                                    <tr>
+                                        <td>R&sup2; entreno</td>
+                                        <td>Bajo</td>
+                                        <td>Alto</td>
+                                        <td>Perfecto (1.0)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>R&sup2; test</td>
+                                        <td>Bajo</td>
+                                        <td>Alto</td>
+                                        <td>Muy bajo o negativo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Diagn&oacute;stico</td>
+                                        <td>Subajuste</td>
+                                        <td>Buen modelo</td>
+                                        <td>Sobreajuste</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>R&sup2; alto no es suficiente</h4>
+                            <p>Un polinomio de grado n-1 pasa exactamente por n puntos, dando R&sup2; = 1.0 en entrenamiento. Pero predice p&eacute;simamente datos nuevos. Por eso necesitamos validaci&oacute;n cruzada.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Extrapolaci&oacute;n peligrosa</h4>
+                            <p>Fuera del rango de datos, el t&eacute;rmino l&iacute;der domina y la predicci&oacute;n se dispara (hacia +&infin; o -&infin;). Los polinomios son &uacute;tiles para interpolaci&oacute;n, no para extrapolaci&oacute;n a largo plazo.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Este tradeoff es el mismo principio que gobierna la selecci&oacute;n de modelos en redes neuronales, &aacute;rboles de decisi&oacute;n y gradient boosting. Lo que aprenden hoy con polinomios aplica a todo ML.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: CROSS-VALIDATION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Validaci&oacute;n cruzada para elegir el grado</h2>
+                <p class="slide-subtitle">La curva U: el est&aacute;ndar para selecci&oacute;n de modelo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># X, y = datos ya definidos</span>
+
+grados = <span class="func">range</span>(<span class="number">1</span>, <span class="number">9</span>)
+mse_cv = []
+
+<span class="keyword">for</span> g <span class="keyword">in</span> grados:
+    modelo = make_pipeline(
+        PolynomialFeatures(g),
+        LinearRegression()
+    )
+    scores = cross_val_score(
+        modelo, X, y, cv=<span class="number">5</span>,
+        scoring=<span class="string">'neg_mean_squared_error'</span>
+    )
+    mse_cv.append(-scores.mean())
+    <span class="keyword">print</span>(<span class="string">f"Grado {g}: MSE = {-scores.mean():.2f}"</span>)
+
+<span class="comment"># Graficar la curva U</span>
+fig, ax = plt.subplots(figsize=(<span class="number">9</span>,<span class="number">5</span>),
+                       layout=<span class="string">'constrained'</span>)
+ax.plot(<span class="func">list</span>(grados), mse_cv, <span class="string">'o-'</span>,
+        color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>, markersize=<span class="number">8</span>)
+mejor = <span class="func">list</span>(grados)[np.argmin(mse_cv)]
+ax.axvline(mejor, ls=<span class="string">'--'</span>, color=<span class="string">'green'</span>,
+           label=<span class="string">f'Mejor grado: {mejor}'</span>)
+ax.set_xlabel(<span class="string">'Grado del polinomio'</span>)
+ax.set_ylabel(<span class="string">'MSE promedio (CV 5-fold)'</span>)
+ax.set_title(<span class="string">'Selecci&oacute;n del grado &oacute;ptimo'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>C&oacute;mo leer la curva U</h3>
+                            <ul>
+                                <li>El error de entrenamiento siempre baja al subir el grado</li>
+                                <li>El error de validaci&oacute;n primero baja y luego sube: forma de U</li>
+                                <li>El m&iacute;nimo de la curva de validaci&oacute;n = grado &oacute;ptimo</li>
+                                <li>A la izquierda del m&iacute;nimo: subajuste (sesgo alto)</li>
+                                <li>A la derecha del m&iacute;nimo: sobreajuste (varianza alta)</li>
+                            </ul>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>cross_val_score</h4>
+                            <p>Divide los datos en 5 partes (folds). Entrena con 4 y eval&uacute;a con 1, rotando. Promedia el error. As&iacute; estimamos c&oacute;mo generaliza el modelo a datos nuevos.</p>
+                        </div>
+                        <div class="warning-box">
+                            <p>Con pocos datos (como censos), usar cv = min(5, n). Si n &lt; 10, considerar leave-one-out (cv=n).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 12: APLICACION CR ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicaci&oacute;n CR: poblaci&oacute;n censal de Costa Rica</h2>
+                <p class="slide-subtitle">11 censos nacionales (1864-2022) — Fuente: INEC</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">from</span> sklearn.metrics <span class="keyword">import</span> r2_score
+
+<span class="comment"># Datos reales INEC: censos nacionales</span>
+a&ntilde;os = np.array([<span class="number">1864</span>,<span class="number">1883</span>,<span class="number">1892</span>,<span class="number">1927</span>,<span class="number">1950</span>,<span class="number">1963</span>,
+                 <span class="number">1973</span>,<span class="number">1984</span>,<span class="number">2000</span>,<span class="number">2011</span>,<span class="number">2022</span>])
+pob = np.array([<span class="number">120000</span>,<span class="number">182073</span>,<span class="number">243205</span>,<span class="number">471524</span>,
+    <span class="number">800875</span>,<span class="number">1336274</span>,<span class="number">1871780</span>,<span class="number">2416809</span>,
+    <span class="number">3810179</span>,<span class="number">4301712</span>,<span class="number">5044197</span>])
+
+X = a&ntilde;os.reshape(-<span class="number">1</span>, <span class="number">1</span>)
+y = pob / <span class="number">1e6</span>  <span class="comment"># en millones</span>
+X_plot = np.linspace(<span class="number">1860</span>,<span class="number">2030</span>,<span class="number">300</span>).reshape(-<span class="number">1</span>,<span class="number">1</span>)
+
+fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>,<span class="number">10</span>),
+                         layout=<span class="string">'constrained'</span>)
+<span class="keyword">for</span> ax, g <span class="keyword">in</span> <span class="func">zip</span>(axes.flat, [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>]):
+    m = make_pipeline(
+        PolynomialFeatures(g), LinearRegression()
+    )
+    m.fit(X, y)
+    r2 = m.score(X, y)
+    ax.scatter(a&ntilde;os, y, c=<span class="string">'red'</span>, s=<span class="number">60</span>, zorder=<span class="number">5</span>)
+    ax.plot(X_plot, m.predict(X_plot), <span class="string">'b-'</span>, lw=<span class="number">2</span>)
+    ax.set_title(<span class="string">f'Grado {g} — R&sup2; = {r2:.4f}'</span>)
+    ax.set_xlim(<span class="number">1860</span>, <span class="number">2030</span>)
+    ax.set_ylim(-<span class="number">0.5</span>, <span class="number">7</span>)
+    ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.suptitle(<span class="string">'Regresi&oacute;n polinomial: Censos CR'</span>,
+             fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Datos censales de Costa Rica</h3>
+                            <ul>
+                                <li>11 censos nacionales desde 1864 hasta 2022</li>
+                                <li>Crecimiento acelerado hasta ~1980, luego desaceleraci&oacute;n</li>
+                                <li>&Uacute;ltimo censo (2022): 5,044,197 habitantes</li>
+                                <li>Fuente: INEC (inec.cr)</li>
+                            </ul>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Qu&eacute; observar</h4>
+                            <p>Grado 1 no captura la curvatura. Grado 2-3 se ajustan bien. Grado 5 oscila y predice valores negativos despu&eacute;s de 2022. El sobreajuste se hace visible en la extrapolaci&oacute;n.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Pregunta para discutir: un polinomio de grado 3 predice ~6 millones para 2030. Un modelo log&iacute;stico predice ~5.3 millones. Cu&aacute;l es m&aacute;s realista y por qu&eacute;?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 13: REGULARIZACION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regularizaci&oacute;n Ridge: suavizar sin bajar el grado</h2>
+                <p class="slide-subtitle">Penalizar coeficientes grandes para evitar oscilaciones</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> (
+    PolynomialFeatures, StandardScaler
+)
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> Ridge
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Comparar: grado 8 sin y con regularizaci&oacute;n</span>
+grado = <span class="number">8</span>
+
+sin_reg = make_pipeline(
+    PolynomialFeatures(grado),
+    LinearRegression()
+)
+
+con_reg = make_pipeline(
+    PolynomialFeatures(grado),
+    StandardScaler(),
+    Ridge(alpha=<span class="number">1.0</span>)
+)
+
+sin_reg.fit(X, y)
+con_reg.fit(X, y)
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>,<span class="number">5</span>),
+                         layout=<span class="string">'constrained'</span>)
+<span class="keyword">for</span> ax, modelo, titulo <span class="keyword">in</span> <span class="func">zip</span>(axes,
+    [sin_reg, con_reg],
+    [<span class="string">'Sin regularizaci&oacute;n'</span>, <span class="string">'Ridge &alpha;=1.0'</span>]):
+    ax.scatter(a&ntilde;os, y, c=<span class="string">'red'</span>, s=<span class="number">60</span>, zorder=<span class="number">5</span>)
+    ax.plot(X_plot, modelo.predict(X_plot),
+            c=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+    ax.set_title(titulo)
+    ax.set_xlim(<span class="number">1860</span>, <span class="number">2030</span>)
+    ax.set_ylim(-<span class="number">2</span>, <span class="number">10</span>)
+    ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.suptitle(<span class="string">'Grado 8: efecto de Ridge'</span>,
+             fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Qu&eacute; hace Ridge</h4>
+                            <p>Minimiza: suma(errores&sup2;) + &alpha; &middot; suma(coeficientes&sup2;). El par&aacute;metro &alpha; controla cu&aacute;nto penaliza coeficientes grandes. Resultado: curvas m&aacute;s suaves sin reducir el grado.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>StandardScaler es obligatorio</h3>
+                            <ul>
+                                <li>Sin escalar, x&sup8; tiene valores enormes comparado con x</li>
+                                <li>Ridge penaliza igual todos los coeficientes: sin escalar, penaliza injustamente los de grado bajo</li>
+                                <li>StandardScaler centra y normaliza cada feature antes de Ridge</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Pr&aacute;ctica est&aacute;ndar en la industria: PolynomialFeatures + StandardScaler + Ridge (o Lasso). Casi nunca se usa regresi&oacute;n polinomial sin regularizaci&oacute;n.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 14: RESUMEN ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen semana 10</h2>
+                <p class="slide-subtitle">Funciones polinomiales: de la teor&iacute;a al modelo predictivo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Polinomios en Python</h4>
+                            <p><code>numpy.polynomial.Polynomial</code> es la API moderna. Coeficientes de menor a mayor grado. Soporta ra&iacute;ces, derivadas, integrales y ajuste a datos.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Ceros computacionales</h4>
+                            <p>SymPy <code>solve()</code> para ra&iacute;ces exactas y factorizaci&oacute;n simb&oacute;lica. NumPy <code>p.roots()</code> para c&aacute;lculo num&eacute;rico r&aacute;pido.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Regresi&oacute;n polinomial</h4>
+                            <p><code>PolynomialFeatures + LinearRegression</code> en un pipeline. La regresi&oacute;n polinomial ES regresi&oacute;n lineal con features transformadas.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Sobreajuste y regularizaci&oacute;n</h4>
+                            <p>Grado alto = R&sup2; perfecto pero predicciones in&uacute;tiles. Validaci&oacute;n cruzada para elegir grado. Ridge para suavizar sin reducir complejidad.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Taller 4 (asignado hoy)</h3>
+                            <ul>
+                                <li>Tema: funciones cuadr&aacute;ticas y polinomiales</li>
+                                <li>Parte manual: identificar propiedades, graficar, encontrar ceros</li>
+                                <li>Parte Python: regresi&oacute;n polinomial con datos reales</li>
+                                <li>Comparar grados 1, 2, 3 y justificar la elecci&oacute;n</li>
+                                <li>Calcular R&sup2; y analizar residuos</li>
+                                <li>Entrega: semana 11</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Pr&oacute;xima semana: funciones racionales. Veremos as&iacute;ntotas, dominios restringidos, funciones inversas y sus implicaciones para modelos de ML con restricciones de dominio.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px;">
+                            <h3>Recordatorio</h3>
+                            <p>El Taller 3 (funciones lineales + regresi&oacute;n) se entreg&oacute; la semana pasada. Revisen la retroalimentaci&oacute;n en la plataforma. Presentaci&oacute;n 2 es en semana 11.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end presentation-container -->
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&larr; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft')  changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

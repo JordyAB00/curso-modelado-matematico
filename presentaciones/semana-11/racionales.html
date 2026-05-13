@@ -1,0 +1,1408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semanas 11-12: Funciones racionales, exponenciales y logar&iacute;tmicas en Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string  { color: #ce9178; }
+        .code-box .number  { color: #b5cea8; }
+        .code-box .func    { color: #dcdcaa; }
+        .code-box .orange  { color: #FF8C00; font-weight: bold; }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 52px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 28px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ml-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 14px;
+            padding: 18px;
+            color: white;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .ml-card h4 {
+            color: #FF8C00;
+            font-size: 17px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ml-card p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .section-divider {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px 140px 80px;
+        }
+
+        .section-divider .section-label {
+            font-size: 18px;
+            color: #FF8C00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-divider .section-title {
+            font-size: 52px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .section-divider .section-subtitle {
+            font-size: 22px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1: PORTADA ==================== -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Racionales, exponenciales y logar&iacute;tmicas en Python</h1>
+            <p class="cover-subtitle">Semanas 11&ndash;12: del an&aacute;lisis simb&oacute;lico a la regresi&oacute;n no lineal</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matem&aacute;tica b&aacute;sica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: PUENTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos en el iPad, ahora en c&oacute;digo</h2>
+                <p class="slide-subtitle">Dos semanas de teor&iacute;a &rarr; una sesi&oacute;n integrada de Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">Semana 11</div>
+                        <div class="stat-label">Racionales: as&iacute;ntotas, inversas, graficaci&oacute;n</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Semana 12</div>
+                        <div class="stat-label">Exponenciales, logaritmos, composici&oacute;n</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Integraci&oacute;n</div>
+                        <div class="stat-label">Regresiones no lineales con datos de CR</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matem&aacute;tico</th>
+                                <th>Herramienta Python</th>
+                                <th>Aplicaci&oacute;n en DS/ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>f(x) = P(x)/Q(x), as&iacute;ntotas</td>
+                                <td><code>sp.cancel(), sp.limit()</code></td>
+                                <td>Modelos de saturaci&oacute;n</td>
+                            </tr>
+                            <tr>
+                                <td>Funciones inversas</td>
+                                <td><code>sp.solve(Eq(y, f), x)</code></td>
+                                <td>Invertir transformaciones en pipelines</td>
+                            </tr>
+                            <tr>
+                                <td>Propiedades de logaritmos</td>
+                                <td><code>sp.expand_log(), sp.logcombine()</code></td>
+                                <td>Linealizar datos exponenciales</td>
+                            </tr>
+                            <tr>
+                                <td>Composici&oacute;n f&compfn;g</td>
+                                <td><code>f_expr.subs(x, g_expr)</code></td>
+                                <td>Redes neuronales, pipelines</td>
+                            </tr>
+                            <tr>
+                                <td>Regresi&oacute;n exp/log</td>
+                                <td><code>scipy.optimize.curve_fit()</code></td>
+                                <td>Modelar crecimiento y decaimiento</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Hoy unificamos dos semanas: SymPy para el an&aacute;lisis simb&oacute;lico, Matplotlib para graficar correctamente, y SciPy/NumPy para ajustar modelos a datos reales de Costa Rica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: RACIONALES EN SYMPY ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Funciones racionales en SymPy</h2>
+                <p class="slide-subtitle">cancel(), fraction(), apart() y el protocolo &ldquo;Dominio Primero&rdquo;</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+x = sp.Symbol(<span class="string">'x'</span>)
+
+<span class="comment"># Definir una funci&oacute;n racional</span>
+P = x**<span class="number">3</span> - <span class="number">2</span>*x**<span class="number">2</span> - <span class="number">5</span>*x + <span class="number">6</span>
+Q = x**<span class="number">2</span> - <span class="number">4</span>
+f = P / Q
+
+<span class="comment"># Factorizar</span>
+<span class="keyword">print</span>(sp.factor(P))  <span class="comment"># (x-3)(x-1)(x+2)</span>
+<span class="keyword">print</span>(sp.factor(Q))  <span class="comment"># (x-2)(x+2)</span>
+
+<span class="comment"># Simplificar (cancela factores comunes)</span>
+f_simple = sp.cancel(f)
+<span class="keyword">print</span>(f_simple)
+<span class="comment"># => (x**2 - 4*x + 3)/(x - 2)</span>
+
+<span class="comment"># Separar numerador y denominador</span>
+num, den = sp.fraction(f_simple)
+
+<span class="comment"># Fracciones parciales</span>
+<span class="keyword">print</span>(sp.apart(f, x))
+
+<span class="comment"># Clasificar: propia vs impropia</span>
+grado_P = sp.degree(P, x)  <span class="comment"># 3</span>
+grado_Q = sp.degree(Q, x)  <span class="comment"># 2</span>
+tipo = <span class="string">"propia"</span> <span class="keyword">if</span> grado_P &lt; grado_Q \
+       <span class="keyword">else</span> <span class="string">"impropia"</span>
+<span class="keyword">print</span>(tipo)  <span class="comment"># impropia</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Funci&oacute;n SymPy</th>
+                                        <th>Qu&eacute; hace</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>sp.factor(expr)</code></td>
+                                        <td>Factoriza un polinomio</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>sp.cancel(f)</code></td>
+                                        <td>Cancela factores comunes P/Q</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>sp.fraction(f)</code></td>
+                                        <td>Separa en (numerador, denominador)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>sp.apart(f, x)</code></td>
+                                        <td>Descompone en fracciones parciales</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>sp.degree(P, x)</code></td>
+                                        <td>Grado del polinomio</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>sp.div(P, Q, x)</code></td>
+                                        <td>Divisi&oacute;n: (cociente, residuo)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Hueco vs. as&iacute;ntota</h4>
+                            <p><code>cancel()</code> elimina factores comunes. Si (x+2) desapareci&oacute; al simplificar, hay un <strong>hueco</strong> en x = &minus;2. Si un factor queda en el denominador simplificado, es <strong>as&iacute;ntota vertical</strong>.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Protocolo: siempre factorizar y simplificar con cancel() ANTES de cualquier an&aacute;lisis. Esto clasifica autom&aacute;ticamente huecos vs. as&iacute;ntotas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 4: ASINTOTAS CON SYMPY ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">As&iacute;ntotas: solveset(), limit() y div()</h2>
+                <p class="slide-subtitle">Encontrar y verificar verticales, horizontales y oblicuas</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+x = sp.Symbol(<span class="string">'x'</span>)
+f = (<span class="number">2</span>*x**<span class="number">2</span> + <span class="number">3</span>*x - <span class="number">5</span>) / (x**<span class="number">2</span> - x - <span class="number">6</span>)
+
+<span class="comment"># === AS&Iacute;NTOTAS VERTICALES ===</span>
+f_simple = sp.cancel(f)
+_, den = sp.fraction(f_simple)
+av = sp.solveset(den, x, sp.S.Reals)
+<span class="keyword">print</span>(<span class="string">"AV:"</span>, av)  <span class="comment"># {-2, 3}</span>
+
+<span class="comment"># Verificar con l&iacute;mites laterales</span>
+<span class="keyword">for</span> a <span class="keyword">in</span> av:
+    <span class="keyword">print</span>(<span class="string">f"x->{a}+:"</span>, sp.limit(f, x, a, <span class="string">'+'</span>))
+    <span class="keyword">print</span>(<span class="string">f"x->{a}-:"</span>, sp.limit(f, x, a, <span class="string">'-'</span>))
+
+<span class="comment"># === AS&Iacute;NTOTA HORIZONTAL ===</span>
+ah = sp.limit(f, x, sp.oo)
+<span class="keyword">print</span>(<span class="string">"AH:"</span>, ah)  <span class="comment"># 2 (grados iguales)</span>
+
+<span class="comment"># === AS&Iacute;NTOTA OBLICUA (otro ejemplo) ===</span>
+g = (x**<span class="number">2</span> + <span class="number">3</span>*x + <span class="number">1</span>) / (x - <span class="number">1</span>)
+P2 = x**<span class="number">2</span> + <span class="number">3</span>*x + <span class="number">1</span>
+Q2 = x - <span class="number">1</span>
+cociente, residuo = sp.div(P2, Q2, x)
+<span class="keyword">print</span>(<span class="string">"Oblicua:"</span>, cociente)  <span class="comment"># x + 4</span>
+
+<span class="comment"># Verificar: f(x) - oblicua -> 0</span>
+<span class="keyword">print</span>(sp.limit(g - cociente, x, sp.oo))  <span class="comment"># 0</span>
+                    </div>
+                    <div>
+                        <div class="output-box">
+AV: {-2, 3}
+x->-2+: -oo    x->-2-: +oo
+x->3+:  +oo    x->3-:  -oo
+
+AH: 2
+
+Oblicua: x + 4
+                        </div>
+                        <div class="comparison-table" style="margin-top: 15px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Tipo</th>
+                                        <th>Condici&oacute;n</th>
+                                        <th>C&oacute;digo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Vertical</td>
+                                        <td>Ceros del den. simplificado</td>
+                                        <td><code>solveset(den, x)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Horizontal</td>
+                                        <td>L&iacute;mite en &plusmn;&infin;</td>
+                                        <td><code>limit(f, x, oo)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Oblicua</td>
+                                        <td>deg(P) = deg(Q) + 1</td>
+                                        <td><code>div(P, Q, x)[0]</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Hecho importante</h4>
+                            <p>Una funci&oacute;n racional <strong>puede cruzar</strong> su AH. La as&iacute;ntota describe el comportamiento cuando x &rarr; &plusmn;&infin;, no es una barrera.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: GRAFICAR CON NP.NAN ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Graficar funciones racionales en Matplotlib</h2>
+                <p class="slide-subtitle">El truco de np.nan para eliminar l&iacute;neas espurias</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># f(x) = (2x+1) / (x&sup2; - x - 6)</span>
+x = np.linspace(-<span class="number">8</span>, <span class="number">8</span>, <span class="number">2000</span>)
+num = <span class="number">2</span>*x + <span class="number">1</span>
+den = x**<span class="number">2</span> - x - <span class="number">6</span>
+
+<span class="keyword">with</span> np.errstate(divide=<span class="string">'ignore'</span>,
+                        invalid=<span class="string">'ignore'</span>):
+    y = num / den
+
+<span class="comment"># CLAVE: reemplazar valores extremos con NaN</span>
+y[np.abs(y) > <span class="number">50</span>] = np.nan
+
+<span class="comment"># Tambi&eacute;n: NaN cerca de cada AV</span>
+<span class="keyword">for</span> av <span class="keyword">in</span> [<span class="number">3</span>, -<span class="number">2</span>]:
+    y[np.abs(x - av) &lt; <span class="number">0.05</span>] = np.nan
+
+<span class="comment"># Graficar</span>
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">7</span>),
+                        layout=<span class="string">'constrained'</span>)
+ax.plot(x, y, <span class="string">'b-'</span>, lw=<span class="number">2</span>, label=<span class="string">'f(x)'</span>)
+
+<span class="comment"># As&iacute;ntotas</span>
+ax.axvline(x=<span class="number">3</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>,
+           alpha=<span class="number">0.7</span>, label=<span class="string">'AV: x=3'</span>)
+ax.axvline(x=-<span class="number">2</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>,
+           alpha=<span class="number">0.7</span>, label=<span class="string">'AV: x=-2'</span>)
+ax.axhline(y=<span class="number">0</span>, color=<span class="string">'green'</span>, ls=<span class="string">'--'</span>,
+           alpha=<span class="number">0.7</span>, label=<span class="string">'AH: y=0'</span>)
+
+ax.set_xlim(-<span class="number">8</span>, <span class="number">8</span>); ax.set_ylim(-<span class="number">15</span>, <span class="number">15</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>El problema</h4>
+                            <p>Matplotlib conecta puntos consecutivos con l&iacute;neas rectas. Cerca de una AV, esto genera una <strong>l&iacute;nea vertical espuria</strong> que no existe en la funci&oacute;n real.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>La soluci&oacute;n: np.nan</h4>
+                            <p>Reemplazar con <code>np.nan</code> los valores cercanos a las as&iacute;ntotas y los valores extremos. <code>nan</code> rompe la l&iacute;nea del gr&aacute;fico, eliminando el artefacto visual.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>C&oacute;digo de colores est&aacute;ndar</h3>
+                            <ul>
+                                <li>Curva: azul s&oacute;lido (<code>lw=2</code>)</li>
+                                <li>As&iacute;ntota vertical: rojo punteado (<code>'--'</code>)</li>
+                                <li>As&iacute;ntota horizontal: verde punteado</li>
+                                <li>As&iacute;ntota oblicua: naranja punteado</li>
+                                <li>Hueco: c&iacute;rculo blanco con borde azul</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Usar siempre <code>errstate(divide='ignore')</code> para evitar warnings de divisi&oacute;n por cero. NumPy genera inf y nan que luego limpiamos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: FUNCIONES INVERSAS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Funciones inversas con SymPy</h2>
+                <p class="slide-subtitle">solve() para despejar, simplify() para verificar composici&oacute;n</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+x, y = sp.symbols(<span class="string">'x y'</span>)
+
+<span class="comment"># f(x) = (2x + 3) / (x - 1)</span>
+f = (<span class="number">2</span>*x + <span class="number">3</span>) / (x - <span class="number">1</span>)
+
+<span class="comment"># Paso 1: Resolver y = f(x) para x</span>
+inv_sol = sp.solve(sp.Eq(y, f), x)
+<span class="keyword">print</span>(<span class="string">"f_inv(y) ="</span>, inv_sol)
+<span class="comment"># => [(y + 3)/(y - 2)]</span>
+
+<span class="comment"># Paso 2: Reescribir con x</span>
+f_inv = inv_sol[<span class="number">0</span>].subs(y, x)
+<span class="keyword">print</span>(<span class="string">"f_inv(x) ="</span>, f_inv)
+<span class="comment"># => (x + 3)/(x - 2)</span>
+
+<span class="comment"># Paso 3: Verificar composici&oacute;n</span>
+comp1 = sp.simplify(f.subs(x, f_inv))
+<span class="keyword">print</span>(<span class="string">"f(f_inv(x)) ="</span>, comp1)  <span class="comment"># x</span>
+
+comp2 = sp.simplify(f_inv.subs(x, f))
+<span class="keyword">print</span>(<span class="string">"f_inv(f(x)) ="</span>, comp2)  <span class="comment"># x</span>
+
+<span class="comment"># Dominios y rangos</span>
+<span class="keyword">print</span>(<span class="string">"Dom(f):     R \\ {1}"</span>)
+<span class="keyword">print</span>(<span class="string">"Ran(f):     R \\ {2}"</span>)
+<span class="keyword">print</span>(<span class="string">"Dom(f_inv): R \\ {2} = Ran(f)"</span>)
+                    </div>
+                    <div>
+                        <div class="output-box">
+f_inv(y) = [(y + 3)/(y - 2)]
+f_inv(x) = (x + 3)/(x - 2)
+f(f_inv(x)) = x
+f_inv(f(x)) = x
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>M&eacute;todo: resolver para x</h4>
+                            <p>En vez de &ldquo;intercambiar x e y&rdquo;, <strong>despejamos x</strong> de la ecuaci&oacute;n y = f(x). El resultado es la inversa. Luego renombramos y &rarr; x.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Propiedad clave</h4>
+                            <p>Dom(f&supmin;&sup1;) = Ran(f) y Ran(f&supmin;&sup1;) = Dom(f). Las as&iacute;ntotas de f y f&supmin;&sup1; se intercambian: la AV de f se convierte en AH de f&supmin;&sup1;.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En ciencia de datos: <code>scaler.inverse_transform()</code> deshace StandardScaler. En GLMs, la funci&oacute;n de enlace inversa mapea predicciones lineales a la escala original.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: DIVISOR SECCION ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Tema 12</p>
+            <h2 class="section-title">Funciones exponenciales y logar&iacute;tmicas</h2>
+            <p class="section-subtitle">El lenguaje del crecimiento, la probabilidad y la transformaci&oacute;n de datos</p>
+        </div>
+
+        <!-- ==================== SLIDE 8: LOGARITMOS EN PYTHON ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Logaritmos en Python: NumPy y SymPy</h2>
+                <p class="slide-subtitle">C&aacute;lculo num&eacute;rico vectorizado + manipulaci&oacute;n simb&oacute;lica de propiedades</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+<span class="comment"># === NumPy: c&aacute;lculo num&eacute;rico vectorizado ===</span>
+x = np.array([<span class="number">1</span>, np.e, <span class="number">10</span>, <span class="number">100</span>, <span class="number">1000</span>])
+np.log(x)     <span class="comment"># ln: [0, 1, 2.30, 4.61, 6.91]</span>
+np.log10(x)   <span class="comment"># log10: [0, 0.43, 1, 2, 3]</span>
+np.log2(x)    <span class="comment"># log2: [0, 1.44, 3.32, 6.64, 9.97]</span>
+np.log1p(<span class="number">0.001</span>)  <span class="comment"># ln(1+x), preciso para x&asymp;0</span>
+
+<span class="comment"># === SymPy: manipulaci&oacute;n simb&oacute;lica ===</span>
+x, y = sp.symbols(<span class="string">'x y'</span>, positive=<span class="keyword">True</span>)
+
+<span class="comment"># expand_log: aplica propiedades</span>
+sp.expand_log(sp.log(x * y))
+<span class="comment"># => log(x) + log(y)</span>
+sp.expand_log(sp.log(x**<span class="number">3</span>))
+<span class="comment"># => 3*log(x)</span>
+
+<span class="comment"># logcombine: operaci&oacute;n inversa</span>
+n = sp.Symbol(<span class="string">'n'</span>, real=<span class="keyword">True</span>)
+sp.logcombine(sp.log(x) + sp.log(y))
+<span class="comment"># => log(x*y)</span>
+sp.logcombine(n * sp.log(x))
+<span class="comment"># => log(x**n)</span>
+
+<span class="comment"># Cambio de base</span>
+sp.log(x, <span class="number">10</span>)   <span class="comment"># log10(x)</span>
+sp.log(x, <span class="number">2</span>)    <span class="comment"># log2(x)</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Funci&oacute;n</th>
+                                        <th>NumPy</th>
+                                        <th>SymPy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>ln(x)</td>
+                                        <td><code>np.log(x)</code></td>
+                                        <td><code>sp.log(x)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>log&sub1;&sub0;(x)</td>
+                                        <td><code>np.log10(x)</code></td>
+                                        <td><code>sp.log(x, 10)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>log&sub2;(x)</td>
+                                        <td><code>np.log2(x)</code></td>
+                                        <td><code>sp.log(x, 2)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>e<sup>x</sup></td>
+                                        <td><code>np.exp(x)</code></td>
+                                        <td><code>sp.exp(x)</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>positive=True es obligatorio</h4>
+                            <p>Sin esta restricci&oacute;n, SymPy <strong>no expande</strong> log(x&sup2;) a 2&middot;log(x) porque no sabe si x &gt; 0. Esto refuerza que log(x&sup2;) = 2&middot;log(x) <strong>solo</strong> vale para x &gt; 0.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>En Python, log = ln</h4>
+                            <p>Tanto en NumPy como en SymPy, <code>log()</code> sin base es el <strong>logaritmo natural</strong> (base e). Para base 10 o base 2, usar las funciones espec&iacute;ficas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: EXP/LOG GRAFICACION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Graficar exponenciales y logar&iacute;tmicas</h2>
+                <p class="slide-subtitle">Escala lineal, semiloga&shy;r&iacute;tmica y la relaci&oacute;n inversa e<sup>x</sup> &harr; ln(x)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">6</span>),
+                          layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># --- Panel 1: exp y log como inversas ---</span>
+ax = axes[<span class="number">0</span>]
+x_exp = np.linspace(-<span class="number">2</span>, <span class="number">4</span>, <span class="number">300</span>)
+x_log = np.linspace(<span class="number">0.01</span>, <span class="number">8</span>, <span class="number">300</span>)
+
+ax.plot(x_exp, np.exp(x_exp), lw=<span class="number">2.5</span>,
+        label=<span class="string">r'$f(x) = e^x$'</span>)
+ax.plot(x_log, np.log(x_log), lw=<span class="number">2.5</span>,
+        label=<span class="string">r'$g(x) = \ln(x)$'</span>)
+ax.plot(x_exp, x_exp, <span class="string">'--'</span>, color=<span class="string">'gray'</span>,
+        alpha=<span class="number">0.6</span>, label=<span class="string">'y = x'</span>)
+ax.set_aspect(<span class="string">'equal'</span>)
+ax.set(xlim=(-<span class="number">3</span>, <span class="number">6</span>), ylim=(-<span class="number">3</span>, <span class="number">6</span>),
+       title=<span class="string">r'$e^x$ y $\ln(x)$: inversas'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># --- Panel 2: escala semilogar&iacute;tmica ---</span>
+ax = axes[<span class="number">1</span>]
+x2 = np.linspace(<span class="number">0</span>, <span class="number">8</span>, <span class="number">300</span>)
+ax.semilogy(x2, np.exp(x2), lw=<span class="number">2</span>,
+            label=<span class="string">r'$e^x$'</span>)
+ax.semilogy(x2, <span class="number">2</span>**x2, <span class="string">'--'</span>, lw=<span class="number">2</span>,
+            label=<span class="string">r'$2^x$'</span>)
+ax.set_title(<span class="string">'Semilog: rectas = exponencial'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, which=<span class="string">'both'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="three-columns">
+                            <div class="ml-card">
+                                <div class="badge">e<sup>x</sup></div>
+                                <h4>Dominio: R</h4>
+                                <p>Rango: (0, &infin;). AH: y = 0. Pasa por (0, 1). Siempre positiva, siempre creciente.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">ln(x)</div>
+                                <h4>Dominio: (0, &infin;)</h4>
+                                <p>Rango: R. AV: x = 0. Pasa por (1, 0). Reflejo de e<sup>x</sup> sobre y = x.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Semilog</div>
+                                <h4>Herramienta diagn&oacute;stica</h4>
+                                <p>Si datos curvos se vuelven rectos en escala semilog, siguen un patr&oacute;n exponencial.</p>
+                            </div>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Verificaci&oacute;n en SymPy</h4>
+                            <p><code>sp.simplify(sp.exp(sp.log(x)))</code> &rarr; x<br>
+                            <code>sp.simplify(sp.log(sp.exp(x)))</code> &rarr; x<br>
+                            Confirma que son inversas, como vimos en el iPad.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p><code>ax.semilogy()</code> es la funci&oacute;n clave para el diagn&oacute;stico visual. Si sus datos del proyecto parecen exponenciales, graf&iacute;quenlos en semilog para confirmarlo.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 10: COMPOSICION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Composici&oacute;n de funciones en Python</h2>
+                <p class="slide-subtitle">.subs() para composici&oacute;n general &mdash; compose() solo para polinomios</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+<span class="comment"># === Composici&oacute;n num&eacute;rica (NumPy) ===</span>
+f = <span class="keyword">lambda</span> x: np.exp(x)
+g = <span class="keyword">lambda</span> x: np.log(x)
+
+fog = <span class="keyword">lambda</span> x: f(g(x))  <span class="comment"># e^(ln(x)) = x</span>
+gof = <span class="keyword">lambda</span> x: g(f(x))  <span class="comment"># ln(e^x) = x</span>
+
+x_vals = np.array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])
+<span class="keyword">print</span>(fog(x_vals))  <span class="comment"># [1. 2. 3. 4. 5.]</span>
+<span class="keyword">print</span>(gof(x_vals))  <span class="comment"># [1. 2. 3. 4. 5.]</span>
+
+<span class="comment"># === Ejemplo NO conmutativo ===</span>
+h = <span class="keyword">lambda</span> x: x**<span class="number">2</span>
+k = <span class="keyword">lambda</span> x: np.log(x)
+<span class="keyword">print</span>(<span class="string">"h(k(e)):"</span>, h(k(np.e)))  <span class="comment"># 1.0</span>
+<span class="keyword">print</span>(<span class="string">"k(h(e)):"</span>, k(h(np.e)))  <span class="comment"># 2.0</span>
+
+<span class="comment"># === Composici&oacute;n simb&oacute;lica (SymPy) ===</span>
+x = sp.Symbol(<span class="string">'x'</span>, positive=<span class="keyword">True</span>)
+f_s = sp.exp(x)
+g_s = sp.log(x)
+
+<span class="comment"># Usar .subs() (NO compose())</span>
+fog_s = f_s.subs(x, g_s)
+<span class="keyword">print</span>(sp.simplify(fog_s))  <span class="comment"># x</span>
+
+gof_s = g_s.subs(x, f_s)
+<span class="keyword">print</span>(sp.simplify(gof_s))  <span class="comment"># x</span>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>compose() vs .subs()</h4>
+                            <p><code>sympy.compose()</code> <strong>solo funciona con polinomios</strong> (m&oacute;dulo <code>sympy.polys</code>). Para composici&oacute;n general con exp, log, trig, la forma correcta es <code>.subs()</code>.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>No conmutativa</h4>
+                            <p>h(k(x)) = (ln(x))&sup2; &ne; k(h(x)) = ln(x&sup2;) = 2&middot;ln(x).<br>
+                            En x = e: h(k(e)) = 1, pero k(h(e)) = 2.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Composici&oacute;n en ciencia de datos</h3>
+                            <ul>
+                                <li>Pipelines de sklearn: cada paso transforma la salida del anterior</li>
+                                <li>Redes neuronales: cada capa aplica &sigma;(Wx + b), la red completa es f&compfn;f&compfn;...&compfn;f</li>
+                                <li>Regresi&oacute;n exp: log &rarr; regresi&oacute;n lineal &rarr; exp (para volver a escala original)</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>La composici&oacute;n es la base de TODO pipeline de datos. Cuando hacen log-transform &rarr; fit &rarr; exp-transform, est&aacute;n componiendo funciones.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: DIVISOR SECCION ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Regresiones no lineales</p>
+            <h2 class="section-title">Ajustar modelos a datos reales</h2>
+            <p class="section-subtitle">curve_fit, Polynomial.fit y aplicaciones con datos de Costa Rica</p>
+        </div>
+
+        <!-- ==================== SLIDE 12: REGRESION EXPONENCIAL ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regresi&oacute;n exponencial y logar&iacute;tmica</h2>
+                <p class="slide-subtitle">curve_fit para ajuste directo + Polynomial.fit para transformaci&oacute;n lineal</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> curve_fit
+<span class="keyword">from</span> numpy.polynomial <span class="keyword">import</span> Polynomial
+
+<span class="comment"># === M&eacute;todo 1: curve_fit (ajuste directo) ===</span>
+<span class="keyword">def</span> <span class="func">modelo_exp</span>(x, a, b):
+    <span class="keyword">return</span> a * np.exp(b * x)
+
+<span class="keyword">def</span> <span class="func">modelo_log</span>(x, a, b):
+    <span class="keyword">return</span> a + b * np.log(x)
+
+<span class="comment"># Ajustar exponencial</span>
+popt, pcov = curve_fit(modelo_exp, x_data, y_data,
+                        p0=[<span class="number">1.0</span>, <span class="number">0.3</span>])
+a, b = popt
+errores = np.sqrt(np.diag(pcov))
+
+<span class="comment"># Ajustar logar&iacute;tmica</span>
+popt_log, _ = curve_fit(modelo_log, x_pos, y_log)
+
+<span class="comment"># === M&eacute;todo 2: Polynomial.fit (linealizar) ===</span>
+<span class="comment"># ln(y) = ln(a) + b*x  &rarr;  recta</span>
+ln_y = np.log(y_data)
+p = Polynomial.fit(x_data, ln_y, deg=<span class="number">1</span>)
+coefs = p.convert().coef  <span class="comment"># [ln(a), b]</span>
+a_est = np.exp(coefs[<span class="number">0</span>])
+
+<span class="comment"># === R&sup2; ===</span>
+<span class="keyword">def</span> <span class="func">r2</span>(y_real, y_pred):
+    ss_res = np.sum((y_real - y_pred)**<span class="number">2</span>)
+    ss_tot = np.sum((y_real - y_real.mean())**<span class="number">2</span>)
+    <span class="keyword">return</span> <span class="number">1</span> - ss_res / ss_tot
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>M&eacute;todo</th>
+                                        <th>Ventajas</th>
+                                        <th>Limitaciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>curve_fit</code></td>
+                                        <td>Ajuste directo, sin sesgo</td>
+                                        <td>Necesita p0 (valores iniciales)</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Polynomial.fit</code></td>
+                                        <td>R&aacute;pido, estable</td>
+                                        <td>Solo si y &gt; 0, introduce sesgo</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Polynomial.fit vs polyfit</h4>
+                            <p><code>np.polyfit</code> es <strong>legacy</strong> desde NumPy 1.4. Usar siempre <code>numpy.polynomial.Polynomial.fit()</code>. Los coeficientes van de grado bajo a alto (opuesto a polyfit).</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Comparar modelos con AIC</h4>
+                            <p>AIC = n&middot;ln(RSS/n) + 2k. Se elige el modelo con <strong>menor</strong> AIC. Solo comparar modelos ajustados a la <strong>misma</strong> variable respuesta.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Para el proyecto: ajusten al menos 2 modelos (exponencial, logar&iacute;tmico, polinomial) y comparen con R&sup2; y AIC. curve_fit es la herramienta m&aacute;s vers&aacute;til.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 13: APLICACION CR ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicaci&oacute;n CR: tipo de cambio y poblaci&oacute;n</h2>
+                <p class="slide-subtitle">Modelos exponenciales y log&iacute;sticos con datos del BCCR e INEC</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> curve_fit
+
+<span class="comment"># === Tipo de cambio USD/CRC (BCCR) ===</span>
+anios = np.array([<span class="number">1975</span>,<span class="number">1985</span>,<span class="number">1995</span>,<span class="number">2005</span>,<span class="number">2015</span>],
+                  dtype=float)
+tc = np.array([<span class="number">8.57</span>, <span class="number">50.45</span>, <span class="number">179.73</span>,
+               <span class="number">477.79</span>, <span class="number">534.57</span>])
+
+t = anios - <span class="number">1975</span>  <span class="comment"># normalizar</span>
+
+<span class="keyword">def</span> <span class="func">exp_model</span>(t, P0, r):
+    <span class="keyword">return</span> P0 * np.exp(r * t)
+
+popt, _ = curve_fit(exp_model, t, tc, p0=[<span class="number">8</span>, <span class="number">0.1</span>])
+<span class="keyword">print</span>(<span class="string">f"TC = {popt[0]:.1f}&middot;e^({popt[1]:.4f}&middot;t)"</span>)
+<span class="keyword">print</span>(<span class="string">f"Depreciaci&oacute;n: {popt[1]*100:.1f}% anual"</span>)
+<span class="keyword">print</span>(<span class="string">f"T. duplicaci&oacute;n: {np.log(2)/popt[1]:.1f} a&ntilde;os"</span>)
+
+<span class="comment"># === Poblaci&oacute;n CR (INEC) ===</span>
+anios_p = np.array([<span class="number">1950</span>,<span class="number">1970</span>,<span class="number">1990</span>,<span class="number">2011</span>,<span class="number">2022</span>])
+pob = np.array([<span class="number">0.869</span>,<span class="number">1.731</span>,<span class="number">3.049</span>,<span class="number">4.302</span>,<span class="number">5.044</span>])
+
+<span class="keyword">def</span> <span class="func">logistico</span>(t, K, A, r):
+    <span class="keyword">return</span> K / (<span class="number">1</span> + A * np.exp(-r * t))
+
+t_p = anios_p - <span class="number">1950</span>
+popt_l, _ = curve_fit(logistico, t_p, pob,
+                       p0=[<span class="number">6</span>, <span class="number">6</span>, <span class="number">0.05</span>])
+<span class="keyword">print</span>(<span class="string">f"Capacidad de carga: {popt_l[0]:.1f}M"</span>)
+                    </div>
+                    <div>
+                        <div class="three-columns">
+                            <div class="stat-card">
+                                <div class="stat-value">~10%</div>
+                                <div class="stat-label">Depreciaci&oacute;n anual del col&oacute;n (1975&ndash;2015)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">~7 a&ntilde;os</div>
+                                <div class="stat-label">Tiempo de duplicaci&oacute;n del tipo de cambio</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">2044</div>
+                                <div class="stat-label">INEC: inicio de decrecimiento poblacional</div>
+                            </div>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Tipo de cambio: exponencial pura</h4>
+                            <p>De &cent;8.57 (1975) a &cent;534 (2015): 40 a&ntilde;os de depreciaci&oacute;n exponencial. Desde 2015 se estabiliz&oacute; con flotaci&oacute;n administrada (~&cent;465 en 2026).</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Poblaci&oacute;n: exponencial vs. log&iacute;stico</h4>
+                            <p>El modelo exponencial sobreestima (predice 15M en 2070). El <strong>log&iacute;stico</strong> captura la saturaci&oacute;n: la tasa de fertilidad cay&oacute; de 6 (1950) a 1.31 hijos/mujer (2021). Capacidad de carga ~5.5&ndash;6M.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Estos dos ejemplos son ideales para el proyecto: muestran c&oacute;mo comparar modelos con R&sup2; y por qu&eacute; el contexto importa al elegir entre exponencial y log&iacute;stico.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 14: SIGMOID Y LOG-LOSS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexi&oacute;n con ML: sigmoide y log-loss</h2>
+                <p class="slide-subtitle">La funci&oacute;n exponencial como coraz&oacute;n de la clasificaci&oacute;n</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">13</span>, <span class="number">5</span>),
+                          layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># --- Sigmoide ---</span>
+x = np.linspace(-<span class="number">8</span>, <span class="number">8</span>, <span class="number">300</span>)
+sigmoid = <span class="number">1</span> / (<span class="number">1</span> + np.exp(-x))
+
+ax = axes[<span class="number">0</span>]
+ax.plot(x, sigmoid, lw=<span class="number">2.5</span>, color=<span class="string">'#FF8C00'</span>)
+ax.axhline(y=<span class="number">0.5</span>, color=<span class="string">'gray'</span>, ls=<span class="string">':'</span>)
+ax.axhline(y=<span class="number">0</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>, alpha=<span class="number">0.3</span>)
+ax.axhline(y=<span class="number">1</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">r'$\sigma(x) = \frac{1}{1+e^{-x}}$'</span>)
+ax.set(xlabel=<span class="string">'x (logit)'</span>, ylabel=<span class="string">'&sigma;(x)'</span>)
+
+<span class="comment"># --- Log-loss ---</span>
+p = np.linspace(<span class="number">0.001</span>, <span class="number">0.999</span>, <span class="number">300</span>)
+ax = axes[<span class="number">1</span>]
+ax.plot(p, -np.log(p), lw=<span class="number">2.5</span>, color=<span class="string">'#FF8C00'</span>,
+        label=<span class="string">'y=1: $-\\log(p)$'</span>)
+ax.plot(p, -np.log(<span class="number">1</span>-p), lw=<span class="number">2.5</span>, color=<span class="string">'#2d2d2d'</span>,
+        label=<span class="string">'y=0: $-\\log(1-p)$'</span>)
+ax.set(xlabel=<span class="string">'Probabilidad predicha'</span>,
+       ylabel=<span class="string">'P&eacute;rdida'</span>, ylim=(<span class="number">0</span>, <span class="number">6</span>))
+ax.set_title(<span class="string">'Log-loss (entrop&iacute;a cruzada)'</span>)
+ax.legend()
+plt.show()
+                    </div>
+                    <div>
+                        <div class="three-columns">
+                            <div class="ml-card">
+                                <div class="badge">Sigmoide</div>
+                                <h4>&sigma;(x) = 1/(1+e<sup>&minus;x</sup>)</h4>
+                                <p>Composici&oacute;n de exp, suma, divisi&oacute;n. Transforma cualquier n&uacute;mero real al intervalo (0, 1). Funci&oacute;n de activaci&oacute;n en regresi&oacute;n log&iacute;stica.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Log-loss</div>
+                                <h4>L = &minus;[y&middot;log(p) + (1&minus;y)&middot;log(1&minus;p)]</h4>
+                                <p>Penaliza exponencialmente las predicciones confiadas pero incorrectas. Funci&oacute;n de costo est&aacute;ndar para clasificaci&oacute;n binaria.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Softmax</div>
+                                <h4>p<sub>i</sub> = e<sup>z<sub>i</sub></sup> / &Sigma;e<sup>z<sub>j</sub></sup></h4>
+                                <p>Generalizaci&oacute;n de sigmoide para m&uacute;ltiples clases. Transforma un vector de n&uacute;meros en probabilidades que suman 1.</p>
+                            </div>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>&iquest;Por qu&eacute; importa esto ahora?</h4>
+                            <p>Cada vez que un modelo de ML calcula una predicci&oacute;n de probabilidad, est&aacute; usando composiciones de funciones exponenciales y logar&iacute;tmicas. El tema de hoy es la base matem&aacute;tica de los cursos de ML que vienen despu&eacute;s.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>La sigmoide es literalmente una funci&oacute;n racional de e<sup>x</sup>: &sigma;(x) = e<sup>x</sup>/(e<sup>x</sup> + 1). Combina todo lo que hemos visto: racionales, exponenciales, composici&oacute;n e inversas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 15: RESUMEN ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen semanas 11&ndash;12</h2>
+                <p class="slide-subtitle">De funciones racionales a regresiones no lineales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Funciones racionales (semana 11)</h4>
+                            <p><code>sp.cancel()</code> para simplificar y detectar huecos. <code>sp.solveset()</code> + <code>sp.limit()</code> para as&iacute;ntotas. <code>np.nan</code> para graficar correctamente. <code>sp.solve(Eq(y,f), x)</code> para inversas.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Logaritmos y exponenciales (semana 12)</h4>
+                            <p><code>np.log()</code> = ln, <code>np.log10()</code> = log&sub1;&sub0;. <code>sp.expand_log()</code> y <code>sp.logcombine()</code> para manipular propiedades. <code>positive=True</code> es obligatorio en SymPy para que funcionen.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Composici&oacute;n y regresiones</h4>
+                            <p>Usar <code>.subs()</code> para componer (no <code>compose()</code>). <code>curve_fit()</code> para ajustar modelos no lineales. <code>Polynomial.fit()</code> en vez de <code>polyfit</code> (legacy). Comparar con R&sup2; y AIC.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Entregables y fechas</h3>
+                            <ul>
+                                <li><strong>Avance 2</strong> del proyecto (10%): fecha l&iacute;mite hoy</li>
+                                <li><strong>Taller 5</strong>: se asigna hoy (exponenciales/logar&iacute;tmicas), se entrega semana 13</li>
+                                <li><strong>Quiz 2</strong> (10%): pr&oacute;xima semana (semana 13), contenido semanas 7&ndash;12</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Pr&oacute;xima semana: trigonometr&iacute;a anal&iacute;tica. &Aacute;ngulos, c&iacute;rculo unitario, identidades trigonom&eacute;tricas y sus funciones en NumPy. Tambi&eacute;n se aplica el Quiz 2: estudien semanas 7&ndash;12.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px;">
+                            <h3>Herramientas nuevas de hoy</h3>
+                            <ul>
+                                <li><code>sp.cancel()</code>, <code>sp.fraction()</code>, <code>sp.apart()</code></li>
+                                <li><code>sp.limit(f, x, valor, direcci&oacute;n)</code></li>
+                                <li><code>np.nan</code> para romper l&iacute;neas en gr&aacute;ficos</li>
+                                <li><code>sp.expand_log()</code>, <code>sp.logcombine()</code></li>
+                                <li><code>scipy.optimize.curve_fit()</code></li>
+                                <li><code>numpy.polynomial.Polynomial.fit()</code></li>
+                                <li><code>ax.semilogy()</code> para escala semiloga&shy;r&iacute;tmica</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end presentation-container -->
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&larr; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft')  changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

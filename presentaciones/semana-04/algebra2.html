@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 4: Álgebra avanzada - Matemática básica para ciencia de datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">14</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Álgebra avanzada con Python</h1>
+            <p class="cover-subtitle">Semana 4: factorización, binomio y polinomios</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de hoy</h2>
+                <p class="slide-subtitle">De la teoría manual al código</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. Productos notables con expand()</h4>
+                        <p>Expandir expresiones automáticamente</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Factorización con factor()</h4>
+                        <p>Descomponer en factores irreducibles</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Teorema del binomio</h4>
+                        <p>Coeficientes binomiales y distribución binomial</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. División de polinomios</h4>
+                        <p>div() y evaluación de restos</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>5. Ceros de polinomios: roots() y solve()</h4>
+                    <p>Encontrar raíces simbólicas y numéricas</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Productos notables con expand() -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Productos notables con SymPy</h2>
+                <p class="slide-subtitle">expand() hace el trabajo pesado</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Función expand()</h3>
+                    <p>Toma una expresión factorizada y la desarrolla completamente aplicando todas las reglas algebraicas. Es el equivalente a multiplicar término por término, pero automático y sin errores.</p>
+                </div>
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+
+<span class="comment"># ===========================================</span>
+<span class="comment"># PRODUCTOS NOTABLES BÁSICOS</span>
+<span class="comment"># ===========================================</span>
+
+<span class="comment"># 1. Cuadrado de suma: (a + b)² = a² + 2ab + b²</span>
+<span class="keyword">expr1</span> = (x + <span class="number">3</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr1))
+<span class="comment"># Salida: x**2 + 6*x + 9</span>
+
+<span class="comment"># 2. Cuadrado de diferencia: (a - b)² = a² - 2ab + b²</span>
+<span class="keyword">expr2</span> = (<span class="number">2</span>*x - <span class="number">5</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr2))
+<span class="comment"># Salida: 4*x**2 - 20*x + 25</span>
+
+<span class="comment"># 3. Diferencia de cuadrados: (a+b)(a-b) = a² - b²</span>
+<span class="keyword">expr3</span> = (x + y) * (x - y)
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr3))
+<span class="comment"># Salida: x**2 - y**2</span>
+
+<span class="comment"># 4. Cubo de suma: (a+b)³</span>
+<span class="keyword">expr4</span> = (x + <span class="number">2</span>)**<span class="number">3</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr4))
+<span class="comment"># Salida: x**3 + 6*x**2 + 12*x + 8</span>
+
+<span class="comment"># 5. Expresiones multivariables</span>
+<span class="keyword">expr5</span> = (x + y + <span class="number">1</span>)**<span class="number">2</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr5))
+<span class="comment"># Salida: x**2 + 2*x*y + 2*x + y**2 + 2*y + 1</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>expand() es perfecto para verificar manualmente tu trabajo algebraico. Si expandiste a mano, usa SymPy para confirmar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Factorización con factor() -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Factorización automática</h2>
+                <p class="slide-subtitle">factor() encuentra factores irreducibles</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># =============================</span>
+<span class="comment"># DIFERENCIA DE CUADRADOS</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">expr1</span> = x**<span class="number">2</span> - <span class="number">9</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr1))
+<span class="comment"># (x - 3)*(x + 3)</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># TRINOMIO CUADRADO PERFECTO</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">expr2</span> = x**<span class="number">2</span> + <span class="number">6</span>*x + <span class="number">9</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr2))
+<span class="comment"># (x + 3)**2</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># FACTORIZACIÓN GENERAL</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">expr3</span> = x**<span class="number">2</span> + <span class="number">5</span>*x + <span class="number">6</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr3))
+<span class="comment"># (x + 2)*(x + 3)</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># =============================</span>
+<span class="comment"># DIFERENCIA/SUMA DE CUBOS</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">expr4</span> = x**<span class="number">3</span> - <span class="number">8</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr4))
+<span class="comment"># (x - 2)*(x**2 + 2*x + 4)</span>
+
+<span class="keyword">expr5</span> = x**<span class="number">3</span> + <span class="number">27</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr5))
+<span class="comment"># (x + 3)*(x**2 - 3*x + 9)</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># FACTORIZACIÓN COMPLETA</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">expr6</span> = x**<span class="number">4</span> - <span class="number">16</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(expr6))
+<span class="comment"># (x - 2)*(x + 2)*(x**2 + 4)</span>
+                    </div>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>expand() vs factor(): operaciones inversas</h4>
+                    <p>Son funciones complementarias. expand() desarrolla, factor() descompone. Úsalas en conjunto para verificar identidades algebraicas.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="comment"># Verificar que son inversas</span>
+<span class="keyword">original</span> = (x + <span class="number">5</span>) * (x - <span class="number">3</span>)
+<span class="keyword">expandida</span> = <span class="keyword">expand</span>(original)     <span class="comment"># x**2 + 2*x - 15</span>
+<span class="keyword">factorizada</span> = <span class="keyword">factor</span>(expandida)  <span class="comment"># (x - 3)*(x + 5)</span>
+
+<span class="keyword">print</span>(original == factorizada)  <span class="comment"># True</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Teorema del binomio -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Teorema del binomio en Python</h2>
+                <p class="slide-subtitle">Coeficientes binomiales y distribución binomial</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Recordatorio matemático</h3>
+                    <p>(a + b)ⁿ = Σ C(n,k) · aⁿ⁻ᵏ · bᵏ donde C(n,k) = n! / [k!(n-k)!]</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="code-box">
+<span class="comment"># ================================</span>
+<span class="comment"># COEFICIENTES BINOMIALES</span>
+<span class="comment"># ================================</span>
+
+<span class="keyword">from</span> sympy <span class="keyword">import</span> binomial, expand
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols
+
+<span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+
+<span class="comment"># Calcular C(5,2)</span>
+<span class="keyword">print</span>(<span class="keyword">binomial</span>(<span class="number">5</span>, <span class="number">2</span>))
+<span class="comment"># Salida: 10</span>
+
+<span class="comment"># Calcular C(10,3)</span>
+<span class="keyword">print</span>(<span class="keyword">binomial</span>(<span class="number">10</span>, <span class="number">3</span>))
+<span class="comment"># Salida: 120</span>
+
+<span class="comment"># Triángulo de Pascal (fila 4)</span>
+<span class="keyword">for</span> k <span class="keyword">in range</span>(<span class="number">5</span>):
+    <span class="keyword">print</span>(<span class="keyword">binomial</span>(<span class="number">4</span>, k), end=<span class="string">" "</span>)
+<span class="comment"># Salida: 1 4 6 4 1</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># ================================</span>
+<span class="comment"># EXPANSIÓN BINOMIAL</span>
+<span class="comment"># ================================</span>
+
+<span class="comment"># Expandir (x + y)⁴</span>
+<span class="keyword">expr</span> = (x + y)**<span class="number">4</span>
+<span class="keyword">print</span>(<span class="keyword">expand</span>(expr))
+<span class="comment"># x**4 + 4*x**3*y + 6*x**2*y**2 + </span>
+<span class="comment"># 4*x*y**3 + y**4</span>
+
+<span class="comment"># Verificar coeficientes</span>
+<span class="keyword">for</span> k <span class="keyword">in range</span>(<span class="number">5</span>):
+    <span class="keyword">coef</span> = <span class="keyword">binomial</span>(<span class="number">4</span>, k)
+    <span class="keyword">print</span>(<span class="string">f"Coef x^</span>{<span class="number">4</span>-k}<span class="string">y^</span>{k}<span class="string">: </span>{coef}<span class="string">"</span>)
+<span class="comment"># Coef x^4y^0: 1</span>
+<span class="comment"># Coef x^3y^1: 4</span>
+<span class="comment"># Coef x^2y^2: 6</span>
+<span class="comment"># ...</span>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Conexión con ciencia de datos: distribución binomial</h3>
+                    <p>La distribución binomial P(X=k) = C(n,k)·p^k·(1-p)^(n-k) modela eventos binarios (éxito/fracaso). Se usa en A/B testing, clasificación binaria, simulaciones Monte Carlo.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> binom
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Probabilidad de obtener exactamente 5 caras en 10 lanzamientos</span>
+<span class="keyword">prob</span> = <span class="keyword">binom</span>.<span class="keyword">pmf</span>(k=<span class="number">5</span>, n=<span class="number">10</span>, p=<span class="number">0.5</span>)
+<span class="keyword">print</span>(<span class="string">f"P(X=5) = </span>{prob:<span class="string">.4f</span>}<span class="string">"</span>)  <span class="comment"># 0.2461</span>
+
+<span class="comment"># Generar 1000 muestras</span>
+<span class="keyword">muestras</span> = np.<span class="keyword">random</span>.<span class="keyword">binomial</span>(n=<span class="number">10</span>, p=<span class="number">0.5</span>, size=<span class="number">1000</span>)
+<span class="keyword">print</span>(<span class="string">f"Media: </span>{muestras.<span class="keyword">mean</span>():<span class="string">.2f</span>}<span class="string">, Esperada: </span>{<span class="number">10</span>*<span class="number">0.5</span>}<span class="string">"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: División de polinomios -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">División de polinomios con SymPy</h2>
+                <p class="slide-subtitle">div() y verificación de factores</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>División algebraica: A(x) = B(x)·Q(x) + R(x)</h3>
+                    <p>SymPy puede dividir polinomios y retornar cociente y resto simultáneamente.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, div, Poly
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># ===================================================</span>
+<span class="comment"># DIVISIÓN BÁSICA</span>
+<span class="comment"># ===================================================</span>
+
+<span class="comment"># Dividir: (x² - 4) / (x - 2)</span>
+<span class="keyword">dividendo</span> = x**<span class="number">2</span> - <span class="number">4</span>
+<span class="keyword">divisor</span> = x - <span class="number">2</span>
+
+<span class="keyword">cociente</span>, <span class="keyword">resto</span> = <span class="keyword">div</span>(dividendo, divisor, domain=<span class="string">'ZZ'</span>)
+<span class="keyword">print</span>(<span class="string">f"Cociente: </span>{cociente}<span class="string">"</span>)  <span class="comment"># x + 2</span>
+<span class="keyword">print</span>(<span class="string">f"Resto: </span>{resto}<span class="string">"</span>)        <span class="comment"># 0</span>
+
+<span class="comment"># ===================================================</span>
+<span class="comment"># VERIFICACIÓN: dividendo = divisor*cociente + resto</span>
+<span class="comment"># ===================================================</span>
+
+<span class="keyword">verificacion</span> = divisor * cociente + resto
+<span class="keyword">print</span>(<span class="keyword">verificacion</span> == dividendo)  <span class="comment"># True</span>
+
+<span class="comment"># ===================================================</span>
+<span class="comment"># DIVISIÓN CON RESTO NO CERO</span>
+<span class="comment"># ===================================================</span>
+
+<span class="keyword">f</span> = <span class="number">5</span>*x**<span class="number">2</span> + <span class="number">10</span>*x + <span class="number">3</span>
+<span class="keyword">g</span> = <span class="number">2</span>*x + <span class="number">2</span>
+
+<span class="keyword">q</span>, <span class="keyword">r</span> = <span class="keyword">div</span>(f, g, domain=<span class="string">'QQ'</span>)  <span class="comment"># QQ = racionales</span>
+<span class="keyword">print</span>(<span class="string">f"q = </span>{q}<span class="string">"</span>)  <span class="comment"># 5*x/2 + 5/2</span>
+<span class="keyword">print</span>(<span class="string">f"r = </span>{r}<span class="string">"</span>)  <span class="comment"># -2</span>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="key-point">
+                        <h4>Teorema del resto</h4>
+                        <p>El resto de dividir p(x) entre (x-c) es p(c). No necesitas dividir, solo evalúa.</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Resto de (x³+2x²-5x+2)/(x-1)</span>
+<span class="keyword">p</span> = x**<span class="number">3</span> + <span class="number">2</span>*x**<span class="number">2</span> - <span class="number">5</span>*x + <span class="number">2</span>
+
+<span class="comment"># Método 1: dividir</span>
+<span class="keyword">q</span>, <span class="keyword">r</span> = <span class="keyword">div</span>(p, x-<span class="number">1</span>)
+<span class="keyword">print</span>(<span class="string">f"Resto: </span>{r}<span class="string">"</span>)  <span class="comment"># 0</span>
+
+<span class="comment"># Método 2: evaluar p(1)</span>
+<span class="keyword">print</span>(p.<span class="keyword">subs</span>(x, <span class="number">1</span>))  <span class="comment"># 0</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Si el resto es 0, entonces el divisor es un factor. Esto nos lleva al teorema del factor: (x-c) es factor de p(x) si y solo si p(c) = 0.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Ceros de polinomios parte 1 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Encontrar ceros: roots() y solve()</h2>
+                <p class="slide-subtitle">Raíces simbólicas exactas</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Teorema fundamental del álgebra en acción</h3>
+                    <p>Todo polinomio de grado n tiene exactamente n raíces complejas (contando multiplicidades). SymPy encuentra estas raíces simbólicamente cuando es posible.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, roots
+<span class="keyword">from</span> sympy <span class="keyword">import</span> solve, real_roots
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># =============================</span>
+<span class="comment"># FUNCIÓN roots()</span>
+<span class="comment"># =============================</span>
+
+<span class="comment"># Retorna diccionario {raíz: multiplicidad}</span>
+
+<span class="keyword">p1</span> = x**<span class="number">2</span> - <span class="number">4</span>
+<span class="keyword">print</span>(<span class="keyword">roots</span>(p1))
+<span class="comment"># {-2: 1, 2: 1}</span>
+
+<span class="keyword">p2</span> = x**<span class="number">2</span> - <span class="number">6</span>*x + <span class="number">9</span>
+<span class="keyword">print</span>(<span class="keyword">roots</span>(p2))
+<span class="comment"># {3: 2}  ← raíz doble</span>
+
+<span class="keyword">p3</span> = x**<span class="number">3</span> - <span class="number">1</span>
+<span class="keyword">print</span>(<span class="keyword">roots</span>(p3))
+<span class="comment"># {1: 1, -1/2 - sqrt(3)*I/2: 1,</span>
+<span class="comment">#  -1/2 + sqrt(3)*I/2: 1}</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># =============================</span>
+<span class="comment"># FUNCIÓN solve()</span>
+<span class="comment"># =============================</span>
+
+<span class="comment"># Retorna lista de soluciones</span>
+
+<span class="keyword">p1</span> = x**<span class="number">2</span> - <span class="number">4</span>
+<span class="keyword">print</span>(<span class="keyword">solve</span>(p1, x))
+<span class="comment"># [-2, 2]</span>
+
+<span class="keyword">p2</span> = x**<span class="number">3</span> - <span class="number">6</span>*x**<span class="number">2</span> + <span class="number">11</span>*x - <span class="number">6</span>
+<span class="keyword">print</span>(<span class="keyword">solve</span>(p2, x))
+<span class="comment"># [1, 2, 3]</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># SOLO RAÍCES REALES</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">p3</span> = x**<span class="number">3</span> - <span class="number">1</span>
+<span class="keyword">print</span>(<span class="keyword">real_roots</span>(p3))
+<span class="comment"># [1]  ← solo la real</span>
+                    </div>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>Diferencia entre roots() y solve()</h4>
+                    <p><strong>roots()</strong>: Retorna diccionario con multiplicidades. Más información sobre la estructura del polinomio.</p>
+                    <p style="margin-top: 8px;"><strong>solve()</strong>: Retorna lista simple de soluciones. Más fácil para usar en código.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="comment"># Ejemplo: encontrar y verificar raíces</span>
+<span class="keyword">polinomio</span> = x**<span class="number">3</span> - <span class="number">7</span>*x + <span class="number">6</span>
+<span class="keyword">raices</span> = <span class="keyword">solve</span>(polinomio, x)
+
+<span class="keyword">print</span>(<span class="string">"Raíces:"</span>, raices)  <span class="comment"># [-3, 1, 2]</span>
+
+<span class="comment"># Verificar cada raíz</span>
+<span class="keyword">for</span> r <span class="keyword">in</span> raices:
+    <span class="keyword">resultado</span> = polinomio.<span class="keyword">subs</span>(x, r)
+    <span class="keyword">print</span>(<span class="string">f"p(</span>{r}<span class="string">) = </span>{resultado}<span class="string">"</span>)  <span class="comment"># Todos dan 0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Ceros de polinomios parte 2 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Raíces numéricas con NumPy</h2>
+                <p class="slide-subtitle">Cuando necesitas números, no símbolos</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>numpy.roots() vs SymPy roots()</h3>
+                    <p>NumPy encuentra raíces NUMÉRICAS (aproximaciones en punto flotante) usando eigenvalores de la matriz compañera. Es extremadamente rápido pero pierde exactitud simbólica.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="code-box">
+<span class="comment"># ===========================</span>
+<span class="comment"># NumPy: RÁPIDO, NUMÉRICO</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Coeficientes de x³ - 1</span>
+<span class="comment"># Orden DESCENDENTE: [1, 0, 0, -1]</span>
+<span class="keyword">coefs</span> = [<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, -<span class="number">1</span>]
+<span class="keyword">raices</span> = np.<span class="keyword">roots</span>(coefs)
+
+<span class="keyword">print</span>(raices)
+<span class="comment"># [ 1.  +0.j        ]</span>
+<span class="comment"># [-0.5+0.8660254j ]</span>
+<span class="comment"># [-0.5-0.8660254j ]</span>
+
+<span class="comment"># Trabajar solo con reales</span>
+<span class="keyword">raices_reales</span> = raices[
+    np.<span class="keyword">isreal</span>(raices)
+].<span class="keyword">real</span>
+
+<span class="keyword">print</span>(raices_reales)
+<span class="comment"># [1.]</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># ===========================</span>
+<span class="comment"># SymPy: EXACTO, SIMBÓLICO</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+<span class="keyword">p</span> = x**<span class="number">3</span> - <span class="number">1</span>
+
+<span class="keyword">raices</span> = <span class="keyword">roots</span>(p)
+<span class="keyword">print</span>(raices)
+<span class="comment"># {1: 1,</span>
+<span class="comment">#  -1/2 - sqrt(3)*I/2: 1,</span>
+<span class="comment">#  -1/2 + sqrt(3)*I/2: 1}</span>
+
+<span class="comment"># Expresiones EXACTAS ↑</span>
+<span class="comment"># No hay error de redondeo</span>
+
+<span class="comment"># Convertir a numérico si necesitas</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> N
+<span class="keyword">for</span> r <span class="keyword">in</span> raices.<span class="keyword">keys</span>():
+    <span class="keyword">print</span>(<span class="keyword">N</span>(r, <span class="number">5</span>))
+<span class="comment"># 1.0000</span>
+<span class="comment"># -0.50000 - 0.86603*I</span>
+<span class="comment"># -0.50000 + 0.86603*I</span>
+                    </div>
+                </div>
+                <div class="comparison-table" style="margin-top: 20px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>NumPy roots()</th>
+                                <th>SymPy roots()</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tipo de resultado</strong></td>
+                                <td>Aproximación numérica (float64)</td>
+                                <td>Expresión simbólica exacta</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Velocidad</strong></td>
+                                <td>Muy rápido (matriz compañera)</td>
+                                <td>Más lento (álgebra simbólica)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Precisión</strong></td>
+                                <td>~15 dígitos significativos</td>
+                                <td>Exacta (sin error)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uso ideal</strong></td>
+                                <td>Cálculos numéricos masivos</td>
+                                <td>Verificación, educación, análisis</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Regla práctica: usa SymPy para ENTENDER, usa NumPy para CALCULAR en producción.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Aplicación ML - Eigenvalores -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: eigenvalores y PCA</h2>
+                <p class="slide-subtitle">Los ceros de polinomios en machine learning</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Conexión matemática: eigenvalores como raíces</h3>
+                    <p>Los eigenvalores de una matriz A son las raíces del polinomio característico det(A - λI) = 0. Por el teorema fundamental del álgebra, toda matriz n×n tiene exactamente n eigenvalores complejos.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># PARTE 1: CÁLCULO SIMBÓLICO DEL POLINOMIO CARACTERÍSTICO</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">lam</span> = <span class="keyword">symbols</span>(<span class="string">'lambda'</span>)
+
+<span class="comment"># Matriz 2×2</span>
+<span class="keyword">A_sym</span> = <span class="keyword">Matrix</span>([[<span class="number">4</span>, -<span class="number">2</span>], [<span class="number">1</span>, <span class="number">1</span>]])
+
+<span class="comment"># Matriz identidad</span>
+<span class="keyword">I</span> = <span class="keyword">eye</span>(<span class="number">2</span>)
+
+<span class="comment"># Polinomio característico: det(A - λI)</span>
+<span class="keyword">poli_caract</span> = (A_sym - lam*I).<span class="keyword">det</span>()
+<span class="keyword">print</span>(<span class="string">"Polinomio característico:"</span>)
+<span class="keyword">print</span>(poli_caract)
+<span class="comment"># lambda**2 - 5*lambda + 6</span>
+
+<span class="comment"># Factorizar</span>
+<span class="keyword">print</span>(<span class="keyword">factor</span>(poli_caract))
+<span class="comment"># (lambda - 2)*(lambda - 3)</span>
+
+<span class="comment"># Eigenvalores = raíces</span>
+<span class="keyword">eigenvals_sym</span> = <span class="keyword">solve</span>(poli_caract, lam)
+<span class="keyword">print</span>(<span class="string">"Eigenvalores simbólicos:"</span>, eigenvals_sym)
+<span class="comment"># [2, 3]</span>
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># PARTE 2: VERIFICACIÓN NUMÉRICA CON NUMPY</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">A_num</span> = np.<span class="keyword">array</span>([[<span class="number">4</span>, -<span class="number">2</span>], [<span class="number">1</span>, <span class="number">1</span>]])
+<span class="keyword">eigenvals_num</span>, <span class="keyword">eigenvecs</span> = np.<span class="keyword">linalg</span>.<span class="keyword">eig</span>(A_num)
+
+<span class="keyword">print</span>(<span class="string">"Eigenvalores numéricos:"</span>, eigenvals_num)
+<span class="comment"># [3. 2.]</span>
+
+<span class="keyword">print</span>(<span class="string">"
+Eigenvectores:"</span>)
+<span class="keyword">print</span>(eigenvecs)
+<span class="comment"># [[ 0.89442719 -0.70710678]</span>
+<span class="comment">#  [ 0.4472136   0.70710678]]</span>
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>¿Por qué esto importa en ML?</h4>
+                    <p><strong>PCA (Principal Component Analysis)</strong>: Encuentra direcciones de máxima varianza usando eigenvectores de la matriz de covarianza. Los eigenvalores más grandes indican las componentes principales más importantes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: PCA en acción -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">PCA: reducción dimensional con eigenvalores</h2>
+                <p class="slide-subtitle">Álgebra polinomial aplicada a datos reales</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sklearn.decomposition <span class="keyword">import</span> PCA
+<span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_iris
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># CARGAR DATOS: IRIS DATASET (4 DIMENSIONES)</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">iris</span> = <span class="keyword">load_iris</span>()
+<span class="keyword">X</span> = iris.<span class="keyword">data</span>  <span class="comment"># 150 muestras × 4 características</span>
+<span class="keyword">y</span> = iris.<span class="keyword">target</span>
+
+<span class="keyword">print</span>(<span class="string">f"Dimensiones originales: </span>{X.<span class="keyword">shape</span>}<span class="string">"</span>)
+<span class="comment"># (150, 4)</span>
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># APLICAR PCA: REDUCIR A 2 COMPONENTES PRINCIPALES</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">pca</span> = <span class="keyword">PCA</span>(n_components=<span class="number">2</span>)
+<span class="keyword">X_reducido</span> = pca.<span class="keyword">fit_transform</span>(X)
+
+<span class="keyword">print</span>(<span class="string">f"Dimensiones reducidas: </span>{X_reducido.<span class="keyword">shape</span>}<span class="string">"</span>)
+<span class="comment"># (150, 2)</span>
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># ANALIZAR EIGENVALORES (VARIANZA EXPLICADA)</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">print</span>(<span class="string">"
+Eigenvalores (varianza explicada):"</span>)
+<span class="keyword">print</span>(pca.<span class="keyword">explained_variance_</span>)
+<span class="comment"># [4.22824171 0.24267075]</span>
+
+<span class="keyword">print</span>(<span class="string">"
+Porcentaje de varianza explicada:"</span>)
+<span class="keyword">print</span>(pca.<span class="keyword">explained_variance_ratio_</span>)
+<span class="comment"># [0.92461872 0.05306648]</span>
+<span class="comment"># ↑ Las 2 componentes capturan 97.77% de la información</span>
+
+<span class="keyword">print</span>(<span class="string">f"
+Varianza total capturada: </span>{pca.<span class="keyword">explained_variance_ratio_</span>.<span class="keyword">sum</span>():<span class="string">.2%</span>}<span class="string">"</span>)
+<span class="comment"># 97.77%</span>
+
+<span class="comment"># =========================================================</span>
+<span class="comment"># VISUALIZAR EN 2D</span>
+<span class="comment"># =========================================================</span>
+
+<span class="keyword">plt</span>.<span class="keyword">figure</span>(figsize=(<span class="number">10</span>, <span class="number">6</span>))
+<span class="keyword">colores</span> = [<span class="string">'#FF8C00'</span>, <span class="string">'#2d2d2d'</span>, <span class="string">'#6e6e73'</span>]
+
+<span class="keyword">for</span> i <span class="keyword">in range</span>(<span class="number">3</span>):
+    <span class="keyword">plt</span>.<span class="keyword">scatter</span>(
+        X_reducido[y == i, <span class="number">0</span>],
+        X_reducido[y == i, <span class="number">1</span>],
+        c=colores[i],
+        label=iris.<span class="keyword">target_names</span>[i],
+        s=<span class="number">50</span>,
+        alpha=<span class="number">0.7</span>
+    )
+
+<span class="keyword">plt</span>.<span class="keyword">xlabel</span>(<span class="string">'Primera componente principal (PC1)'</span>, fontsize=<span class="number">12</span>)
+<span class="keyword">plt</span>.<span class="keyword">ylabel</span>(<span class="string">'Segunda componente principal (PC2)'</span>, fontsize=<span class="number">12</span>)
+<span class="keyword">plt</span>.<span class="keyword">title</span>(<span class="string">'PCA de Iris Dataset: 4D → 2D'</span>, fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+<span class="keyword">plt</span>.<span class="keyword">legend</span>()
+<span class="keyword">plt</span>.<span class="keyword">grid</span>(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+<span class="keyword">plt</span>.<span class="keyword">show</span>()
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Conexión clave: PCA calcula eigenvalores del polinomio característico de la matriz de covarianza. Los eigenvalores más grandes = direcciones de mayor varianza = componentes principales más importantes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Ejercicio práctico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejercicio práctico guiado</h2>
+                <p class="slide-subtitle">Integrar todo lo aprendido</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Desafío: análisis completo de un polinomio</h3>
+                    <p>Dado el polinomio p(x) = x³ - 6x² + 11x - 6, realiza el siguiente análisis completo usando SymPy.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="feature-card">
+                        <h4>Tarea 1: Factorización</h4>
+                        <p>Usa factor() para descomponer el polinomio en factores irreducibles. ¿Cuáles son los factores?</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Tarea 2: Encontrar ceros</h4>
+                        <p>Usa roots() y solve() para encontrar todos los ceros. ¿Cuántos ceros tiene? ¿Son todos reales?</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Tarea 3: División</h4>
+                        <p>Divide p(x) entre (x - 1) usando div(). ¿Cuál es el cociente y el resto? Verifica con teorema del resto.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Tarea 4: Verificación</h4>
+                        <p>Verifica que p(x) = (factores encontrados). Expande el producto de factores y compara con el polinomio original.</p>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="comment"># Template de código para copiar en Google Colab</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+<span class="keyword">p</span> = x**<span class="number">3</span> - <span class="number">6</span>*x**<span class="number">2</span> + <span class="number">11</span>*x - <span class="number">6</span>
+
+<span class="comment"># Tarea 1: Factorización</span>
+<span class="keyword">factorizado</span> = <span class="keyword">factor</span>(p)
+<span class="keyword">print</span>(<span class="string">"Factorización:"</span>, factorizado)
+
+<span class="comment"># Tarea 2: Ceros</span>
+<span class="keyword">raices_dict</span> = <span class="keyword">roots</span>(p)
+<span class="keyword">raices_lista</span> = <span class="keyword">solve</span>(p, x)
+<span class="keyword">print</span>(<span class="string">"Raíces (dict):"</span>, raices_dict)
+<span class="keyword">print</span>(<span class="string">"Raíces (lista):"</span>, raices_lista)
+
+<span class="comment"># Tarea 3: División</span>
+<span class="keyword">cociente</span>, <span class="keyword">resto</span> = <span class="keyword">div</span>(p, x - <span class="number">1</span>)
+<span class="keyword">print</span>(<span class="string">f"Cociente: </span>{cociente}<span class="string">, Resto: </span>{resto}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"Verificación con teorema del resto: p(1) = </span>{p.<span class="keyword">subs</span>(x, <span class="number">1</span>)}<span class="string">"</span>)
+
+<span class="comment"># Tarea 4: Verificación</span>
+<span class="keyword">producto_factores</span> = <span class="keyword">expand</span>(factorizado)
+<span class="keyword">print</span>(<span class="string">f"¿p(x) == producto de factores? </span>{p == producto_factores}<span class="string">"</span>)
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p><strong>Solución esperada:</strong> p(x) = (x - 1)(x - 2)(x - 3), ceros: {1, 2, 3}, resto de división por (x-1): 0.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Comparativa expand/factor/simplify -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuándo usar cada función de SymPy</h2>
+                <p class="slide-subtitle">Guía de decisión rápida</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Función</th>
+                                <th>Qué hace</th>
+                                <th>Cuándo usarla</th>
+                                <th>Ejemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>expand()</strong></td>
+                                <td>Desarrolla productos, aplica distributiva</td>
+                                <td>Cuando tienes factores y quieres la forma desarrollada</td>
+                                <td>(x+3)² → x²+6x+9</td>
+                            </tr>
+                            <tr>
+                                <td><strong>factor()</strong></td>
+                                <td>Descompone en factores irreducibles</td>
+                                <td>Para resolver ecuaciones, simplificar, encontrar ceros</td>
+                                <td>x²-9 → (x-3)(x+3)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>simplify()</strong></td>
+                                <td>Reduce a forma más simple (heurístico)</td>
+                                <td>Expresiones complicadas que quieres limpiar</td>
+                                <td>sin²(x)+cos²(x) → 1</td>
+                            </tr>
+                            <tr>
+                                <td><strong>div()</strong></td>
+                                <td>División polinomial (cociente + resto)</td>
+                                <td>División larga algebraica, verificar factores</td>
+                                <td>(x²-4)/(x-2) → (x+2, 0)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>roots()</strong></td>
+                                <td>Raíces con multiplicidades (dict)</td>
+                                <td>Análisis estructural del polinomio</td>
+                                <td>x²-6x+9 → {3: 2}</td>
+                            </tr>
+                            <tr>
+                                <td><strong>solve()</strong></td>
+                                <td>Soluciones de ecuaciones (lista)</td>
+                                <td>Resolver ecuaciones para usar en código</td>
+                                <td>x²-4=0 → [-2, 2]</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="key-point">
+                        <h4>Flujo de trabajo típico</h4>
+                        <p>1. Define el polinomio<br>2. Factoriza con factor()<br>3. Encuentra ceros con solve()<br>4. Verifica con subs() o div()<br>5. Expande con expand() si necesitas</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Ejemplo de flujo completo</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+<span class="keyword">p</span> = x**<span class="number">2</span> - <span class="number">5</span>*x + <span class="number">6</span>
+
+<span class="keyword">print</span>(<span class="string">"1. Original:"</span>, p)
+<span class="keyword">print</span>(<span class="string">"2. Factorizado:"</span>, <span class="keyword">factor</span>(p))
+<span class="keyword">print</span>(<span class="string">"3. Ceros:"</span>, <span class="keyword">solve</span>(p))
+<span class="keyword">print</span>(<span class="string">"4. Verificar p(2):"</span>, p.<span class="keyword">subs</span>(x,<span class="number">2</span>))
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Recursos adicionales -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Recursos para profundizar</h2>
+                <p class="slide-subtitle">Documentación y práctica</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Documentación oficial SymPy</h3>
+                        <ul>
+                            <li><strong>Polynomials Module:</strong> docs.sympy.org/latest/modules/polys/</li>
+                            <li><strong>Solvers Guide:</strong> docs.sympy.org/latest/guides/solving/</li>
+                            <li><strong>Tutorials:</strong> docs.sympy.org/latest/tutorials/</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Tutoriales interactivos</h3>
+                        <ul>
+                            <li><strong>SymPy Live:</strong> live.sympy.org (ejecutar código online)</li>
+                            <li><strong>Real Python:</strong> Artículos sobre SymPy aplicado</li>
+                            <li><strong>YouTube:</strong> Canales de álgebra computacional</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Libros de referencia</h3>
+                    <ul>
+                        <li><strong>STEWART, James.</strong> Pre-cálculo. Matemática para cálculo (6ª ed.). Cengage, 2012. Capítulos 3-4 sobre polinomios.</li>
+                        <li><strong>VANDERPLAS, Jake.</strong> Python Data Science Handbook. O'Reilly, 2016. Capítulo sobre NumPy y álgebra lineal.</li>
+                        <li><strong>SymPy Documentation Team.</strong> SymPy Tutorial (latest). Disponible en docs.sympy.org.</li>
+                    </ul>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="feature-card">
+                        <h4>Practica en Colab</h4>
+                        <p>Crea un notebook con los 20 productos notables más comunes. Expándelos manualmente, luego verifica con SymPy.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Proyecto sugerido</h4>
+                        <p>Implementa un "verificador de tareas de álgebra" que tome una expresión, la factorice, encuentre ceros y grafique.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>La documentación oficial de SymPy es excepcional. Invierte tiempo leyéndola, tiene ejemplos interactivos y explicaciones matemáticas profundas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Resumen y próxima semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen y próximos pasos</h2>
+                <p class="slide-subtitle">Lo que dominamos hoy</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Productos notables y factorización</h4>
+                    <p>expand() desarrolla expresiones automáticamente. factor() encuentra la descomposición en factores irreducibles. Son operaciones inversas fundamentales para simplificar álgebra.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Teorema del binomio</h4>
+                    <p>binomial(n,k) calcula coeficientes binomiales. Conexión directa con distribución binomial en estadística y probabilidad para ciencia de datos.</p>
+                </div>
+                <div class="key-point">
+                    <h4>División de polinomios</h4>
+                    <p>div() realiza división algebraica retornando cociente y resto. Teorema del resto: p(c) = resto de dividir p(x) entre (x-c). Teorema del factor: (x-c) es factor ⟺ p(c)=0.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Ceros y eigenvalores</h4>
+                    <p>roots() y solve() encuentran raíces simbólicas. NumPy roots() para aproximaciones numéricas rápidas. Los eigenvalores son ceros del polinomio característico, fundamentales en PCA y ML.</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Próxima semana: ecuaciones e inecuaciones</h3>
+                    <p>Ecuaciones lineales y cuadráticas, sistemas de ecuaciones, inecuaciones. Resolución con SymPy y aplicaciones en optimización y programación lineal.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p><strong>Tarea para casa:</strong> Completa el taller práctico #1 que se asignó hoy. Entrega próximo lunes. Debe incluir trabajo manual + verificación en Python.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

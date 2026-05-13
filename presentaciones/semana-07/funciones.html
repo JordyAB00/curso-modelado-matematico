@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semanas 7-8: Funciones y funciones lineales con Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string  { color: #ce9178; }
+        .code-box .number  { color: #b5cea8; }
+        .code-box .func    { color: #dcdcaa; }
+        .code-box .orange  { color: #FF8C00; font-weight: bold; }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 58px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 22px;
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ml-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 14px;
+            padding: 18px;
+            color: white;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .ml-card h4 {
+            color: #FF8C00;
+            font-size: 17px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ml-card p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 14px 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .step-text h5 {
+            font-size: 16px;
+            color: #2d2d2d;
+            margin-bottom: 2px;
+        }
+
+        .step-text p {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        .arrow-connector {
+            text-align: center;
+            font-size: 22px;
+            color: #FF8C00;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+        .section-divider {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px 140px 80px;
+        }
+
+        .section-divider .section-label {
+            font-size: 18px;
+            color: #FF8C00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-divider .section-title {
+            font-size: 52px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .section-divider .section-subtitle {
+            font-size: 22px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">16</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1: PORTADA ==================== -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Funciones y regresión lineal en Python</h1>
+            <p class="cover-subtitle">Semanas 7-8: del concepto al modelo predictivo</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: PUENTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos en el iPad, ahora en código</h2>
+                <p class="slide-subtitle">El puente entre la matemática y la programación</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">def / lambda</div>
+                        <div class="stat-label">Funciones en Python</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">np.polyfit</div>
+                        <div class="stat-label">Regresión con NumPy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">R2 score</div>
+                        <div class="stat-label">Evaluación del modelo</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matematico</th>
+                                <th>Herramienta Python</th>
+                                <th>Aplicación en DS/ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>f: A -> B (definición)</td>
+                                <td><code>def f(x): return ...</code></td>
+                                <td>Cualquier modelo predictivo</td>
+                            </tr>
+                            <tr>
+                                <td>Dominio y restricciones</td>
+                                <td><code>SymPy solveset()</code></td>
+                                <td>Validación de datos, preprocesamiento</td>
+                            </tr>
+                            <tr>
+                                <td>Evaluación masiva f(X)</td>
+                                <td><code>lambdify + NumPy</code></td>
+                                <td>Predicción sobre datasets completos</td>
+                            </tr>
+                            <tr>
+                                <td>y = mx + b (función lineal)</td>
+                                <td><code>np.polyfit(x, y, 1)</code></td>
+                                <td>Regresión lineal simple</td>
+                            </tr>
+                            <tr>
+                                <td>R2 (bondad de ajuste)</td>
+                                <td><code>model.score(X, y)</code></td>
+                                <td>Evaluación de modelos predictivos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>En esta sesión cubriremos funciones generales en Python (semana 7) y luego regresión lineal (semana 8). Cada herramienta tiene su rol: SymPy para entender, NumPy para calcular, sklearn para modelar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: def, lambda ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Definir funciones en Python</h2>
+                <p class="slide-subtitle">def, lambda y funciones como objetos de primera clase</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># === def -- funcion con nombre ===</span>
+<span class="keyword">def</span> <span class="func">f</span>(x: <span class="func">float</span>) -> <span class="func">float</span>:
+    <span class="string">"""f(x) = x^2 - 3x + 2"""</span>
+    <span class="keyword">return</span> x**<span class="number">2</span> - <span class="number">3</span>*x + <span class="number">2</span>
+
+<span class="comment"># Type hints documentan dominio y codominio:</span>
+<span class="comment"># f: float -> float  equiv  f: R -> R</span>
+
+<span class="comment"># Evaluar en puntos especificos</span>
+<span class="keyword">print</span>(f(<span class="number">0</span>))   <span class="comment"># => 2</span>
+<span class="keyword">print</span>(f(<span class="number">1</span>))   <span class="comment"># => 0  (raiz)</span>
+<span class="keyword">print</span>(f(<span class="number">2</span>))   <span class="comment"># => 0  (raiz)</span>
+
+<span class="comment"># === lambda -- funcion anonima ===</span>
+cuadrado  = <span class="keyword">lambda</span> x: x**<span class="number">2</span>
+identidad = <span class="keyword">lambda</span> x: x
+reciproco = <span class="keyword">lambda</span> x: <span class="number">1</span>/x   <span class="comment"># dominio: x != 0</span>
+
+<span class="comment"># === Funciones como objetos de primera clase ===</span>
+familias = [
+    <span class="keyword">lambda</span> x: x,       <span class="comment"># lineal</span>
+    <span class="keyword">lambda</span> x: x**<span class="number">2</span>,    <span class="comment"># cuadratica</span>
+    <span class="keyword">lambda</span> x: x**<span class="number">3</span>,    <span class="comment"># cubica</span>
+    <span class="keyword">lambda</span> x: <span class="number">2</span>**x,    <span class="comment"># exponencial</span>
+]
+nombres = [<span class="string">'Lineal'</span>, <span class="string">'Cuadratica'</span>, <span class="string">'Cubica'</span>, <span class="string">'Exponencial'</span>]
+
+<span class="keyword">for</span> nombre, func <span class="keyword">in</span> <span class="func">zip</span>(nombres, familias):
+    <span class="keyword">print</span>(<span class="string">f"</span>{nombre}: f(2) = {func(<span class="number">2</span>)}<span class="string">"</span>)
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>def vs lambda</h4>
+                            <p><code>def</code> crea funciones con nombre, docstring y lógica compleja. <code>lambda</code> crea funciones anónimas de una sola expresión. Para ciencia de datos, <code>def</code> siempre es preferible en código de producción.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Type hints</h4>
+                            <p><code>x: float</code> y <code>-> float</code> documentan formalmente el dominio y codominio de la función. Equivale a escribir f: R -> R en notación matemática.</p>
+                        </div>
+                        <div class="output-box">
+Lineal:      f(2) = 2
+Cuadratica:  f(2) = 4
+Cubica:      f(2) = 8
+Exponencial: f(2) = 4
+                        </div>
+                        <div class="highlight-box">
+                            <p>Pasar funciones como argumentos a otras funciones es fundamental en DS: map(), filter(), y los pipelines de sklearn funcionan exactamente así.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 4: COMPOSICION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Composición de funciones</h2>
+                <p class="slide-subtitle">(f . g)(x) = f(g(x)) -- el corazón de los pipelines</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px; font-size: 20px;">
+                            (f . g)(x) = f(g(x))
+                        </div>
+                        <div class="code-box">
+<span class="comment"># Componer funciones: HOF (higher-order function)</span>
+<span class="keyword">def</span> <span class="func">componer</span>(f, g):
+    <span class="string">"""Retorna la composición f . g."""</span>
+    <span class="keyword">return lambda</span> x: f(g(x))
+
+f = <span class="keyword">lambda</span> x: x**<span class="number">2</span>     <span class="comment"># f(x) = x^2</span>
+g = <span class="keyword">lambda</span> x: x + <span class="number">1</span>   <span class="comment"># g(x) = x + 1</span>
+
+fog = componer(f, g)   <span class="comment"># (f.g)(x) = (x+1)^2</span>
+gof = componer(g, f)   <span class="comment"># (g.f)(x) = x^2 + 1</span>
+
+<span class="keyword">print</span>(<span class="string">f"(f.g)(3) = {fog(3)}"</span>)  <span class="comment"># => 16</span>
+<span class="keyword">print</span>(<span class="string">f"(g.f)(3) = {gof(3)}"</span>)  <span class="comment"># => 10</span>
+<span class="comment"># La composición NO es conmutativa</span>
+
+<span class="comment"># ===================================</span>
+<span class="comment"># Pipeline = composición en sklearn</span>
+<span class="comment"># ===================================</span>
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> Pipeline
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> (
+    StandardScaler, FunctionTransformer
+)
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Pipeline = g(f2(f1(X)))</span>
+pipeline = Pipeline([
+    (<span class="string">'log'</span>, FunctionTransformer(np.log1p)),
+    (<span class="string">'scaler'</span>, StandardScaler()),
+    (<span class="string">'modelo'</span>, LinearRegression())
+])
+<span class="comment"># pipeline.predict(X) computa g(f2(f1(X)))</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Orden importa</h4>
+                            <p>f . g != g . f en general. (f.g)(3) = f(g(3)) = f(4) = 16, mientras (g.f)(3) = g(9) = 10. Esta asimetría tiene consecuencias directas en pipelines de ML.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Pipeline como composición</h3>
+                            <ul>
+                                <li>log1p(x) transforma el dominio para normalizar distribuciones sesgadas</li>
+                                <li>StandardScaler centra y escala: f(x) = (x-mu)/sigma</li>
+                                <li>LinearRegression aplica la función final de predicción</li>
+                                <li>El orden es estricto: primero transformar, luego modelar</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Un pipeline de ML es formalmente una composición de funciones: predicción = modelo(escalar(log(datos))). La matemática detrás es exactamente f . g . h.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: SymPy subs/evalf ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">SymPy 1.14: subs() y evalf()</h2>
+                <p class="slide-subtitle">Evaluación simbólica exacta con precisión arbitraria</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, sin, cos, pi, sqrt
+<span class="keyword">from</span> sympy <span class="keyword">import</span> factor, simplify
+
+x = symbols(<span class="string">'x'</span>)
+f = x**<span class="number">2</span> - <span class="number">3</span>*x + <span class="number">2</span>
+
+<span class="comment"># === subs() -- sustitución simbólica ===</span>
+<span class="keyword">print</span>(f.subs(x, <span class="number">3</span>))        <span class="comment"># => 2  (exacto)</span>
+<span class="keyword">print</span>(f.subs(x, <span class="number">1</span>))        <span class="comment"># => 0  (raiz exacta)</span>
+
+<span class="comment"># Sustitución simbólica</span>
+a = symbols(<span class="string">'a'</span>)
+<span class="keyword">print</span>(f.subs(x, a + <span class="number">1</span>))    <span class="comment"># => a^2 - a</span>
+
+<span class="comment"># Sustituciones multiples</span>
+b = symbols(<span class="string">'b'</span>)
+expr_2d = a**<span class="number">2</span> + b**<span class="number">2</span>
+<span class="keyword">print</span>(expr_2d.subs([(a, <span class="number">3</span>), (b, <span class="number">4</span>)]))  <span class="comment"># => 25</span>
+
+<span class="comment"># SymPy factoriza automáticamente</span>
+<span class="keyword">print</span>(factor(f))   <span class="comment"># => (x - 1)*(x - 2)</span>
+
+<span class="comment"># === evalf() -- valor numerico ===</span>
+<span class="keyword">print</span>(sqrt(<span class="number">2</span>).evalf())     <span class="comment"># => 1.41421356237310</span>
+<span class="keyword">print</span>(sqrt(<span class="number">2</span>).evalf(<span class="number">50</span>))  <span class="comment"># 50 digitos</span>
+<span class="keyword">print</span>(pi.evalf(<span class="number">30</span>))        <span class="comment"># 30 digitos de pi</span>
+
+<span class="comment"># Verificar identidad trigonometrica</span>
+identidad = sin(x)**<span class="number">2</span> + cos(x)**<span class="number">2</span>
+<span class="keyword">print</span>(simplify(identidad))  <span class="comment"># => 1</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Método</th>
+                                        <th>Qué hace</th>
+                                        <th>Retorna</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>.subs(x, val)</code></td>
+                                        <td>Sustituye x por un valor</td>
+                                        <td>Expresión exacta</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.subs([(a,v1),...])</code></td>
+                                        <td>Múltiples sustituciones</td>
+                                        <td>Expresión exacta</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.evalf()</code></td>
+                                        <td>Convierte a decimal</td>
+                                        <td>Float 15 digitos</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>.evalf(n)</code></td>
+                                        <td>Decimal con n dígitos</td>
+                                        <td>Precisión arbitraria</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>subs() es inmutable -- nunca modifica la expresión original. Siempre retorna una nueva expresión. Corresponde exactamente a la evaluación matemática f(x0).</p>
+                        </div>
+                        <div class="key-point">
+                            <h4>Cuándo usar subs vs evalf</h4>
+                            <p>subs() para verificación exacta y manipulación algebraica. evalf() cuando se necesita un número decimal para graficar o comparar.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: lambdify ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">lambdify(): el puente simbólico-numérico</h2>
+                <p class="slide-subtitle">Convertir expresiones SymPy en funciones NumPy veloces</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, sin, lambdify
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+x = symbols(<span class="string">'x'</span>)
+expr = x**<span class="number">2</span> - <span class="number">3</span>*x + <span class="number">2</span>
+
+<span class="comment"># === lambdify -- convierte a función NumPy ===</span>
+<span class="comment"># SIEMPRE especificar modules='numpy'</span>
+f_num = lambdify(x, expr, modules=<span class="string">'numpy'</span>)
+
+<span class="comment"># Ahora f_num acepta arrays NumPy enteros</span>
+x_array = np.linspace(-<span class="number">2</span>, <span class="number">5</span>, <span class="number">1000</span>)
+y_array = f_num(x_array)  <span class="comment"># 1000 evaluaciones</span>
+
+<span class="comment"># Funciones con trigonometría</span>
+g_expr = sin(x)**<span class="number">2</span> + x
+g_num = lambdify(x, g_expr, modules=<span class="string">'numpy'</span>)
+<span class="keyword">print</span>(<span class="string">f"g(pi) = {g_num(np.pi):.6f}"</span>)
+
+<span class="comment"># lambdify con Piecewise (función a trozos)</span>
+<span class="keyword">from</span> sympy <span class="keyword">import</span> Piecewise
+pw_expr = Piecewise(
+    (x**<span class="number">2</span>, x < <span class="number">0</span>),
+    (x + <span class="number">1</span>, <span class="keyword">True</span>)
+)
+pw_num = lambdify(x, pw_expr, modules=<span class="string">'numpy'</span>)
+<span class="keyword">print</span>(pw_num(-<span class="number">2</span>))   <span class="comment"># => 4.0  (tramo x^2)</span>
+<span class="keyword">print</span>(pw_num(<span class="number">3</span>))    <span class="comment"># => 4.0  (tramo x+1)</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Método</th>
+                                        <th>Velocidad</th>
+                                        <th>Caso ideal</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>subs() + evalf()</code></td>
+                                        <td>~10<sup>4</sup> eval/seg</td>
+                                        <td>Verificación exacta</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>lambdify + math</code></td>
+                                        <td>~10<sup>6</sup> eval/seg</td>
+                                        <td>Evaluación escalar</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>lambdify + numpy</code></td>
+                                        <td>~10<sup>8</sup> elem/seg</td>
+                                        <td>Datasets completos</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 15px;">
+                            <div class="step-row">
+                                <div class="step-number">1</div>
+                                <div class="step-text">
+                                    <h5>Definir simbólicamente con SymPy</h5>
+                                    <p>Verificar, simplificar, factorizar, derivar</p>
+                                </div>
+                            </div>
+                            <div class="arrow-connector">&#x2193;</div>
+                            <div class="step-row">
+                                <div class="step-number">2</div>
+                                <div class="step-text">
+                                    <h5>Convertir con lambdify(modules='numpy')</h5>
+                                    <p>El puente entre el mundo simbólico y numérico</p>
+                                </div>
+                            </div>
+                            <div class="arrow-connector">&#x2193;</div>
+                            <div class="step-row">
+                                <div class="step-number">3</div>
+                                <div class="step-text">
+                                    <h5>Evaluar con NumPy + graficar con Matplotlib</h5>
+                                    <p>Miles de puntos en milisegundos</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: DOMINIO/RANGO EN PREPROCESSING ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Dominio y rango en preprocessing</h2>
+                <p class="slide-subtitle">Las restricciones matemáticas tienen consecuencias reales en ML</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># === MinMaxScaler como función lineal biyectiva ===</span>
+<span class="comment"># f: [x_min, x_max] -> [0, 1]</span>
+<span class="keyword">def</span> <span class="func">min_max_scale</span>(x: np.ndarray) -> np.ndarray:
+    x_min, x_max = x.min(), x.max()
+    <span class="keyword">return</span> (x - x_min) / (x_max - x_min)
+
+turistas = np.array([<span class="number">270</span>, <span class="number">245</span>, <span class="number">198</span>, <span class="number">140</span>, <span class="number">110</span>,
+                     <span class="number">104</span>, <span class="number">122</span>, <span class="number">175</span>, <span class="number">278</span>]) * <span class="number">1000</span>
+norm = min_max_scale(turistas.astype(float))
+<span class="keyword">print</span>(<span class="string">f"Min normalizado: {norm.min():.1f}"</span>)  <span class="comment"># 0.0</span>
+<span class="keyword">print</span>(<span class="string">f"Max normalizado: {norm.max():.1f}"</span>)  <span class="comment"># 1.0</span>
+
+<span class="comment"># === log1p: dominio x > -1 ===</span>
+ingresos = np.array([<span class="number">0</span>, <span class="number">500</span>, <span class="number">1200</span>, <span class="number">15000</span>, <span class="number">0</span>])
+<span class="keyword">print</span>(np.log1p(ingresos))  <span class="comment"># sin error en 0</span>
+
+<span class="comment"># === Errores de dominio en datos reales ===</span>
+x_test = np.array([<span class="number">2</span>, <span class="number">0</span>, -<span class="number">3</span>])
+<span class="keyword">with</span> np.errstate(divide=<span class="string">'ignore'</span>, invalid=<span class="string">'ignore'</span>):
+    resultado = np.log(x_test)
+    <span class="keyword">print</span>(resultado)
+<span class="comment"># => [0.693..., -inf, nan]  ERRORES DE DOMINIO</span>
+
+<span class="comment"># Solución: log1p o clip</span>
+seguro = np.log1p(np.clip(x_test, <span class="number">0</span>, <span class="keyword">None</span>))
+                    </div>
+                    <div>
+                        <div class="three-columns" style="margin-bottom: 12px;">
+                            <div class="ml-card">
+                                <div class="badge">MinMax</div>
+                                <h4>f: [xmin, xmax] -> [0,1]</h4>
+                                <p>Biyectiva. Rango exactamente [0,1]. Función lineal.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">log1p</div>
+                                <h4>f: (-1,inf) -> R</h4>
+                                <p>Dom extendido al incluir x=0. Maneja ceros sin -inf.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Scaler</div>
+                                <h4>f: R -> R</h4>
+                                <p>z = (x-mu)/sigma. Centra mu=0 y sigma=1. Biyectiva.</p>
+                            </div>
+                        </div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Transformación</th>
+                                        <th>Dominio</th>
+                                        <th>Rango</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>MinMaxScaler</td><td>[xmin, xmax]</td><td>[0, 1]</td></tr>
+                                    <tr><td>StandardScaler</td><td>R</td><td>R (mu=0, sigma=1)</td></tr>
+                                    <tr><td>log(x)</td><td>(0, inf)</td><td>R</td></tr>
+                                    <tr><td>log1p(x)</td><td>(-1, inf)</td><td>R</td></tr>
+                                    <tr><td>Sigmoid</td><td>R</td><td>(0, 1)</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 8: FLUJO COMPLETO ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Flujo completo: SymPy -> lambdify -> NumPy -> Matplotlib</h2>
+                <p class="slide-subtitle">De la definición simbólica a la gráfica en 4 pasos</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, lambdify, factor
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = symbols(<span class="string">'x'</span>)
+
+<span class="comment"># -- PASO 1: Definir simbólicamente</span>
+f_sym = x**<span class="number">2</span> - <span class="number">3</span>*x + <span class="number">2</span>
+<span class="keyword">print</span>(<span class="string">"Factorizada:"</span>, factor(f_sym))    <span class="comment"># => (x-1)*(x-2)</span>
+<span class="keyword">print</span>(<span class="string">"f(0) ="</span>, f_sym.subs(x, <span class="number">0</span>))       <span class="comment"># => 2</span>
+
+<span class="comment"># -- PASO 2: Convertir a función numérica</span>
+f_num = lambdify(x, f_sym, modules=<span class="string">'numpy'</span>)
+
+<span class="comment"># -- PASO 3: Evaluar sobre el dominio</span>
+x_vals = np.linspace(-<span class="number">1</span>, <span class="number">4</span>, <span class="number">500</span>)
+y_vals = f_num(x_vals)
+
+<span class="comment"># -- PASO 4: Graficar con API orientada a objetos</span>
+fig, ax = plt.subplots(figsize=(<span class="number">9</span>, <span class="number">5</span>), layout=<span class="string">'constrained'</span>)
+ax.plot(x_vals, y_vals, color=<span class="string">'#FF8C00'</span>, linewidth=<span class="number">2.5</span>, label=<span class="string">r'$f(x) = x^2 - 3x + 2$'</span>)
+ax.scatter([<span class="number">1</span>, <span class="number">2</span>], [<span class="number">0</span>, <span class="number">0</span>], color=<span class="string">'red'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>, label=<span class="string">'Raices: x=1, x=2'</span>)
+ax.scatter([<span class="number">0</span>], [<span class="number">2</span>], color=<span class="string">'steelblue'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>, label=<span class="string">'Intercepto y: (0, 2)'</span>)
+ax.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>); ax.axvline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>)
+ax.set_xlabel(<span class="string">'x (dominio)'</span>); ax.set_ylabel(<span class="string">'f(x) (rango)'</span>)
+ax.set_title(<span class="string">'SymPy -> lambdify -> NumPy -> Matplotlib'</span>); ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                </div>
+                <div class="highlight-box" style="margin-top: 12px;">
+                    <p>Este es el flujo estándar del curso: SymPy para entender y verificar, lambdify como puente, NumPy para evaluar masivamente, Matplotlib para comunicar. Cada herramienta tiene su rol.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: DIVISOR SECCION ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Semana 8</p>
+            <h2 class="section-title">Funciones lineales en Python</h2>
+            <p class="section-subtitle">De y = mx + b a la regresión lineal con NumPy y scikit-learn</p>
+        </div>
+
+        <!-- ==================== SLIDE 10: FUNCION LINEAL EN PYTHON ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La función lineal en Python</h2>
+                <p class="slide-subtitle">f(x) = mx + b -- definición, evaluación y gráfica</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># === Definir funciones lineales ===</span>
+<span class="keyword">def</span> <span class="func">lineal</span>(x, m, b):
+    <span class="string">"""f(x) = mx + b"""</span>
+    <span class="keyword">return</span> m * x + b
+
+<span class="comment"># Evaluar: Ventas = 2.5 * Publicidad + 10</span>
+publicidad = np.array([<span class="number">0</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">15</span>, <span class="number">20</span>, <span class="number">25</span>])
+ventas = lineal(publicidad, m=<span class="number">2.5</span>, b=<span class="number">10</span>)
+<span class="keyword">print</span>(ventas)  <span class="comment"># [10. 22.5 35. 47.5 60. 72.5]</span>
+
+<span class="comment"># === Visualizar múltiples pendientes ===</span>
+x = np.linspace(-<span class="number">5</span>, <span class="number">5</span>, <span class="number">200</span>)
+
+fig, ax = plt.subplots(figsize=(<span class="number">9</span>, <span class="number">5</span>), layout=<span class="string">'constrained'</span>)
+
+pendientes = [<span class="number">2</span>, <span class="number">0.5</span>, <span class="number">0</span>, -<span class="number">1</span>, -<span class="number">3</span>]
+<span class="keyword">for</span> m <span class="keyword">in</span> pendientes:
+    ax.plot(x, lineal(x, m, <span class="number">0</span>),
+            label=<span class="string">f'm = {m}'</span>, lw=<span class="number">2</span>)
+
+ax.axhline(<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.8</span>)
+ax.axvline(<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.8</span>)
+ax.set_title(<span class="string">'Efecto de la pendiente m en f(x) = mx'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_ylim(-<span class="number">10</span>, <span class="number">10</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Pendiente = efecto marginal</h4>
+                            <p>En el modelo <code>Ventas = 2.5 * Pub + 10</code>, la pendiente 2.5 significa: por cada unidad monetaria adicional en publicidad, las ventas aumentan en promedio 2.5 unidades.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Intercepto = valor base</h4>
+                            <p>El intercepto b = 10 representa las ventas cuando la publicidad es cero. Ojo: no siempre tiene sentido práctico (depende del contexto).</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Propiedades clave</h3>
+                            <ul>
+                                <li>m > 0: creciente. m &lt; 0: decreciente. m = 0: constante</li>
+                                <li>Dominio: R. Rango: R (si m != 0)</li>
+                                <li>Biyectiva si m != 0. Invertible: f^-1(y) = (y-b)/m</li>
+                                <li>Tasa de cambio CONSTANTE = la pendiente m</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En ML: y_hat = w1*x + bias. El peso w1 es la pendiente; bias es el intercepto. Es la misma ecuación con diferente nombre.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: PENDIENTE 3 METODOS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Calcular la pendiente: tres métodos en Python</h2>
+                <p class="slide-subtitle">De la fórmula manual a scikit-learn</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy <span class="keyword">import</span> stats
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+
+x = np.array([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>], dtype=float)
+y = np.array([<span class="number">2.1</span>, <span class="number">3.8</span>, <span class="number">6.2</span>, <span class="number">7.5</span>, <span class="number">9.8</span>, <span class="number">11.5</span>, <span class="number">14.1</span>, <span class="number">15.9</span>])
+
+<span class="comment"># Metodo 1: Fórmula manual con NumPy (lo que hicimos en el iPad)</span>
+x_mean, y_mean = np.mean(x), np.mean(y)
+m = np.sum((x - x_mean) * (y - y_mean)) / np.sum((x - x_mean)**<span class="number">2</span>)
+b = y_mean - m * x_mean
+<span class="keyword">print</span>(<span class="string">f"Manual:  m={m:.4f}, b={b:.4f}"</span>)
+
+<span class="comment"># Metodo 2: scipy.stats.linregress (incluye p-valor y error estándar)</span>
+slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
+<span class="keyword">print</span>(<span class="string">f"Scipy:   m={slope:.4f}, b={intercept:.4f}, R2={r_value**2:.4f}"</span>)
+
+<span class="comment"># Metodo 3: scikit-learn (patrón fit/predict del ML)</span>
+modelo = LinearRegression().fit(x.reshape(-<span class="number">1</span>, <span class="number">1</span>), y)
+<span class="keyword">print</span>(<span class="string">f"Sklearn: m={modelo.coef_[0]:.4f}, b={modelo.intercept_:.4f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"         R2={modelo.score(x.reshape(-1, 1), y):.4f}"</span>)
+                </div>
+                <div class="three-columns" style="margin-top: 15px;">
+                    <div class="feature-card">
+                        <h4>Fórmula manual</h4>
+                        <p>Implementa OLS directamente. Ideal para entender la matemática detrás. Se usa como ejercicio pedagógico.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>scipy.stats.linregress</h4>
+                        <p>Una línea de código. Retorna pendiente, intercepto, r, p-valor y error estándar. Ideal para análisis rápido.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>sklearn LinearRegression</h4>
+                        <p>Patrón fit/predict del ML. Se integra con pipelines, cross-validation y GridSearch. Estándar de la industria.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 12: np.polyfit vs sklearn ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">np.polyfit vs sklearn.LinearRegression</h2>
+                <p class="slide-subtitle">Dos herramientas, dos filosofías, mismo resultado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>], dtype=float)
+y = np.array([<span class="number">2.1</span>,<span class="number">4.0</span>,<span class="number">5.8</span>,<span class="number">8.2</span>,<span class="number">9.8</span>,<span class="number">12.1</span>,<span class="number">14.0</span>,<span class="number">15.9</span>,<span class="number">18.2</span>,<span class="number">20.1</span>])
+
+<span class="comment"># --- Camino 1: np.polyfit ---</span>
+coefs = np.polyfit(x, y, deg=<span class="number">1</span>)  <span class="comment"># [pendiente, intercepto]</span>
+p = np.poly1d(coefs)
+<span class="keyword">print</span>(<span class="string">f"polyfit: y = {coefs[0]:.3f}x + {coefs[1]:.3f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Prediccion x=11: {p(11):.2f}"</span>)
+
+<span class="comment"># --- Camino 2: sklearn ---</span>
+modelo = LinearRegression()
+modelo.fit(x.reshape(-<span class="number">1</span>, <span class="number">1</span>), y)  <span class="comment"># X debe ser 2D</span>
+<span class="keyword">print</span>(<span class="string">f"sklearn: y = {modelo.coef_[0]:.3f}x + {modelo.intercept_:.3f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"R2 = {modelo.score(x.reshape(-1, 1), y):.4f}"</span>)
+
+<span class="comment"># --- Graficar ---</span>
+fig, ax = plt.subplots(figsize=(<span class="number">8</span>,<span class="number">5</span>), layout=<span class="string">'constrained'</span>)
+ax.scatter(x, y, color=<span class="string">'steelblue'</span>, s=<span class="number">60</span>,
+           label=<span class="string">'Datos observados'</span>, zorder=<span class="number">5</span>)
+
+x_line = np.linspace(<span class="number">0</span>, <span class="number">11</span>, <span class="number">100</span>)
+ax.plot(x_line, p(x_line), color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>,
+        label=<span class="string">f'y = {coefs[0]:.2f}x + {coefs[1]:.2f}'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Regresión lineal simple'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspecto</th>
+                                        <th>np.polyfit</th>
+                                        <th>sklearn</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Tipo</td>
+                                        <td>Función pura</td>
+                                        <td>Clase fit/predict</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Input X</td>
+                                        <td>Array 1D</td>
+                                        <td>Array 2D (n x p)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Reg. múltiple</td>
+                                        <td>No</td>
+                                        <td>Si</td>
+                                    </tr>
+                                    <tr>
+                                        <td>R2 auto</td>
+                                        <td>No (manual)</td>
+                                        <td>model.score()</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Grado polinomial</td>
+                                        <td>Cualquiera (deg=n)</td>
+                                        <td>Solo lineal</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Integración ML</td>
+                                        <td>No</td>
+                                        <td>Pipelines, CV</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Estrategia del curso: usar np.polyfit() para introducir el concepto (más simple), luego migrar a sklearn.LinearRegression cuando se enseña el flujo de trabajo de ML.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 10px;">
+                            <h4>Cuidado con reshape</h4>
+                            <p>sklearn requiere X en 2D: <code>x.reshape(-1, 1)</code> convierte un array de forma (n,) a (n, 1). Esto es porque sklearn está diseñado para múltiples features.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 13: R2 ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">R2: qué mide y cuándo engaña</h2>
+                <p class="slide-subtitle">El coeficiente de determinación -- cálculo, interpretación y trampas</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px;">
+                            R2 = 1 - SS_res / SS_tot
+                        </div>
+                        <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+x = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>], dtype=float)
+y = np.array([<span class="number">2.1</span>,<span class="number">4.0</span>,<span class="number">5.8</span>,<span class="number">8.2</span>,<span class="number">9.8</span>,<span class="number">12.1</span>,<span class="number">14.0</span>,<span class="number">15.9</span>,<span class="number">18.2</span>,<span class="number">20.1</span>])
+
+coefs = np.polyfit(x, y, <span class="number">1</span>)
+y_pred = np.polyval(coefs, x)
+
+<span class="comment"># Cálculo manual de R2</span>
+ss_res = np.sum((y - y_pred)**<span class="number">2</span>)
+ss_tot = np.sum((y - np.mean(y))**<span class="number">2</span>)
+r2 = <span class="number">1</span> - (ss_res / ss_tot)
+<span class="keyword">print</span>(<span class="string">f"R2 = {r2:.6f}"</span>)
+
+<span class="comment"># Verificación: R2 = correlación^2</span>
+r = np.corrcoef(x, y)[<span class="number">0</span>, <span class="number">1</span>]
+<span class="keyword">print</span>(<span class="string">f"r^2 = {r**2:.6f}"</span>)  <span class="comment"># igual</span>
+
+<span class="comment"># Con sklearn (automático)</span>
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+modelo = LinearRegression().fit(
+    x.reshape(-<span class="number">1</span>,<span class="number">1</span>), y)
+<span class="keyword">print</span>(<span class="string">f"sklearn R2 = {modelo.score(x.reshape(-1,1), y):.6f}"</span>)
+                        </div>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Interpretación correcta</h4>
+                            <p>R2 = 0.85 significa que el modelo explica el 85% de la variabilidad de Y. NO significa que "acierta el 85% de las veces".</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Cuarteto de Anscombe</h3>
+                            <p>Cuatro datasets con misma media, misma recta de regresión y mismo R2 = 0.67, pero patrones completamente diferentes. Lección: SIEMPRE visualizar antes de confiar en R2.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Cuándo R2 engaña</h3>
+                            <ul>
+                                <li>R2 alto NO implica causalidad</li>
+                                <li>Agregar variables siempre aumenta R2 (usar R2 ajustado)</li>
+                                <li>R2 alto en entrenamiento puede ser sobreajuste</li>
+                                <li>Un R2 "bueno" depende del campo (0.3 en social, 0.9 en física)</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Práctica recomendada: combinar R2 con RMSE o MAE. R2 para bondad de ajuste general; RMSE/MAE para cuantificar error en unidades concretas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 14: RESIDUOS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Residuos: el diagnóstico del modelo</h2>
+                <p class="slide-subtitle">e_i = y_i - y_hat_i -- visualizar para validar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+
+x = np.array([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>]).reshape(-<span class="number">1</span>,<span class="number">1</span>)
+y = np.array([<span class="number">2.1</span>,<span class="number">3.8</span>,<span class="number">6.2</span>,<span class="number">7.5</span>,<span class="number">9.8</span>,<span class="number">11.5</span>,<span class="number">14.1</span>,<span class="number">15.9</span>])
+
+reg = LinearRegression().fit(x, y)
+y_pred = reg.predict(x)
+residuos = y - y_pred
+
+<span class="comment"># Verificar propiedades matemáticas</span>
+<span class="keyword">print</span>(<span class="string">f"Suma residuos: {np.sum(residuos):.10f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Corr(x, res):  {np.corrcoef(x.flatten(), residuos)[0,1]:.10f}"</span>)
+
+<span class="comment"># Gráfico de diagnóstico</span>
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">12</span>, <span class="number">5</span>),
+                         layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># Panel 1: datos + recta</span>
+axes[<span class="number">0</span>].scatter(x, y, color=<span class="string">'steelblue'</span>, s=<span class="number">60</span>)
+axes[<span class="number">0</span>].plot(x, y_pred, color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+<span class="keyword">for</span> i <span class="keyword">in</span> <span class="func">range</span>(<span class="func">len</span>(x)):
+    axes[<span class="number">0</span>].plot([x[i], x[i]], [y[i], y_pred[i]],
+               color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>, alpha=<span class="number">0.5</span>)
+axes[<span class="number">0</span>].set_title(<span class="string">'Regresión + residuos verticales'</span>)
+
+<span class="comment"># Panel 2: residuos vs ajustados</span>
+axes[<span class="number">1</span>].scatter(y_pred, residuos, color=<span class="string">'seagreen'</span>, s=<span class="number">60</span>)
+axes[<span class="number">1</span>].axhline(y=<span class="number">0</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>)
+axes[<span class="number">1</span>].set_xlabel(<span class="string">'Valores ajustados'</span>)
+axes[<span class="number">1</span>].set_ylabel(<span class="string">'Residuos'</span>)
+axes[<span class="number">1</span>].set_title(<span class="string">'Gráfico de residuos'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Propiedades de los residuos</h3>
+                            <ul>
+                                <li>Suman cero: sum(e_i) = 0</li>
+                                <li>Ortogonales a x: sum(x_i * e_i) = 0</li>
+                                <li>La recta SIEMPRE pasa por (x_bar, y_bar)</li>
+                            </ul>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Cómo leer el gráfico de residuos</h3>
+                            <ul>
+                                <li>Dispersión aleatoria alrededor de 0: modelo adecuado</li>
+                                <li>Patrón curvo: sugiere no linealidad (necesita modelo cuadrático u otro)</li>
+                                <li>Patrón de embudo: heterocedasticidad (varianza no constante)</li>
+                                <li>Puntos extremos aislados: outliers que merecen investigación</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>El gráfico de residuos es la herramienta diagnóstica más importante. Un R2 alto con residuos con patrón curvo significa que un modelo lineal no es apropiado.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 15: APLICACION CR ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación CR: regresión con datos del BCCR</h2>
+                <p class="slide-subtitle">Tipo de cambio colón-dólar -- de los datos reales al modelo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+
+<span class="comment"># Datos reales BCCR: TC mensual CRC/USD (2024-2026)</span>
+meses_label = [<span class="string">'Ene24'</span>,<span class="string">'Abr24'</span>,<span class="string">'Jul24'</span>,<span class="string">'Oct24'</span>,
+               <span class="string">'Ene25'</span>,<span class="string">'Abr25'</span>,<span class="string">'Jul25'</span>,<span class="string">'Oct25'</span>,
+               <span class="string">'Ene26'</span>,<span class="string">'Feb26'</span>]
+tc = np.array([<span class="number">518</span>, <span class="number">510</span>, <span class="number">515</span>, <span class="number">508</span>, <span class="number">500</span>,
+               <span class="number">495</span>, <span class="number">488</span>, <span class="number">480</span>, <span class="number">476</span>, <span class="number">472</span>], dtype=float)
+t = np.arange(<span class="func">len</span>(tc)).reshape(-<span class="number">1</span>, <span class="number">1</span>)
+
+<span class="comment"># Ajustar regresión lineal</span>
+modelo = LinearRegression().fit(t, tc)
+tc_pred = modelo.predict(t)
+
+<span class="keyword">print</span>(<span class="string">f"Pendiente: {modelo.coef_[0]:.2f} CRC/periodo"</span>)
+<span class="keyword">print</span>(<span class="string">f"Intercepto: {modelo.intercept_:.2f} CRC"</span>)
+<span class="keyword">print</span>(<span class="string">f"R2: {modelo.score(t, tc):.4f}"</span>)
+
+<span class="comment"># Predicción: próximo trimestre (t=10)</span>
+tc_futuro = modelo.predict([[<span class="number">10</span>]])
+<span class="keyword">print</span>(<span class="string">f"Prediccion Abr-2026: {tc_futuro[0]:.1f} CRC/USD"</span>)
+
+<span class="comment"># Graficar</span>
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>,<span class="number">5</span>), layout=<span class="string">'constrained'</span>)
+ax.scatter(t, tc, c=<span class="string">'#2d2d2d'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>,
+           label=<span class="string">'Datos reales BCCR'</span>)
+ax.plot(t, tc_pred, color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>,
+        label=<span class="string">f'Modelo: TC = {modelo.coef_[0]:.1f}t + {modelo.intercept_:.1f}'</span>)
+ax.axhline(<span class="number">500</span>, ls=<span class="string">'--'</span>, color=<span class="string">'red'</span>, alpha=<span class="number">0.5</span>, label=<span class="string">'Ref 500 CRC'</span>)
+ax.set_xticks(t.flatten())
+ax.set_xticklabels(meses_label, rotation=<span class="number">45</span>)
+ax.set_ylabel(<span class="string">'CRC/USD'</span>); ax.legend()
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Regresión lineal: tipo de cambio BCCR 2024-2026'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Interpretación del modelo</h4>
+                            <p>La pendiente negativa indica que el colón se ha apreciado frente al dólar en el período 2024-2026. Cada trimestre, el tipo de cambio disminuye en promedio unos 5 CRC.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Contexto económico</h3>
+                            <ul>
+                                <li>TC pasó de ~518 a ~472 CRC/USD (apreciación ~8-9%)</li>
+                                <li>Tasa de política monetaria: 3.25% (inicio 2026)</li>
+                                <li>Inflación negativa gran parte de 2023-2025</li>
+                                <li>Zonas francas crecieron 10.7% vs 2.7% régimen definitivo</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Pregunta crítica: el modelo predice que el colón seguirá apreciándose indefinidamente. Es esto realista? Aquí aparece la limitación del modelo lineal para fenómenos que tienen equilibrios naturales.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 10px;">
+                            <h4>Paquete bccr</h4>
+                            <p>Con <code>pip install bccr</code> se puede descargar datos del BCCR directamente en DataFrames. Código: <code>SW(TC_compra=317)</code> para tipo de cambio de compra.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 16: RESUMEN ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen semanas 7-8</h2>
+                <p class="slide-subtitle">Del concepto matemático al modelo predictivo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Funciones en Python (semana 7)</h4>
+                            <p><code>def f(x)</code> es f: A -> B. Type hints documentan dominio/codominio. lambdify convierte SymPy a NumPy para evaluación masiva. Composición de funciones = pipelines de ML.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Función lineal (semana 8)</h4>
+                            <p>f(x) = mx + b. La pendiente m es el efecto marginal (constante). Tres formas de calcularla en Python: manual, scipy, sklearn.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Regresión lineal</h4>
+                            <p>np.polyfit para introducir el concepto. sklearn.LinearRegression para el flujo ML (fit/predict/score). Siempre visualizar datos + residuos.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>R2 y diagnóstico</h4>
+                            <p>R2 = proporción de varianza explicada. Combinar con RMSE/MAE. El cuarteto de Anscombe demuestra que los números solos no bastan.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Taller 3 (asignado hoy)</h3>
+                            <ul>
+                                <li>Tema: funciones lineales + regresión</li>
+                                <li>Incluye ejercicios manuales + implementación en Python</li>
+                                <li>Usar el flujo completo: SymPy -> lambdify -> NumPy -> Matplotlib</li>
+                                <li>Calcular y analizar R2 para cada modelo</li>
+                                <li>Entrega: semana 9</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Próxima semana: funciones cuadráticas. Veremos vértice, eje de simetría, regresión cuadrática y comparación de modelos lineal vs. cuadrático (R2).</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px;">
+                            <h3>Recordatorio</h3>
+                            <p>El Taller 2 (gráficas + Matplotlib) se entrega esta semana si aún no lo han hecho. Revisen la retroalimentación del Avance 1 del proyecto.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end presentation-container -->
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&larr; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft')  changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

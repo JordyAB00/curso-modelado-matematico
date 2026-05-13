@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 6: Gráficas en el plano cartesiano con Python - Matemática básica para ciencia de datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 22px;
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">12</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Gráficas con Python</h1>
+            <p class="cover-subtitle">Semana 6: del papel a Matplotlib</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Lo que vimos en el iPad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos a mano, ahora en código</h2>
+                <p class="slide-subtitle">Automatizando cálculos geométricos con Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">d = ?</div>
+                        <div class="stat-label">Distancias con NumPy</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">y = mx + b</div>
+                        <div class="stat-label">Rectas con Matplotlib</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">(x-h)² + (y-k)²</div>
+                        <div class="stat-label">Círculos programáticos</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>En los próximos 25 minutos veremos cómo Python hace en milisegundos lo que calculamos a mano. Esto es la base de la visualización de datos en ciencia de datos.</p>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matemático</th>
+                                <th>Función Python</th>
+                                <th>Aplicación en ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Distancia euclidiana</td>
+                                <td><code>np.linalg.norm()</code></td>
+                                <td>KNN, clustering, embeddings</td>
+                            </tr>
+                            <tr>
+                                <td>Punto medio</td>
+                                <td><code>(p1 + p2) / 2</code></td>
+                                <td>Centroides en K-Means</td>
+                            </tr>
+                            <tr>
+                                <td>Ecuación de recta</td>
+                                <td><code>ax.plot()</code></td>
+                                <td>Regresión lineal</td>
+                            </tr>
+                            <tr>
+                                <td>Ecuación de círculo</td>
+                                <td><code>plt.Circle()</code></td>
+                                <td>Fronteras de decisión</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Distancias con NumPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Distancias y puntos medios con NumPy</h2>
+                <p class="slide-subtitle">np.linalg.norm() es tu mejor amigo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px;">
+                            d = √[(x₂-x₁)² + (y₂-y₁)²]
+                        </div>
+                        <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Definir dos puntos</span>
+<span class="keyword">p1</span> = np.array([<span class="number">2</span>, <span class="number">3</span>])
+<span class="keyword">p2</span> = np.array([<span class="number">8</span>, <span class="number">11</span>])
+
+<span class="comment"># Distancia: forma manual</span>
+<span class="keyword">d_manual</span> = np.sqrt(np.sum((p2 - p1)**<span class="number">2</span>))
+
+<span class="comment"># Distancia: forma idiomática</span>
+<span class="keyword">d_numpy</span> = np.linalg.norm(p2 - p1)
+
+<span class="keyword">print</span>(<span class="string">f"Distancia: </span>{d_numpy}<span class="string">"</span>)
+<span class="comment"># Distancia: 10.0</span>
+
+<span class="comment"># Punto medio</span>
+<span class="keyword">medio</span> = (p1 + p2) / <span class="number">2</span>
+<span class="keyword">print</span>(<span class="string">f"Punto medio: </span>{medio}<span class="string">"</span>)
+<span class="comment"># Punto medio: [5. 7.]</span>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>np.linalg.norm()</h4>
+                            <p>Calcula la norma (longitud) de un vector. Cuando le pasas la diferencia entre dos puntos, obtienes la distancia euclidiana.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Operaciones vectorizadas</h4>
+                            <p>p2 - p1 resta componente a componente. NumPy hace esto automáticamente sin necesidad de loops.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En KNN, calcular distancias entre miles de puntos es instantáneo gracias a NumPy. Un loop en Python puro tardaría 100x más.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Matriz de distancias -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Matriz de distancias: la base de KNN</h2>
+                <p class="slide-subtitle">scipy.spatial.distance.cdist para todos los pares</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.spatial.distance <span class="keyword">import</span> cdist
+
+<span class="comment"># Dataset de ejemplo: 4 puntos</span>
+<span class="keyword">puntos</span> = np.array([
+    [<span class="number">0</span>, <span class="number">0</span>],   <span class="comment"># Punto A</span>
+    [<span class="number">3</span>, <span class="number">4</span>],   <span class="comment"># Punto B</span>
+    [<span class="number">1</span>, <span class="number">1</span>],   <span class="comment"># Punto C</span>
+    [<span class="number">6</span>, <span class="number">8</span>]    <span class="comment"># Punto D</span>
+])
+
+<span class="comment"># Matriz de distancias entre TODOS los pares</span>
+<span class="keyword">matriz</span> = cdist(puntos, puntos, metric=<span class="string">'euclidean'</span>)
+
+<span class="keyword">print</span>(<span class="string">"Matriz de distancias:"</span>)
+<span class="keyword">print</span>(np.round(matriz, <span class="number">2</span>))
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Salida:</h3>
+                            <div class="output-box">
+[[0.   5.   1.41 10.  ]
+ [5.   0.   3.61  5.  ]
+ [1.41 3.61 0.   8.6 ]
+ [10.  5.   8.6  0.  ]]
+                            </div>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Interpretación</h4>
+                            <p>Fila i, columna j = distancia entre punto i y punto j. La diagonal es siempre 0. La matriz es simétrica.</p>
+                        </div>
+                        <div class="feature-card" style="margin-top: 12px;">
+                            <h4>Aplicación directa</h4>
+                            <p>KNN usa esta matriz para encontrar los k vecinos más cercanos. El punto C tiene como vecino más cercano al punto A (distancia 1.41).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Introducción a Matplotlib -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Matplotlib 3.10: API orientada a objetos</h2>
+                <p class="slide-subtitle">La forma profesional de graficar en Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="content-box">
+                            <h3>Estructura básica recomendada</h3>
+                            <p>Siempre crear Figure y Axes explícitamente. Usar layout='constrained' en lugar de tight_layout().</p>
+                        </div>
+                        <div class="code-box" style="margin-top: 12px;">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Crear figura y ejes</span>
+fig, ax = plt.subplots(
+    figsize=(<span class="number">9</span>, <span class="number">5</span>),
+    layout=<span class="string">'constrained'</span>
+)
+
+<span class="comment"># Datos</span>
+x = np.linspace(-<span class="number">5</span>, <span class="number">5</span>, <span class="number">100</span>)
+y = x**<span class="number">2</span>
+
+<span class="comment"># Graficar</span>
+ax.plot(x, y, color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+ax.set_xlabel(<span class="string">'x'</span>)
+ax.set_ylabel(<span class="string">'f(x)'</span>)
+ax.set_title(<span class="string">'Parábola y = x²'</span>)
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+plt.show()
+                        </div>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Antiguo (evitar)</th>
+                                        <th>Moderno (usar)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>plt.plot(x, y)</code></td>
+                                        <td><code>ax.plot(x, y)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>plt.xlabel()</code></td>
+                                        <td><code>ax.set_xlabel()</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>plt.tight_layout()</code></td>
+                                        <td><code>layout='constrained'</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>plt.title()</code></td>
+                                        <td><code>ax.set_title()</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>La API orientada a objetos (fig, ax) es más explícita, reproducible y escalable para gráficos complejos con múltiples subplots.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Graficando puntos y cuadrantes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Puntos en el plano cartesiano</h2>
+                <p class="slide-subtitle">ax.scatter() y los cuatro cuadrantes</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+fig, ax = plt.subplots(figsize=(<span class="number">8</span>, <span class="number">8</span>), 
+                       layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># Puntos en cada cuadrante</span>
+<span class="keyword">puntos</span> = {
+    <span class="string">'I'</span>:   (<span class="number">3</span>, <span class="number">4</span>),
+    <span class="string">'II'</span>:  (-<span class="number">2</span>, <span class="number">3</span>),
+    <span class="string">'III'</span>: (-<span class="number">4</span>, -<span class="number">2</span>),
+    <span class="string">'IV'</span>:  (<span class="number">5</span>, -<span class="number">3</span>)
+}
+
+<span class="keyword">colores</span> = [<span class="string">'#FF8C00'</span>, <span class="string">'#2d2d2d'</span>, 
+           <span class="string">'steelblue'</span>, <span class="string">'#e74c3c'</span>]
+
+<span class="keyword">for</span> (nombre, (x, y)), color <span class="keyword">in</span> zip(
+    puntos.items(), colores
+):
+    ax.scatter(x, y, s=<span class="number">150</span>, c=color, 
+               zorder=<span class="number">5</span>)
+    ax.annotate(
+        <span class="string">f'</span>{nombre}: ({x}, {y})<span class="string">'</span>,
+        (x, y), 
+        xytext=(<span class="number">10</span>, <span class="number">10</span>),
+        textcoords=<span class="string">'offset points'</span>,
+        fontsize=<span class="number">11</span>
+    )
+
+<span class="comment"># Ejes cartesianos</span>
+ax.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">1</span>)
+ax.axvline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">1</span>)
+ax.set_xlim(-<span class="number">6</span>, <span class="number">7</span>)
+ax.set_ylim(-<span class="number">5</span>, <span class="number">6</span>)
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_aspect(<span class="string">'equal'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>ax.scatter()</h4>
+                            <p>Dibuja puntos individuales. El parámetro s controla el tamaño, c el color, y zorder el orden de capas (mayor = más arriba).</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>ax.annotate()</h4>
+                            <p>Agrega etiquetas a los puntos. xytext y textcoords controlan la posición relativa del texto.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>ax.set_aspect('equal')</h4>
+                            <p>Fuerza la misma escala en ambos ejes. Esencial para que círculos se vean circulares.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En scatterplots de ML, cada punto es una observación. Los ejes son features. Visualizar datos así es el primer paso del EDA.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Ecuación de rectas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Graficando rectas: y = mx + b</h2>
+                <p class="slide-subtitle">La base visual de la regresión lineal</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">6</span>), 
+                       layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># Dominio</span>
+x = np.linspace(-<span class="number">2</span>, <span class="number">6</span>, <span class="number">100</span>)
+
+<span class="comment"># Recta original: y = 2x + 1</span>
+m1, b1 = <span class="number">2</span>, <span class="number">1</span>
+ax.plot(x, m1*x + b1, 
+        color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>,
+        label=<span class="string">f'y = {m1}x + {b1}'</span>)
+
+<span class="comment"># Recta paralela: misma pendiente</span>
+b2 = -<span class="number">2</span>
+ax.plot(x, m1*x + b2, 
+        color=<span class="string">'steelblue'</span>, lw=<span class="number">2</span>, ls=<span class="string">'--'</span>,
+        label=<span class="string">f'Paralela: y = {m1}x + {b2}'</span>)
+
+<span class="comment"># Recta perpendicular: m₂ = -1/m₁</span>
+m3 = -<span class="number">1</span>/m1
+b3 = <span class="number">3</span>
+ax.plot(x, m3*x + b3, 
+        color=<span class="string">'#2d2d2d'</span>, lw=<span class="number">2</span>, ls=<span class="string">':'</span>,
+        label=<span class="string">f'Perpendicular: y = {m3}x + {b3}'</span>)
+
+ax.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>)
+ax.axvline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>)
+ax.legend(fontsize=<span class="number">11</span>)
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Rectas: paralelas y perpendiculares'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px;">
+                            y = mx + b
+                        </div>
+                        <div class="content-box">
+                            <h3>Interpretación geométrica</h3>
+                            <ul>
+                                <li><strong>m (pendiente):</strong> Qué tan inclinada está la recta</li>
+                                <li><strong>b (intercepto):</strong> Donde cruza el eje y</li>
+                                <li><strong>Paralelas:</strong> m₁ = m₂</li>
+                                <li><strong>Perpendiculares:</strong> m₁ · m₂ = -1</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En regresión lineal, scikit-learn encuentra los valores óptimos de m y b que minimizan el error. La visualización es fundamental.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Ecuación de círculos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Graficando círculos</h2>
+                <p class="slide-subtitle">plt.Circle() y parametrización trigonométrica</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> matplotlib.patches <span class="keyword">as</span> patches
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+fig, (ax1, ax2) = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, 
+    figsize=(<span class="number">12</span>, <span class="number">5</span>), layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># =============================</span>
+<span class="comment"># Método 1: plt.Circle()</span>
+<span class="comment"># =============================</span>
+circulo = patches.Circle(
+    (<span class="number">2</span>, <span class="number">3</span>),        <span class="comment"># centro (h, k)</span>
+    radius=<span class="number">4</span>,      <span class="comment"># radio</span>
+    fill=<span class="keyword">False</span>,
+    edgecolor=<span class="string">'#FF8C00'</span>,
+    linewidth=<span class="number">2</span>
+)
+ax1.add_patch(circulo)
+ax1.plot(<span class="number">2</span>, <span class="number">3</span>, <span class="string">'ko'</span>, ms=<span class="number">8</span>)
+ax1.set_xlim(-<span class="number">4</span>, <span class="number">8</span>)
+ax1.set_ylim(-<span class="number">3</span>, <span class="number">9</span>)
+ax1.set_aspect(<span class="string">'equal'</span>)
+ax1.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax1.set_title(<span class="string">'Método 1: patches.Circle'</span>)
+
+<span class="comment"># =============================</span>
+<span class="comment"># Método 2: Parametrización</span>
+<span class="comment"># =============================</span>
+h, k, r = <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>
+theta = np.linspace(<span class="number">0</span>, <span class="number">2</span>*np.pi, <span class="number">100</span>)
+x = h + r * np.cos(theta)
+y = k + r * np.sin(theta)
+
+ax2.plot(x, y, color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+ax2.plot(h, k, <span class="string">'ko'</span>, ms=<span class="number">8</span>)
+ax2.set_xlim(-<span class="number">4</span>, <span class="number">8</span>)
+ax2.set_ylim(-<span class="number">3</span>, <span class="number">9</span>)
+ax2.set_aspect(<span class="string">'equal'</span>)
+ax2.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax2.set_title(<span class="string">'Método 2: Parametrización'</span>)
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="formula-box" style="margin-bottom: 15px;">
+                            (x - h)² + (y - k)² = r²
+                        </div>
+                        <div class="key-point">
+                            <h4>Parametrización</h4>
+                            <p>x = h + r·cos(θ), y = k + r·sin(θ) donde θ va de 0 a 2π. Esto genera todos los puntos del círculo.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>ax.set_aspect('equal')</h4>
+                            <p>Sin esto, el círculo se verá como elipse porque los ejes tendrán diferentes escalas.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>En KNN con k=1, cada punto de entrenamiento tiene una zona de influencia circular. El radio depende de la distancia al vecino más cercano de otra clase.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Ejemplo integrador -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejemplo integrador: todo junto</h2>
+                <p class="slide-subtitle">Puntos, distancias, recta y círculo en un solo gráfico</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> matplotlib.patches <span class="keyword">as</span> patches
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">8</span>), layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># 1. Puntos</span>
+<span class="keyword">p1</span>, <span class="keyword">p2</span> = np.array([<span class="number">1</span>, <span class="number">2</span>]), np.array([<span class="number">7</span>, <span class="number">8</span>])
+ax.scatter([p1[<span class="number">0</span>], p2[<span class="number">0</span>]], [p1[<span class="number">1</span>], p2[<span class="number">1</span>]], c=<span class="string">'#FF8C00'</span>, s=<span class="number">120</span>, zorder=<span class="number">5</span>)
+ax.annotate(<span class="string">'P₁(1,2)'</span>, p1, xytext=(<span class="number">5</span>, -<span class="number">15</span>), textcoords=<span class="string">'offset points'</span>)
+ax.annotate(<span class="string">'P₂(7,8)'</span>, p2, xytext=(<span class="number">5</span>, <span class="number">10</span>), textcoords=<span class="string">'offset points'</span>)
+
+<span class="comment"># 2. Distancia y punto medio</span>
+<span class="keyword">d</span> = np.linalg.norm(p2 - p1)
+<span class="keyword">medio</span> = (p1 + p2) / <span class="number">2</span>
+ax.plot([p1[<span class="number">0</span>], p2[<span class="number">0</span>]], [p1[<span class="number">1</span>], p2[<span class="number">1</span>]], <span class="string">'--'</span>, color=<span class="string">'steelblue'</span>, lw=<span class="number">1.5</span>)
+ax.scatter(*medio, c=<span class="string">'green'</span>, s=<span class="number">100</span>, marker=<span class="string">'s'</span>, zorder=<span class="number">5</span>)
+ax.annotate(<span class="string">f'M{tuple(medio)}\nd={d:.2f}'</span>, medio, xytext=(<span class="number">10</span>, <span class="number">0</span>), textcoords=<span class="string">'offset points'</span>)
+
+<span class="comment"># 3. Recta que pasa por los puntos</span>
+<span class="keyword">m</span> = (p2[<span class="number">1</span>] - p1[<span class="number">1</span>]) / (p2[<span class="number">0</span>] - p1[<span class="number">0</span>])
+<span class="keyword">b</span> = p1[<span class="number">1</span>] - m * p1[<span class="number">0</span>]
+<span class="keyword">x_line</span> = np.linspace(-<span class="number">1</span>, <span class="number">10</span>, <span class="number">100</span>)
+ax.plot(x_line, m*x_line + b, color=<span class="string">'#2d2d2d'</span>, lw=<span class="number">2</span>, label=<span class="string">f'y = {m:.1f}x + {b:.1f}'</span>)
+
+<span class="comment"># 4. Círculo centrado en el punto medio</span>
+<span class="keyword">circulo</span> = patches.Circle(medio, radius=d/<span class="number">2</span>, fill=<span class="keyword">False</span>, edgecolor=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>, ls=<span class="string">':'</span>)
+ax.add_patch(circulo)
+
+ax.axhline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>); ax.axvline(<span class="number">0</span>, color=<span class="string">'black'</span>, lw=<span class="number">0.8</span>)
+ax.set_xlim(-<span class="number">2</span>, <span class="number">12</span>); ax.set_ylim(-<span class="number">2</span>, <span class="number">12</span>); ax.set_aspect(<span class="string">'equal'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>); ax.set_title(<span class="string">'Integración: puntos, recta y círculo'</span>)
+plt.show()
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Este código combina todo lo de hoy: puntos, distancia euclidiana, punto medio, ecuación de recta y círculo. Es la base para visualizar datos y modelos en ML.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Aplicación Costa Rica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación Costa Rica: distancias entre cantones</h2>
+                <p class="slide-subtitle">Coordenadas geográficas y distancias euclidianas</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Coordenadas aproximadas (lat, lon)</span>
+<span class="keyword">cantones</span> = {
+    <span class="string">'San José'</span>: (<span class="number">9.93</span>, -<span class="number">84.08</span>),
+    <span class="string">'Heredia'</span>: (<span class="number">10.00</span>, -<span class="number">84.12</span>),
+    <span class="string">'Cartago'</span>: (<span class="number">9.86</span>, -<span class="number">83.92</span>),
+    <span class="string">'Alajuela'</span>: (<span class="number">10.02</span>, -<span class="number">84.21</span>),
+    <span class="string">'Limón'</span>: (<span class="number">9.99</span>, -<span class="number">83.03</span>)
+}
+
+<span class="comment"># Convertir a array</span>
+<span class="keyword">nombres</span> = list(cantones.keys())
+<span class="keyword">coords</span> = np.array(list(cantones.values()))
+
+<span class="comment"># Graficar</span>
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">6</span>), 
+                       layout=<span class="string">'constrained'</span>)
+
+ax.scatter(coords[:, <span class="number">1</span>], coords[:, <span class="number">0</span>], 
+           c=<span class="string">'#FF8C00'</span>, s=<span class="number">150</span>, zorder=<span class="number">5</span>)
+
+<span class="keyword">for</span> nombre, (lat, lon) <span class="keyword">in</span> cantones.items():
+    ax.annotate(nombre, (lon, lat), 
+                xytext=(<span class="number">8</span>, <span class="number">8</span>), 
+                textcoords=<span class="string">'offset points'</span>)
+
+<span class="comment"># Distancia San José - Limón</span>
+<span class="keyword">sj</span> = np.array(cantones[<span class="string">'San José'</span>])
+<span class="keyword">li</span> = np.array(cantones[<span class="string">'Limón'</span>])
+<span class="keyword">d</span> = np.linalg.norm(sj - li) * <span class="number">111</span>  <span class="comment"># aprox km</span>
+
+ax.plot([sj[<span class="number">1</span>], li[<span class="number">1</span>]], [sj[<span class="number">0</span>], li[<span class="number">0</span>]], 
+        <span class="string">'--'</span>, color=<span class="string">'steelblue'</span>, lw=<span class="number">2</span>)
+
+ax.set_xlabel(<span class="string">'Longitud'</span>)
+ax.set_ylabel(<span class="string">'Latitud'</span>)
+ax.set_title(<span class="string">f'Cantones CR - SJ a Limón: ~{d:.0f} km'</span>)
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Factor de conversión</h4>
+                            <p>1 grado de latitud es aproximadamente 111 km. Esto permite estimar distancias en kilómetros desde coordenadas.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Limitaciones</h3>
+                            <p>La distancia euclidiana en coordenadas geográficas es una aproximación. Para distancias precisas se usa la fórmula de Haversine que considera la curvatura terrestre.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Datos geográficos de Costa Rica disponibles en SNIT (Sistema Nacional de Información Territorial) y OpenStreetMap.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Mejores prácticas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Mejores prácticas Matplotlib 2026</h2>
+                <p class="slide-subtitle">Plantilla recomendada para Google Colab</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># ===================================</span>
+<span class="comment"># PLANTILLA ESTÁNDAR - Colab 2026</span>
+<span class="comment"># ===================================</span>
+
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Estilo limpio y profesional</span>
+plt.style.use(<span class="string">'seaborn-v0_8-whitegrid'</span>)
+
+<span class="comment"># Crear figura con layout constrained</span>
+fig, ax = plt.subplots(
+    figsize=(<span class="number">9</span>, <span class="number">5</span>),
+    layout=<span class="string">'constrained'</span>
+)
+
+<span class="comment"># --- TU CÓDIGO AQUÍ ---</span>
+x = np.linspace(<span class="number">0</span>, <span class="number">10</span>, <span class="number">100</span>)
+ax.plot(x, np.sin(x), color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>)
+
+<span class="comment"># Etiquetas y título SIEMPRE</span>
+ax.set_xlabel(<span class="string">'Variable x'</span>, fontsize=<span class="number">12</span>)
+ax.set_ylabel(<span class="string">'Variable y'</span>, fontsize=<span class="number">12</span>)
+ax.set_title(<span class="string">'Título descriptivo'</span>, fontsize=<span class="number">14</span>)
+
+<span class="comment"># Grid discreto</span>
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># Guardar ANTES de show()</span>
+fig.savefig(<span class="string">'grafico.png'</span>, dpi=<span class="number">150</span>, 
+            bbox_inches=<span class="string">'tight'</span>)
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="three-columns">
+                            <div class="feature-card">
+                                <h4>1. layout='constrained'</h4>
+                                <p>Reemplaza tight_layout(). Maneja automáticamente espaciado.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>2. API (fig, ax)</h4>
+                                <p>Control explícito. Código reproducible y escalable.</p>
+                            </div>
+                            <div class="feature-card">
+                                <h4>3. savefig() antes</h4>
+                                <p>En Colab, guardar antes de show() evita archivos vacíos.</p>
+                            </div>
+                        </div>
+                        <div class="comparison-table" style="margin-top: 15px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Regla</th>
+                                        <th>Por qué importa</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Siempre especificar figsize</td>
+                                        <td>Gráficos consistentes y legibles</td>
+                                    </tr>
+                                    <tr>
+                                        <td>dpi=150 mínimo</td>
+                                        <td>Calidad para informes</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Etiquetas descriptivas</td>
+                                        <td>Gráfico autoexplicativo</td>
+                                    </tr>
+                                    <tr>
+                                        <td>grid(alpha=0.3)</td>
+                                        <td>Ayuda sin distraer</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Resumen -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen de la semana 6</h2>
+                <p class="slide-subtitle">Del plano cartesiano a la ciencia de datos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Distancias con NumPy</h4>
+                            <p>np.linalg.norm(p2 - p1) calcula distancia euclidiana. Es la base de KNN, clustering y sistemas de recomendación.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Puntos y scatter plots</h4>
+                            <p>ax.scatter() visualiza observaciones en el plano. Cada punto es un dato, cada eje una característica (feature).</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Rectas y regresión</h4>
+                            <p>y = mx + b es exactamente el modelo de regresión lineal. Visualizar la recta de ajuste es fundamental en ML.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Círculos y fronteras</h4>
+                            <p>La ecuación del círculo define regiones de decisión en clasificadores basados en distancia.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Para practicar</h3>
+                            <ul>
+                                <li>Completar el Taller 2 (asignado hoy)</li>
+                                <li>Reproducir los ejemplos en su propio Colab</li>
+                                <li>Buscar coordenadas de lugares en CR y calcular distancias</li>
+                                <li>Experimentar con diferentes estilos de Matplotlib</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>La próxima semana: funciones en Python y concepto general de función matemática. Prepárense para el Quiz 1.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px; background: linear-gradient(135deg, #2d2d2d, #3d3d3d); color: white;">
+                            <h3 style="color: #FF8C00;">Taller 2</h3>
+                            <p style="color: rgba(255,255,255,0.9);">Entrega: próxima semana</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 5: Ecuaciones e inecuaciones con Python - Matemática básica para ciencia de datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">15</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Ecuaciones e inecuaciones con Python</h1>
+            <p class="cover-subtitle">Semana 5: de la teoría manual al código automatizado</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de hoy</h2>
+                <p class="slide-subtitle">De lo manual a lo automatizado con Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. Ecuaciones con SymPy</h4>
+                        <p>solveset() para ecuaciones lineales y cuadráticas</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Inecuaciones automáticas</h4>
+                        <p>reduce_inequalities() y análisis de signos</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Sistemas de ecuaciones</h4>
+                        <p>SymPy linsolve() y NumPy solve()</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Aplicaciones en data science</h4>
+                        <p>Regresión lineal, SVM, filtrado de datos</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Hoy veremos cómo Python resuelve en segundos lo que acabamos de hacer a mano en el iPad</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Ecuaciones lineales con SymPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ecuaciones lineales con SymPy</h2>
+                <p class="slide-subtitle">solveset(): la función recomendada</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Por qué solveset() y no solve()?</h3>
+                    <p>SymPy 1.14.0 recomienda solveset() porque retorna siempre un conjunto (FiniteSet, Interval) con interfaz matemática consistente. La función solve() sigue funcionando pero es menos rigurosa.</p>
+                </div>
+                <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+<span class="keyword">x</span> = sp.<span class="keyword">Symbol</span>(<span class="string">'x'</span>)
+
+<span class="comment"># ========================================</span>
+<span class="comment"># ECUACIÓN LINEAL: 3x + 7 = 22</span>
+<span class="comment"># ========================================</span>
+
+<span class="keyword">eq_lineal</span> = sp.<span class="keyword">Eq</span>(<span class="number">3</span>*x + <span class="number">7</span>, <span class="number">22</span>)
+<span class="keyword">sol_lineal</span> = sp.<span class="keyword">solveset</span>(eq_lineal, x)
+
+<span class="keyword">print</span>(<span class="string">f"Ecuación: </span>{eq_lineal}<span class="string">"</span>)        <span class="comment"># Eq(3*x + 7, 22)</span>
+<span class="keyword">print</span>(<span class="string">f"Solución: </span>{sol_lineal}<span class="string">"</span>)        <span class="comment"># {5}</span>
+
+<span class="comment"># Verificación</span>
+<span class="keyword">print</span>(eq_lineal.<span class="keyword">subs</span>(x, <span class="number">5</span>))             <span class="comment"># True</span>
+
+<span class="comment"># ========================================</span>
+<span class="comment"># EJEMPLO COSTA RICA: Tipo de cambio</span>
+<span class="comment"># ========================================</span>
+
+<span class="comment"># TC(x) = -3.5x + 513, ¿cuándo TC = 492?</span>
+<span class="keyword">m</span> = sp.<span class="keyword">Symbol</span>(<span class="string">'m'</span>)
+<span class="keyword">tc_eq</span> = sp.<span class="keyword">Eq</span>(-<span class="number">3.5</span>*m + <span class="number">513</span>, <span class="number">492</span>)
+<span class="keyword">sol_tc</span> = sp.<span class="keyword">solveset</span>(tc_eq, m)
+
+<span class="keyword">print</span>(<span class="string">f"TC alcanza 492 en mes: </span>{sol_tc}<span class="string">"</span>)  <span class="comment"># {6.0}</span>
+<span class="keyword">print</span>(<span class="string">"Respuesta: Diciembre 2025"</span>)
+                </div>
+                <div class="key-point" style="margin-top: 15px;">
+                    <h4>Error común: usar == en lugar de Eq()</h4>
+                    <p>La expresión x**2 == 4 evalúa un booleano Python, NO crea una ecuación simbólica. Siempre usa sp.Eq(x**2, 4)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Ecuaciones cuadráticas con SymPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ecuaciones cuadráticas con SymPy</h2>
+                <p class="slide-subtitle">Soluciones exactas y discriminante</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+
+<span class="keyword">x</span> = sp.<span class="keyword">Symbol</span>(<span class="string">'x'</span>)
+
+<span class="comment"># =============================</span>
+<span class="comment"># ECUACIÓN: 2x² - 7x + 3 = 0</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">eq_cuad</span> = sp.<span class="keyword">Eq</span>(<span class="number">2</span>*x**<span class="number">2</span> - <span class="number">7</span>*x + <span class="number">3</span>, <span class="number">0</span>)
+<span class="keyword">sol_cuad</span> = sp.<span class="keyword">solveset</span>(eq_cuad, x)
+
+<span class="keyword">print</span>(sol_cuad)  <span class="comment"># {1/2, 3}</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># DISCRIMINANTE SIMBÓLICO</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">a</span>, <span class="keyword">b</span>, <span class="keyword">c</span> = sp.<span class="keyword">symbols</span>(<span class="string">'a b c'</span>)
+<span class="keyword">disc</span> = b**<span class="number">2</span> - <span class="number">4</span>*a*c
+
+<span class="keyword">print</span>(<span class="string">f"Δ = </span>{disc}<span class="string">"</span>)
+<span class="comment"># Δ = b² - 4ac</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># =============================</span>
+<span class="comment"># RAÍCES COMPLEJAS</span>
+<span class="comment"># =============================</span>
+
+<span class="comment"># x² + 4 = 0 (no tiene raíces reales)</span>
+
+<span class="keyword">sol_real</span> = sp.<span class="keyword">solveset</span>(
+    x**<span class="number">2</span> + <span class="number">4</span>, 
+    x, 
+    domain=sp.<span class="keyword">S</span>.Reals
+)
+<span class="keyword">print</span>(sol_real)  <span class="comment"># EmptySet</span>
+
+<span class="keyword">sol_compleja</span> = sp.<span class="keyword">solveset</span>(
+    x**<span class="number">2</span> + <span class="number">4</span>, 
+    x
+)
+<span class="keyword">print</span>(sol_compleja)
+<span class="comment"># {-2i, 2i}</span>
+
+<span class="comment"># =============================</span>
+<span class="comment"># RAÍCES CON MULTIPLICIDAD</span>
+<span class="comment"># =============================</span>
+
+<span class="keyword">poly</span> = x**<span class="number">3</span> - <span class="number">6</span>*x**<span class="number">2</span> + <span class="number">9</span>*x
+<span class="keyword">print</span>(sp.<span class="keyword">roots</span>(poly, x))
+<span class="comment"># {0: 1, 3: 2}  ← x=3 doble</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Usa sp.Rational(1,2) en lugar de 0.5 para obtener soluciones exactas como sqrt(2)/2 en vez de 0.707...</p>
+                </div>
+                <div class="comparison-table" style="margin-top: 15px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Función</th>
+                                <th>Uso</th>
+                                <th>Retorno</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>solveset()</strong></td>
+                                <td>1 ecuación, 1 variable (recomendada)</td>
+                                <td>FiniteSet, Interval, ConditionSet</td>
+                            </tr>
+                            <tr>
+                                <td><strong>solve()</strong></td>
+                                <td>Propósito general</td>
+                                <td>Lista o diccionario</td>
+                            </tr>
+                            <tr>
+                                <td><strong>roots()</strong></td>
+                                <td>Raíces con multiplicidad</td>
+                                <td>{raíz: multiplicidad}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Visualización de ecuaciones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Visualización de ecuaciones cuadráticas</h2>
+                <p class="slide-subtitle">Ver las soluciones gráficamente con Matplotlib</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Ecuación: 2x² - 7x + 3 = 0  →  raíces: x = 1/2, x = 3</span>
+
+<span class="keyword">x_vals</span> = np.<span class="keyword">linspace</span>(-<span class="number">1</span>, <span class="number">5</span>, <span class="number">300</span>)
+<span class="keyword">y_vals</span> = <span class="number">2</span>*x_vals**<span class="number">2</span> - <span class="number">7</span>*x_vals + <span class="number">3</span>
+
+plt.<span class="keyword">figure</span>(figsize=(<span class="number">9</span>, <span class="number">5</span>))
+plt.<span class="keyword">plot</span>(x_vals, y_vals, <span class="string">'b-'</span>, linewidth=<span class="number">2</span>, label=<span class="string">r'$f(x) = 2x^2 - 7x + 3$'</span>)
+plt.<span class="keyword">axhline</span>(y=<span class="number">0</span>, color=<span class="string">'k'</span>, linewidth=<span class="number">0.5</span>)
+plt.<span class="keyword">scatter</span>([<span class="number">0.5</span>, <span class="number">3</span>], [<span class="number">0</span>, <span class="number">0</span>], color=<span class="string">'red'</span>, s=<span class="number">100</span>, zorder=<span class="number">5</span>, 
+            label=<span class="string">'Raíces: x = 1/2, x = 3'</span>)
+
+<span class="comment"># Sombrear región donde f(x) < 0</span>
+plt.<span class="keyword">fill_between</span>(x_vals, y_vals, <span class="number">0</span>, where=(y_vals < <span class="number">0</span>), 
+                 alpha=<span class="number">0.3</span>, color=<span class="string">'red'</span>, label=<span class="string">'f(x) < 0'</span>)
+
+plt.<span class="keyword">xlabel</span>(<span class="string">'x'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">ylabel</span>(<span class="string">'f(x)'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">title</span>(<span class="string">'Ecuación cuadrática: $2x^2 - 7x + 3 = 0$'</span>, fontsize=<span class="number">14</span>)
+plt.<span class="keyword">legend</span>(fontsize=<span class="number">11</span>)
+plt.<span class="keyword">grid</span>(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.<span class="keyword">show</span>()
+                </div>
+                <div class="key-point" style="margin-top: 20px;">
+                    <h4>Conexión con machine learning</h4>
+                    <p>La ecuación lineal y = mx + b es exactamente el modelo de regresión lineal simple. En ML se escribe ŷ = w₁x + b, donde w₁ es el peso (pendiente) y b el sesgo (intercepto).</p>
+                </div>
+                <div class="highlight-box">
+                    <p>La normalización Min-Max: x' = (x - x_min)/(x_max - x_min) y Z-score: x' = (x - μ)/σ son transformaciones lineales fundamentales en data science.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Inecuaciones con SymPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Inecuaciones con SymPy</h2>
+                <p class="slide-subtitle">reduce_inequalities() automatiza el análisis</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+<span class="keyword">from</span> sympy.solvers.inequalities <span class="keyword">import</span> \
+    solve_univariate_inequality
+
+<span class="keyword">x</span> = sp.<span class="keyword">Symbol</span>(<span class="string">'x'</span>, real=<span class="keyword">True</span>)
+
+<span class="comment"># ===========================</span>
+<span class="comment"># INECUACIÓN LINEAL</span>
+<span class="comment"># ===========================</span>
+
+<span class="comment"># 3x - 5 > 7</span>
+<span class="keyword">sol1</span> = sp.<span class="keyword">reduce_inequalities</span>(
+    <span class="number">3</span>*x - <span class="number">5</span> > <span class="number">7</span>, x
+)
+<span class="keyword">print</span>(sol1)  <span class="comment"># 4 < x</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># INECUACIÓN CUADRÁTICA</span>
+<span class="comment"># ===========================</span>
+
+<span class="comment"># x² - 4 >= 0</span>
+<span class="keyword">sol2</span> = sp.<span class="keyword">reduce_inequalities</span>(
+    x**<span class="number">2</span> - <span class="number">4</span> >= <span class="number">0</span>, x
+)
+<span class="keyword">print</span>(sol2)  
+<span class="comment"># x ≤ -2 ∨ x ≥ 2</span>
+
+<span class="comment"># En notación de intervalos:</span>
+<span class="keyword">sol2_intervalo</span> = \
+    solve_univariate_inequality(
+        x**<span class="number">2</span> >= <span class="number">4</span>, x, 
+        relational=<span class="keyword">False</span>
+    )
+<span class="keyword">print</span>(sol2_intervalo)
+<span class="comment"># (-∞, -2] ∪ [2, ∞)</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># ===========================</span>
+<span class="comment"># SISTEMA DE INECUACIONES</span>
+<span class="comment"># ===========================</span>
+
+<span class="comment"># 2x + 1 >= 5  y  x < 10</span>
+<span class="keyword">sol_sistema</span> = sp.<span class="keyword">reduce_inequalities</span>(
+    [<span class="number">2</span>*x + <span class="number">1</span> >= <span class="number">5</span>, x < <span class="number">10</span>], x
+)
+<span class="keyword">print</span>(sol_sistema)
+<span class="comment"># 2 ≤ x < 10</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># VALOR ABSOLUTO</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">from</span> sympy.solvers.inequalities <span class="keyword">import</span> \
+    reduce_abs_inequality
+
+<span class="comment"># |x - 3| < 5</span>
+<span class="keyword">sol_abs</span> = reduce_abs_inequality(
+    sp.<span class="keyword">Abs</span>(x - <span class="number">3</span>) - <span class="number">5</span>, <span class="string">'<'</span>, x
+)
+<span class="keyword">print</span>(sol_abs)
+<span class="comment"># -2 < x < 8</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># RESTRICCIÓN COMBINADA</span>
+<span class="comment"># ===========================</span>
+
+<span class="comment"># x² < 9  y  x > 0</span>
+<span class="keyword">sol_rest</span> = sp.<span class="keyword">reduce_inequalities</span>(
+    [x**<span class="number">2</span> < <span class="number">9</span>, x > <span class="number">0</span>], x
+)
+<span class="keyword">print</span>(sol_rest)
+<span class="comment"># 0 < x < 3</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Limitación importante: reduce_inequalities() solo funciona con UNA variable por inecuación. La expresión reduce_inequalities([x*y > 1], [x, y]) lanza NotImplementedError.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Aplicaciones en data science -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Inecuaciones en ciencia de datos</h2>
+                <p class="slide-subtitle">Cuatro aplicaciones fundamentales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>1. Filtrado de datos con Pandas</h4>
+                        <p>Toda operación de filtrado usa desigualdades: df[(df['edad'] >= 18) & (df['ingreso'] <= 100000)]</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>2. Support Vector Machines (SVM)</h4>
+                        <p>SVM resuelve programación cuadrática donde cada punto contribuye una restricción: yᵢ(w·xᵢ + b) ≥ 1</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>3. Intervalos de confianza</h4>
+                        <p>Un intervalo de confianza es una desigualdad: x̄ - z·(σ/√n) ≤ μ ≤ x̄ + z·(σ/√n)</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>4. Detección de outliers (IQR)</h4>
+                        <p>Outliers: x < Q₁ - 1.5·IQR  o  x > Q₃ + 1.5·IQR. Sistema de desigualdades aplicado a cada observación.</p>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># ============================================</span>
+<span class="comment"># EJEMPLO: FILTRADO DE DATOS</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># Dataset de empleados</span>
+<span class="keyword">df</span> = pd.<span class="keyword">DataFrame</span>({
+    <span class="string">'nombre'</span>: [<span class="string">'Ana'</span>, <span class="string">'José'</span>, <span class="string">'María'</span>, <span class="string">'Carlos'</span>],
+    <span class="string">'edad'</span>: [<span class="number">25</span>, <span class="number">35</span>, <span class="number">42</span>, <span class="number">28</span>],
+    <span class="string">'salario'</span>: [<span class="number">800000</span>, <span class="number">1200000</span>, <span class="number">1800000</span>, <span class="number">950000</span>]
+})
+
+<span class="comment"># Filtrar: edad >= 30 Y salario <= 1500000</span>
+<span class="keyword">filtrados</span> = df[(df[<span class="string">'edad'</span>] >= <span class="number">30</span>) & (df[<span class="string">'salario'</span>] <= <span class="number">1500000</span>)]
+<span class="keyword">print</span>(filtrados)
+<span class="comment">#    nombre  edad  salario</span>
+<span class="comment"># 1    José    35  1200000</span>
+
+<span class="comment"># ============================================</span>
+<span class="comment"># EJEMPLO: DETECCIÓN DE OUTLIERS</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">datos</span> = np.<span class="keyword">array</span>([<span class="number">10</span>, <span class="number">12</span>, <span class="number">13</span>, <span class="number">15</span>, <span class="number">14</span>, <span class="number">100</span>])  <span class="comment"># 100 es outlier</span>
+<span class="keyword">Q1</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">25</span>)
+<span class="keyword">Q3</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">75</span>)
+<span class="keyword">IQR</span> = Q3 - Q1
+
+<span class="keyword">limite_inferior</span> = Q1 - <span class="number">1.5</span> * IQR
+<span class="keyword">limite_superior</span> = Q3 + <span class="number">1.5</span> * IQR
+
+<span class="keyword">outliers</span> = datos[(datos < limite_inferior) | (datos > limite_superior)]
+<span class="keyword">print</span>(<span class="string">f"Outliers detectados: </span>{outliers}<span class="string">"</span>)  <span class="comment"># [100]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Sistemas de ecuaciones con SymPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Sistemas de ecuaciones con SymPy</h2>
+                <p class="slide-subtitle">Cuatro formas equivalentes de resolver</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Sistema a resolver: 2x + 3y = 13,  5x - 2y = 4</h3>
+                    <p>SymPy ofrece múltiples métodos, todos retornan la misma solución: x = 2, y = 3</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="code-box">
+<span class="keyword">import</span> sympy <span class="keyword">as</span> sp
+<span class="keyword">from</span> sympy <span class="keyword">import</span> Matrix
+
+<span class="keyword">x</span>, <span class="keyword">y</span> = sp.<span class="keyword">symbols</span>(<span class="string">'x y'</span>)
+
+<span class="comment"># ===========================</span>
+<span class="comment"># MÉTODO 1: solve()</span>
+<span class="comment"># ===========================</span>
+<span class="comment"># Retorna diccionario</span>
+
+<span class="keyword">sol1</span> = sp.<span class="keyword">solve</span>([
+    sp.<span class="keyword">Eq</span>(<span class="number">2</span>*x + <span class="number">3</span>*y, <span class="number">13</span>),
+    sp.<span class="keyword">Eq</span>(<span class="number">5</span>*x - <span class="number">2</span>*y, <span class="number">4</span>)
+], [x, y])
+
+<span class="keyword">print</span>(sol1)  
+<span class="comment"># {x: 2, y: 3}</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># MÉTODO 2: linsolve()</span>
+<span class="comment"># ===========================</span>
+<span class="comment"># Con expresiones, retorna FiniteSet</span>
+
+<span class="keyword">sol2</span> = sp.<span class="keyword">linsolve</span>([
+    <span class="number">2</span>*x + <span class="number">3</span>*y - <span class="number">13</span>,
+    <span class="number">5</span>*x - <span class="number">2</span>*y - <span class="number">4</span>
+], (x, y))
+
+<span class="keyword">print</span>(sol2)
+<span class="comment"># {(2, 3)}</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># ===========================</span>
+<span class="comment"># MÉTODO 3: matriz aumentada</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">augmented</span> = <span class="keyword">Matrix</span>([
+    [<span class="number">2</span>, <span class="number">3</span>, <span class="number">13</span>],
+    [<span class="number">5</span>, -<span class="number">2</span>, <span class="number">4</span>]
+])
+
+<span class="keyword">sol3</span> = sp.<span class="keyword">linsolve</span>(augmented, (x, y))
+<span class="keyword">print</span>(sol3)
+<span class="comment"># {(2, 3)}</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># MÉTODO 4: forma A, b</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">A</span> = <span class="keyword">Matrix</span>([[<span class="number">2</span>, <span class="number">3</span>], [<span class="number">5</span>, -<span class="number">2</span>]])
+<span class="keyword">b</span> = <span class="keyword">Matrix</span>([<span class="number">13</span>, <span class="number">4</span>])
+
+<span class="keyword">sol4</span> = sp.<span class="keyword">linsolve</span>((A, b), (x, y))
+<span class="keyword">print</span>(sol4)
+<span class="comment"># {(2, 3)}</span>
+
+<span class="comment"># ===========================</span>
+<span class="comment"># VERIFICACIÓN: det(A)</span>
+<span class="comment"># ===========================</span>
+
+<span class="keyword">print</span>(<span class="string">f"det(A) = </span>{A.<span class="keyword">det</span>()}<span class="string">"</span>)
+<span class="comment"># det(A) = -19  (≠ 0, hay solución única)</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Precaución: sp.linsolve() lanza NonlinearError si recibe ecuaciones no lineales. Para sistemas no lineales, usar sp.nonlinsolve() o sp.solve().</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Sistemas con NumPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Sistemas de ecuaciones con NumPy</h2>
+                <p class="slide-subtitle">Velocidad numérica para sistemas grandes</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>np.linalg.solve(): órdenes de magnitud más rápido</h3>
+                    <p>Usa factorización LU (rutina LAPACK _gesv) y es extremadamente eficiente para sistemas numéricos grandes.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># ============================================</span>
+<span class="comment"># SISTEMA 2×2: 2x + 3y = 13,  5x - 2y = 4</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">A</span> = np.<span class="keyword">array</span>([[<span class="number">2</span>, <span class="number">3</span>], [<span class="number">5</span>, -<span class="number">2</span>]])
+<span class="keyword">b</span> = np.<span class="keyword">array</span>([<span class="number">13</span>, <span class="number">4</span>])
+
+<span class="keyword">x</span> = np.<span class="keyword">linalg</span>.<span class="keyword">solve</span>(A, b)
+<span class="keyword">print</span>(<span class="string">f"Solución: x={</span>x[<span class="number">0</span>]<span class="string">}, y={</span>x[<span class="number">1</span>]<span class="string">}"</span>)
+<span class="comment"># Solución: x=2.0, y=3.0</span>
+
+<span class="comment"># Verificación: A @ x debe dar b</span>
+<span class="keyword">print</span>(<span class="string">f"Verificación: </span>{np.<span class="keyword">allclose</span>(A @ x, b)}<span class="string">"</span>)
+<span class="comment"># True</span>
+
+<span class="comment"># ============================================</span>
+<span class="comment"># SISTEMA 3×3</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">A3</span> = np.<span class="keyword">array</span>([
+    [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>],
+    [<span class="number">2</span>, -<span class="number">1</span>, <span class="number">1</span>],
+    [<span class="number">3</span>, <span class="number">1</span>, -<span class="number">1</span>]
+])
+<span class="keyword">b3</span> = np.<span class="keyword">array</span>([<span class="number">14</span>, <span class="number">3</span>, <span class="number">2</span>])
+
+<span class="keyword">x3</span> = np.<span class="keyword">linalg</span>.<span class="keyword">solve</span>(A3, b3)
+<span class="keyword">print</span>(<span class="string">f"Solución 3×3: x={</span>x3[<span class="number">0</span>]<span class="string">:.4f}, y={</span>x3[<span class="number">1</span>]<span class="string">:.4f}, z={</span>x3[<span class="number">2</span>]<span class="string">:.4f}"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># MATRICES SINGULARES: manejo de errores</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">A_singular</span> = np.<span class="keyword">array</span>([[<span class="number">1</span>, <span class="number">2</span>], [<span class="number">2</span>, <span class="number">4</span>]])  <span class="comment"># Fila 2 = 2 × Fila 1</span>
+<span class="keyword">b_singular</span> = np.<span class="keyword">array</span>([<span class="number">3</span>, <span class="number">6</span>])
+
+<span class="keyword">print</span>(<span class="string">f"det(A) = </span>{np.<span class="keyword">linalg</span>.<span class="keyword">det</span>(A_singular)<span class="string">:.6f}"</span>)  <span class="comment"># ≈ 0</span>
+
+<span class="keyword">try</span>:
+    np.<span class="keyword">linalg</span>.<span class="keyword">solve</span>(A_singular, b_singular)
+<span class="keyword">except</span> np.<span class="keyword">linalg</span>.<span class="keyword">LinAlgError</span> <span class="keyword">as</span> e:
+    <span class="keyword">print</span>(<span class="string">f"Error: </span>{e}<span class="string">"</span>)  <span class="comment"># Singular matrix</span>
+
+<span class="comment"># Para sistemas sobredeterminados: mínimos cuadrados</span>
+<span class="keyword">x_lstsq</span>, <span class="keyword">residuals</span>, <span class="keyword">rank</span>, <span class="keyword">sv</span> = np.<span class="keyword">linalg</span>.<span class="keyword">lstsq</span>(
+    A_singular, b_singular, rcond=<span class="keyword">None</span>
+)
+<span class="keyword">print</span>(<span class="string">f"Solución mínimos cuadrados: </span>{x_lstsq}<span class="string">"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: La ecuación normal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La ecuación normal: sistemas y machine learning</h2>
+                <p class="slide-subtitle">Donde los sistemas de ecuaciones se encuentran con regresión lineal</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>La ecuación normal de regresión lineal múltiple</h3>
+                    <p>La regresión lineal se reduce a resolver el sistema: X^T X β = X^T y. Este es un sistema de ecuaciones lineales donde la solución es β̂ = (X^T X)⁻¹ X^T y</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># ============================================</span>
+<span class="comment"># EJEMPLO: Predicción de precios de vivienda</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># Características: [tamaño_m2, num_habitaciones]</span>
+<span class="keyword">X</span> = np.<span class="keyword">array</span>([
+    [<span class="number">80</span>, <span class="number">2</span>],
+    [<span class="number">100</span>, <span class="number">3</span>],
+    [<span class="number">120</span>, <span class="number">3</span>],
+    [<span class="number">150</span>, <span class="number">4</span>],
+    [<span class="number">200</span>, <span class="number">4</span>]
+])
+
+<span class="comment"># Precios en miles de USD</span>
+<span class="keyword">y</span> = np.<span class="keyword">array</span>([<span class="number">45</span>, <span class="number">55</span>, <span class="number">62</span>, <span class="number">78</span>, <span class="number">95</span>])
+
+<span class="comment"># Agregar columna de unos (intercepto)</span>
+<span class="keyword">X_b</span> = np.<span class="keyword">column_stack</span>([np.<span class="keyword">ones</span>(<span class="keyword">len</span>(X)), X])
+
+<span class="comment"># ============================================</span>
+<span class="comment"># RESOLVER ECUACIONES NORMALES: (X^T X) β = X^T y</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">XtX</span> = X_b.<span class="keyword">T</span> @ X_b
+<span class="keyword">Xty</span> = X_b.<span class="keyword">T</span> @ y
+
+<span class="comment"># ¡Esto es un sistema de ecuaciones!</span>
+<span class="keyword">beta</span> = np.<span class="keyword">linalg</span>.<span class="keyword">solve</span>(XtX, Xty)
+
+<span class="keyword">print</span>(<span class="string">f"Intercepto: $</span>{beta[<span class="number">0</span>]<span class="string">:,.0f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Precio por m²: $</span>{beta[<span class="number">1</span>]<span class="string">:,.0f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Precio por habitación: $</span>{beta[<span class="number">2</span>]<span class="string">:,.0f}"</span>)
+
+<span class="keyword">print</span>(<span class="string">f"
+Ecuación: precio = </span>{beta[<span class="number">0</span>]<span class="string">:.0f} + </span>{beta[<span class="number">1</span>]<span class="string">:.0f}·m² + </span>{beta[<span class="number">2</span>]<span class="string">:.0f}·hab"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># PREDICCIÓN PARA NUEVA VIVIENDA</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">nueva_casa</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">130</span>, <span class="number">3</span>])  <span class="comment"># 130 m², 3 hab</span>
+<span class="keyword">precio_predicho</span> = nueva_casa @ beta
+
+<span class="keyword">print</span>(<span class="string">f"
+Predicción para casa 130m², 3 hab: $</span>{precio_predicho<span class="string">:,.0f}"</span>)
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>La regresión lineal múltiple es fundamentalmente resolver un sistema de ecuaciones lineales. Cada vez que haces fit() en scikit-learn, internamente está resolviendo X^T X β = X^T y.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Ejemplo CR - Tipo de cambio -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejemplo Costa Rica: tipo de cambio BCCR</h2>
+                <p class="slide-subtitle">Aplicación completa con datos reales</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Análisis del tipo de cambio 2025-2026</h3>
+                    <p>El tipo de cambio USD/CRC mostró tendencia descendente en 2025: de ₡510/USD (junio) a ₡488/USD (diciembre). Podemos modelarlo con ecuación lineal y predecir valores futuros.</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># ============================================</span>
+<span class="comment"># DATOS: Tipo de cambio aproximado 2do semestre 2025</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">meses</span> = np.<span class="keyword">array</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])  <span class="comment"># Jun a Dic 2025</span>
+<span class="keyword">tc</span> = np.<span class="keyword">array</span>([<span class="number">510</span>, <span class="number">507</span>, <span class="number">505</span>, <span class="number">502</span>, <span class="number">500</span>, <span class="number">500</span>, <span class="number">488</span>])
+
+<span class="comment"># ============================================</span>
+<span class="comment"># AJUSTE LINEAL: TC = mx + b</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">coeffs</span> = np.<span class="keyword">polyfit</span>(meses, tc, <span class="number">1</span>)  <span class="comment"># grado 1 = lineal</span>
+<span class="keyword">m</span>, <span class="keyword">b</span> = coeffs
+
+<span class="keyword">print</span>(<span class="string">f"Modelo lineal: TC = </span>{m<span class="string">:.2f}·mes + </span>{b<span class="string">:.2f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Pendiente: el colón se apreció ~₡</span>{<span class="keyword">abs</span>(m)<span class="string">:.1f} por mes"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># PREDICCIÓN: ¿Cuándo alcanzará ₡492?</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># Resolver: 492 = -3.5x + 513</span>
+<span class="keyword">tc_objetivo</span> = <span class="number">492</span>
+<span class="keyword">mes_objetivo</span> = (tc_objetivo - b) / m
+
+<span class="keyword">print</span>(<span class="string">f"
+TC alcanzará ₡492 en mes: </span>{mes_objetivo<span class="string">:.1f}"</span>)
+<span class="keyword">print</span>(<span class="string">"(Aproximadamente en diciembre 2025)"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># VISUALIZACIÓN</span>
+<span class="comment"># ============================================</span>
+
+plt.<span class="keyword">figure</span>(figsize=(<span class="number">10</span>, <span class="number">6</span>))
+plt.<span class="keyword">scatter</span>(meses, tc, color=<span class="string">'#FF8C00'</span>, s=<span class="number">100</span>, zorder=<span class="number">5</span>, 
+            label=<span class="string">'Datos reales BCCR'</span>)
+plt.<span class="keyword">plot</span>(meses, m*meses + b, <span class="string">'--'</span>, color=<span class="string">'#2d2d2d'</span>, 
+         linewidth=<span class="number">2</span>, label=<span class="string">f'Modelo: TC = {m:.2f}m + {b:.2f}'</span>)
+
+plt.<span class="keyword">xlabel</span>(<span class="string">'Meses desde junio 2025'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">ylabel</span>(<span class="string">'Tipo de cambio (₡/USD)'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">title</span>(<span class="string">'Tipo de cambio USD/CRC - 2do semestre 2025'</span>, fontsize=<span class="number">14</span>)
+plt.<span class="keyword">legend</span>()
+plt.<span class="keyword">grid</span>(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.<span class="keyword">show</span>()
+
+<span class="comment"># ============================================</span>
+<span class="comment"># ACCESO DIRECTO CON PAQUETE BCCR</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># !pip install bccr</span>
+<span class="comment"># from bccr import ServicioWeb</span>
+<span class="comment"># SW = ServicioWeb()</span>
+<span class="comment"># datos = SW(Compra=317, Venta=318, </span>
+<span class="comment">#            FechaInicio="01/01/2025", FechaFinal="31/12/2025")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Ejemplo CR - Producción agrícola -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejemplo Costa Rica: producción agrícola</h2>
+                <p class="slide-subtitle">Sistema de ecuaciones aplicado a cooperativa en Limón</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Problema de optimización agrícola</h3>
+                    <p>Una cooperativa en Limón produce café y banano. Tiene 200 hectáreas disponibles y 1,500 días-trabajador/mes. El café requiere 10 días/ha, el banano 6 días/ha. ¿Cuántas hectáreas de cada cultivo maximizan el uso de recursos?</p>
+                </div>
+                <div class="code-box" style="margin-top: 15px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># ============================================</span>
+<span class="comment"># PLANTEAR SISTEMA DE ECUACIONES</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># x = hectáreas de café</span>
+<span class="comment"># y = hectáreas de banano</span>
+<span class="comment">#</span>
+<span class="comment"># x + y = 200           (tierra disponible)</span>
+<span class="comment"># 10x + 6y = 1,500      (días-trabajador)</span>
+
+<span class="keyword">A</span> = np.<span class="keyword">array</span>([[<span class="number">1</span>, <span class="number">1</span>], [<span class="number">10</span>, <span class="number">6</span>]])
+<span class="keyword">b</span> = np.<span class="keyword">array</span>([<span class="number">200</span>, <span class="number">1500</span>])
+
+<span class="keyword">sol</span> = np.<span class="keyword">linalg</span>.<span class="keyword">solve</span>(A, b)
+<span class="keyword">print</span>(<span class="string">f"Café: </span>{sol[<span class="number">0</span>]<span class="string">:.0f} ha"</span>)
+<span class="keyword">print</span>(<span class="string">f"Banano: </span>{sol[<span class="number">1</span>]<span class="string">:.0f} ha"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># ANÁLISIS ECONÓMICO</span>
+<span class="comment"># ============================================</span>
+
+<span class="comment"># Precios aproximados de mercado (USD/ha/año)</span>
+<span class="keyword">precio_cafe</span> = <span class="number">2500</span>   <span class="comment"># $2,500/ha café</span>
+<span class="keyword">precio_banano</span> = <span class="number">4000</span> <span class="comment"># $4,000/ha banano</span>
+
+<span class="keyword">ingreso_total</span> = precio_cafe * sol[<span class="number">0</span>] + precio_banano * sol[<span class="number">1</span>]
+<span class="keyword">print</span>(<span class="string">f"
+Ingreso anual estimado: $</span>{ingreso_total<span class="string">:,.0f}"</span>)
+
+<span class="comment"># ============================================</span>
+<span class="comment"># VISUALIZACIÓN: Intersección de rectas</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">x_vals</span> = np.<span class="keyword">linspace</span>(<span class="number">0</span>, <span class="number">250</span>, <span class="number">300</span>)
+<span class="keyword">y_tierra</span> = <span class="number">200</span> - x_vals                <span class="comment"># De x + y = 200</span>
+<span class="keyword">y_labor</span> = (<span class="number">1500</span> - <span class="number">10</span>*x_vals) / <span class="number">6</span>  <span class="comment"># De 10x + 6y = 1500</span>
+
+plt.<span class="keyword">figure</span>(figsize=(<span class="number">10</span>, <span class="number">7</span>))
+plt.<span class="keyword">plot</span>(x_vals, y_tierra, <span class="string">'b-'</span>, linewidth=<span class="number">2</span>, 
+         label=<span class="string">'Tierra: x + y = 200'</span>)
+plt.<span class="keyword">plot</span>(x_vals, y_labor, <span class="string">'r-'</span>, linewidth=<span class="number">2</span>, 
+         label=<span class="string">'Mano de obra: 10x + 6y = 1,500'</span>)
+plt.<span class="keyword">plot</span>(sol[<span class="number">0</span>], sol[<span class="number">1</span>], <span class="string">'ko'</span>, markersize=<span class="number">12</span>, zorder=<span class="number">5</span>,
+         label=<span class="string">f'Solución: ({sol[0]:.0f}, {sol[1]:.0f})'</span>)
+
+plt.<span class="keyword">xlabel</span>(<span class="string">'Hectáreas de café (x)'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">ylabel</span>(<span class="string">'Hectáreas de banano (y)'</span>, fontsize=<span class="number">12</span>)
+plt.<span class="keyword">title</span>(<span class="string">'Sistema de ecuaciones: producción agrícola en Limón'</span>, fontsize=<span class="number">14</span>)
+plt.<span class="keyword">legend</span>(fontsize=<span class="number">11</span>)
+plt.<span class="keyword">xlim</span>(<span class="number">0</span>, <span class="number">260</span>)
+plt.<span class="keyword">ylim</span>(<span class="number">0</span>, <span class="number">260</span>)
+plt.<span class="keyword">grid</span>(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.<span class="keyword">show</span>()
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Comparativa SymPy vs NumPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">SymPy vs NumPy: ¿cuándo usar cada uno?</h2>
+                <p class="slide-subtitle">Guía de decisión para problemas reales</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Característica</th>
+                                <th>SymPy (Simbólico)</th>
+                                <th>NumPy (Numérico)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Tipo de resultado</strong></td>
+                                <td>Expresión simbólica exacta: √2, π, etc.</td>
+                                <td>Aproximación numérica: 1.414..., 3.141...</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Velocidad</strong></td>
+                                <td>Más lento (álgebra computacional)</td>
+                                <td>Órdenes de magnitud más rápido</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Precisión</strong></td>
+                                <td>Exacta (sin error de redondeo)</td>
+                                <td>~15 dígitos significativos (float64)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Tamaño de sistema</strong></td>
+                                <td>Pequeño (< 10×10)</td>
+                                <td>Grande (miles de variables)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Uso ideal</strong></td>
+                                <td>Educación, verificación, análisis teórico</td>
+                                <td>Producción, data science, ML</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="feature-card">
+                        <h4>Usa SymPy cuando</h4>
+                        <p>Necesitas respuestas exactas, soluciones generales con parámetros, verificación algebraica, o propósitos educativos donde importa ver la forma simbólica.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Usa NumPy cuando</h4>
+                        <p>Trabajas con datos numéricos grandes, necesitas velocidad computacional, el sistema tiene miles de variables, o no existe solución en forma cerrada.</p>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, solve, lambdify
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># ============================================</span>
+<span class="comment"># FLUJO DE TRABAJO RECOMENDADO</span>
+<span class="comment"># ============================================</span>
+
+<span class="keyword">x</span> = <span class="keyword">symbols</span>(<span class="string">'x'</span>)
+
+<span class="comment"># Paso 1: Resolver simbólicamente con SymPy</span>
+<span class="keyword">soluciones</span> = <span class="keyword">solve</span>(x**<span class="number">2</span> - <span class="number">2</span>, x)
+<span class="keyword">print</span>(<span class="string">f"Simbólico: </span>{soluciones}<span class="string">"</span>)  <span class="comment"># [-sqrt(2), sqrt(2)]</span>
+
+<span class="comment"># Paso 2: Convertir a función numérica con lambdify</span>
+<span class="keyword">f</span> = <span class="keyword">lambdify</span>(x, x**<span class="number">2</span> - <span class="number">2</span>, <span class="string">"numpy"</span>)
+
+<span class="comment"># Paso 3: Evaluar numéricamente sobre arrays grandes</span>
+<span class="keyword">x_array</span> = np.<span class="keyword">linspace</span>(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">1000</span>)
+<span class="keyword">y_array</span> = <span class="keyword">f</span>(x_array)  <span class="comment"># Evaluación vectorizada, muy rápida</span>
+
+<span class="keyword">print</span>(<span class="string">f"Evaluado en 1000 puntos instantáneamente"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Recursos y tarea -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Recursos y práctica</h2>
+                <p class="slide-subtitle">Documentación y ejercicios para profundizar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Documentación oficial</h3>
+                        <ul>
+                            <li>SymPy Solvers: docs.sympy.org/latest/guides/solving/</li>
+                            <li>NumPy Linear Algebra: numpy.org/doc/stable/reference/routines.linalg.html</li>
+                            <li>Matplotlib Gallery: matplotlib.org/stable/gallery/</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Datos de Costa Rica</h3>
+                        <ul>
+                            <li>BCCR: Tipo de cambio, inflación, PIB</li>
+                            <li>INEC: Censo, empleo, demografía</li>
+                            <li>ICE/CENCE: Generación eléctrica</li>
+                            <li>ICT: Estadísticas de turismo</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Práctica recomendada para esta semana</h3>
+                    <ul>
+                        <li>Resuelve el Taller 2 combinando trabajo manual + verificación en Python</li>
+                        <li>Practica resolver sistemas 2×2 primero a mano, luego con SymPy, luego con NumPy</li>
+                        <li>Busca un dataset costarricense (INEC, BCCR) y ajusta un modelo lineal</li>
+                        <li>Reproduce los ejemplos de clase en tu propio notebook de Colab</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>El paquete bccr de Python permite acceder directamente a datos del Banco Central: pip install bccr. Úsalo para obtener series económicas reales de Costa Rica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Resumen -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen de la semana 5</h2>
+                <p class="slide-subtitle">Lo que aprendimos hoy</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Ecuaciones con SymPy</h4>
+                    <p>solveset() es la función recomendada (no solve()) porque retorna conjuntos matemáticos consistentes. Siempre usar sp.Eq() para crear ecuaciones simbólicas. Usa sp.Rational() para soluciones exactas.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Inecuaciones automatizadas</h4>
+                    <p>reduce_inequalities() resuelve inecuaciones lineales y cuadráticas automáticamente. Conexión directa con filtrado de datos, SVM, intervalos de confianza y detección de outliers en data science.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Sistemas de ecuaciones</h4>
+                    <p>SymPy linsolve() para soluciones exactas simbólicas. NumPy linalg.solve() para velocidad computacional en sistemas grandes. La regresión lineal es fundamentalmente resolver X^T X β = X^T y.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Flujo de trabajo óptimo</h4>
+                    <p>Derivar simbólicamente con SymPy → convertir a función numérica con lambdify() → evaluar masivamente con NumPy. Este patrón combina lo mejor de ambos mundos.</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Próxima semana: gráficas en el plano cartesiano</h3>
+                    <p>Distancias, puntos medios, ecuaciones de rectas y círculos. Introducción profunda a Matplotlib para visualización de datos.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

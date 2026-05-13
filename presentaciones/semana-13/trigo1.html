@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 14: Funciones trigonom&eacute;tricas en Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string  { color: #ce9178; }
+        .code-box .number  { color: #b5cea8; }
+        .code-box .func    { color: #dcdcaa; }
+        .code-box .orange  { color: #FF8C00; font-weight: bold; }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 52px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 28px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 26px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ml-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 14px;
+            padding: 18px;
+            color: white;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .ml-card h4 {
+            color: #FF8C00;
+            font-size: 17px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ml-card p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .section-divider {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px 140px 80px;
+        }
+
+        .section-divider .section-label {
+            font-size: 18px;
+            color: #FF8C00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-divider .section-title {
+            font-size: 52px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .section-divider .section-subtitle {
+            font-size: 22px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">14</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1: PORTADA ==================== -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Funciones trigonom&eacute;tricas en Python</h1>
+            <p class="cover-subtitle">Semana 14: amplitud, per&iacute;odo, fase y aplicaciones a ciencia de datos</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matem&aacute;tica b&aacute;sica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: PUENTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos en el iPad, ahora en c&oacute;digo</h2>
+                <p class="slide-subtitle">Cierre de trigonometr&iacute;a anal&iacute;tica + funciones trigonom&eacute;tricas</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">Forma general</div>
+                        <div class="stat-label">y(x) = A&middot;sin(B(x&minus;C)) + D</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Cuatro par&aacute;metros</div>
+                        <div class="stat-label">Amplitud, per&iacute;odo, fase, l&iacute;nea base</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Datos reales</div>
+                        <div class="stat-label">Ajuste sinusoidal con curve_fit</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matem&aacute;tico</th>
+                                <th>Herramienta Python</th>
+                                <th>Aplicaci&oacute;n en DS/ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Funciones sin, cos, tan</td>
+                                <td><code>np.sin(), np.cos(), np.tan()</code></td>
+                                <td>Codificaci&oacute;n c&iacute;clica de variables temporales</td>
+                            </tr>
+                            <tr>
+                                <td>Forma general A&middot;sin(B(x&minus;C))+D</td>
+                                <td>Funci&oacute;n personalizada + matplotlib</td>
+                                <td>Modelado de se&ntilde;ales peri&oacute;dicas</td>
+                            </tr>
+                            <tr>
+                                <td>Identidades de suma</td>
+                                <td><code>sp.expand_trig(), sp.trigsimp()</code></td>
+                                <td>Codificaci&oacute;n posicional en transformers</td>
+                            </tr>
+                            <tr>
+                                <td>Ajuste de modelo a datos</td>
+                                <td><code>scipy.optimize.curve_fit()</code></td>
+                                <td>Predicci&oacute;n de demanda el&eacute;ctrica, mareas</td>
+                            </tr>
+                            <tr>
+                                <td>Descomposici&oacute;n en frecuencias</td>
+                                <td><code>scipy.fft.rfft()</code></td>
+                                <td>Detecci&oacute;n de estacionalidad, an&aacute;lisis de audio</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Hoy fusionamos contenidos: cerramos la trigonometr&iacute;a anal&iacute;tica de la semana pasada y vemos las funciones trigonom&eacute;tricas con sus aplicaciones m&aacute;s relevantes en ciencia de datos moderna.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: NUMPY TRIG (de semana 13) ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Funciones trigonom&eacute;tricas en NumPy</h2>
+                <p class="slide-subtitle">Vectorizadas, r&aacute;pidas y siempre en radianes</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># === Conversiones grados &harr; radianes ===</span>
+np.radians(<span class="number">180</span>)   <span class="comment"># &rarr; 3.14159...</span>
+np.degrees(np.pi) <span class="comment"># &rarr; 180.0</span>
+
+<span class="comment"># === Funciones directas (vectorizadas) ===</span>
+theta = np.linspace(<span class="number">0</span>, <span class="number">2</span>*np.pi, <span class="number">100</span>)
+seno = np.sin(theta)      <span class="comment"># 100 valores</span>
+coseno = np.cos(theta)    <span class="comment"># simult&aacute;neamente</span>
+tangente = np.tan(theta)
+
+<span class="comment"># === Funciones inversas ===</span>
+np.arcsin(<span class="number">0.5</span>)   <span class="comment"># &rarr; &pi;/6</span>
+np.arccos(<span class="number">0</span>)     <span class="comment"># &rarr; &pi;/2</span>
+np.arctan(<span class="number">1</span>)     <span class="comment"># &rarr; &pi;/4</span>
+
+<span class="comment"># arctan2(y, x): cuadrante correcto</span>
+np.arctan2(<span class="number">1</span>, -<span class="number">1</span>)  <span class="comment"># &rarr; 3&pi;/4 (Q2)</span>
+np.arctan2(-<span class="number">1</span>, -<span class="number">1</span>) <span class="comment"># &rarr; -3&pi;/4 (Q3)</span>
+
+<span class="comment"># === Identidad pitag&oacute;rica (verificaci&oacute;n) ===</span>
+x = np.linspace(<span class="number">0</span>, <span class="number">2</span>*np.pi, <span class="number">50</span>)
+np.allclose(np.sin(x)**<span class="number">2</span> + np.cos(x)**<span class="number">2</span>, <span class="number">1</span>)
+<span class="comment"># &rarr; True</span>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Regla de oro</h4>
+                            <p>NumPy <strong>siempre</strong> trabaja en radianes. <code>np.sin(90)</code> NO da 1 porque 90 se interpreta como 90 radianes. Usar siempre <code>np.sin(np.radians(90))</code>.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Vectorizaci&oacute;n</h4>
+                            <p>Una sola llamada a <code>np.sin(arr)</code> aplica la funci&oacute;n a millones de valores en microsegundos. Es entre 50 y 100 veces m&aacute;s r&aacute;pido que un bucle Python puro.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>arctan2 vs arctan</h4>
+                            <p><code>arctan(y/x)</code> pierde informaci&oacute;n del cuadrante. <code>arctan2(y, x)</code> recibe los dos argumentos por separado y devuelve el &aacute;ngulo correcto en (&minus;&pi;, &pi;].</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Estas funciones son la base de todo lo que viene: codificaci&oacute;n c&iacute;clica, ajuste de modelos sinusoidales, positional encoding y similaridad coseno.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 4: GRAFICAS BASICAS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Visualizaci&oacute;n con Matplotlib</h2>
+                <p class="slide-subtitle">Gr&aacute;ficas de sin, cos, tan y sus propiedades</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = np.linspace(-<span class="number">2</span>*np.pi, <span class="number">2</span>*np.pi, <span class="number">500</span>)
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">3</span>, figsize=(<span class="number">15</span>, <span class="number">5</span>),
+                          layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># Seno</span>
+axes[<span class="number">0</span>].plot(x, np.sin(x), lw=<span class="number">2.5</span>, color=<span class="string">'#FF8C00'</span>)
+axes[<span class="number">0</span>].set_title(<span class="string">'sin(x): per&iacute;odo 2&pi;, impar'</span>)
+axes[<span class="number">0</span>].axhline(y=<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.5</span>)
+axes[<span class="number">0</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># Coseno</span>
+axes[<span class="number">1</span>].plot(x, np.cos(x), lw=<span class="number">2.5</span>, color=<span class="string">'#2d2d2d'</span>)
+axes[<span class="number">1</span>].set_title(<span class="string">'cos(x): per&iacute;odo 2&pi;, par'</span>)
+axes[<span class="number">1</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># Tangente: nan en as&iacute;ntotas</span>
+y_tan = np.tan(x)
+y_tan[np.abs(y_tan) > <span class="number">10</span>] = np.nan
+axes[<span class="number">2</span>].plot(x, y_tan, lw=<span class="number">2.5</span>, color=<span class="string">'#006847'</span>)
+axes[<span class="number">2</span>].set_title(<span class="string">'tan(x): per&iacute;odo &pi;, impar'</span>)
+axes[<span class="number">2</span>].set_ylim(-<span class="number">5</span>, <span class="number">5</span>)
+axes[<span class="number">2</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Funci&oacute;n</th>
+                                        <th>Dominio</th>
+                                        <th>Rango</th>
+                                        <th>Per&iacute;odo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>sin x</td>
+                                        <td>R</td>
+                                        <td>[&minus;1, 1]</td>
+                                        <td>2&pi;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>cos x</td>
+                                        <td>R</td>
+                                        <td>[&minus;1, 1]</td>
+                                        <td>2&pi;</td>
+                                    </tr>
+                                    <tr>
+                                        <td>tan x</td>
+                                        <td>R \ {&pi;/2 + n&pi;}</td>
+                                        <td>R</td>
+                                        <td>&pi;</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>El truco de np.nan para la tangente</h4>
+                            <p>Reemplazamos los valores extremos con <code>np.nan</code> para que matplotlib no dibuje l&iacute;neas espurias entre los infinitos positivo y negativo cerca de las as&iacute;ntotas verticales.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Relaci&oacute;n fundamental</h4>
+                            <p>cos(x) = sin(x + &pi;/2). El coseno es el seno desplazado &pi;/2 hacia la izquierda. Esta relaci&oacute;n de fase aparece en la codificaci&oacute;n posicional de los transformers.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: FORMA GENERAL ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La forma general: y(x) = A &middot; sin(B(x &minus; C)) + D</h2>
+                <p class="slide-subtitle">Cuatro par&aacute;metros que describen cualquier sinusoide</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="keyword">def</span> <span class="func">sinusoide</span>(x, A, B, C, D):
+    <span class="comment">"""Forma general: A&middot;sin(B(x-C)) + D"""</span>
+    <span class="keyword">return</span> A * np.sin(B * (x - C)) + D
+
+x = np.linspace(<span class="number">0</span>, <span class="number">24</span>, <span class="number">500</span>)
+
+<span class="comment"># Demanda el&eacute;ctrica de Costa Rica (modelo)</span>
+A = <span class="number">400</span>      <span class="comment"># amplitud (MW)</span>
+B = np.pi/<span class="number">12</span> <span class="comment"># per&iacute;odo de 24 h: T = 2&pi;/B</span>
+C = <span class="number">6</span>        <span class="comment"># desfase: m&aacute;ximo a las 12 m.d.</span>
+D = <span class="number">1200</span>     <span class="comment"># l&iacute;nea base (MW)</span>
+
+P = sinusoide(x, A, B, C, D)
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">5</span>),
+                        layout=<span class="string">'constrained'</span>)
+ax.plot(x, P, lw=<span class="number">2.5</span>, color=<span class="string">'#FF8C00'</span>)
+ax.axhline(D, ls=<span class="string">'--'</span>, color=<span class="string">'gray'</span>,
+           label=<span class="string">f'D = {D} MW'</span>)
+ax.fill_between(x, D-A, D+A, alpha=<span class="number">0.1</span>,
+                color=<span class="string">'#FF8C00'</span>)
+ax.set_xlabel(<span class="string">'Hora del d&iacute;a'</span>)
+ax.set_ylabel(<span class="string">'Demanda (MW)'</span>)
+ax.set_title(<span class="string">'Demanda el&eacute;ctrica de CR (modelo)'</span>)
+ax.legend()
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="three-columns">
+                            <div class="ml-card">
+                                <div class="badge">A</div>
+                                <h4>Amplitud</h4>
+                                <p>(m&aacute;x &minus; m&iacute;n) / 2. Distancia desde la l&iacute;nea base hasta el pico. En CR: A = 400 MW.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">B</div>
+                                <h4>Frecuencia angular</h4>
+                                <p>B = 2&pi;/T donde T es el per&iacute;odo. Para ciclo diario T=24, B=&pi;/12.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">C</div>
+                                <h4>Desfase</h4>
+                                <p>Cu&aacute;nto se desplaza horizontalmente. C=6 hace que el m&aacute;ximo ocurra al mediod&iacute;a.</p>
+                            </div>
+                        </div>
+                        <div class="ml-card" style="margin-top: 15px;">
+                            <div class="badge">D</div>
+                            <h4>Desplazamiento vertical (l&iacute;nea base)</h4>
+                            <p>(m&aacute;x + m&iacute;n) / 2. Es el promedio alrededor del cual oscila la se&ntilde;al. En CR: D = 1200 MW (demanda promedio).</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Saber calcular A, B, C, D a mano nos da intuici&oacute;n. Cuando ajustamos a datos reales, scipy.optimize.curve_fit los encuentra autom&aacute;ticamente.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: EFECTO DE A Y B ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Efecto de la amplitud A y la frecuencia B</h2>
+                <p class="slide-subtitle">C&oacute;mo cambia la onda al modificar cada par&aacute;metro</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = np.linspace(<span class="number">0</span>, <span class="number">4</span>*np.pi, <span class="number">500</span>)
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">5</span>),
+                          layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># === Efecto de la amplitud A ===</span>
+<span class="keyword">for</span> A <span class="keyword">in</span> [<span class="number">0.5</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]:
+    axes[<span class="number">0</span>].plot(x, A*np.sin(x),
+                  lw=<span class="number">2</span>, label=<span class="string">f'A = {A}'</span>)
+axes[<span class="number">0</span>].set_title(<span class="string">'Efecto de A: estira/comprime vertical'</span>)
+axes[<span class="number">0</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">0</span>].set_ylabel(<span class="string">'A &middot; sin(x)'</span>)
+axes[<span class="number">0</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+axes[<span class="number">0</span>].legend()
+axes[<span class="number">0</span>].axhline(<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.5</span>)
+
+<span class="comment"># === Efecto de la frecuencia B ===</span>
+<span class="keyword">for</span> B <span class="keyword">in</span> [<span class="number">0.5</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">4</span>]:
+    T = <span class="number">2</span>*np.pi/B
+    axes[<span class="number">1</span>].plot(x, np.sin(B*x),
+                  lw=<span class="number">2</span>, label=<span class="string">f'B={B}, T={T:.2f}'</span>)
+axes[<span class="number">1</span>].set_title(<span class="string">'Efecto de B: cambia el per&iacute;odo'</span>)
+axes[<span class="number">1</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">1</span>].set_ylabel(<span class="string">'sin(B &middot; x)'</span>)
+axes[<span class="number">1</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+axes[<span class="number">1</span>].legend()
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Amplitud A</h4>
+                            <p>Multiplica todos los valores de la onda por A. La forma es id&eacute;ntica pero estirada (A &gt; 1) o comprimida (A &lt; 1) verticalmente. Si A es negativo, la onda se refleja respecto al eje x.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Frecuencia angular B</h4>
+                            <p>Comprime o estira horizontalmente. B grande &rarr; ondas apretadas (per&iacute;odo corto). B peque&ntilde;o &rarr; ondas estiradas (per&iacute;odo largo). La regla siempre es: <strong>T = 2&pi; / B</strong>.</p>
+                        </div>
+                        <div class="comparison-table" style="margin-top: 12px;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Per&iacute;odo deseado</th>
+                                        <th>Valor de B</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>24 h (ciclo diario)</td>
+                                        <td>&pi;/12 &asymp; 0.262</td>
+                                    </tr>
+                                    <tr>
+                                        <td>7 d&iacute;as (semanal)</td>
+                                        <td>2&pi;/7 &asymp; 0.898</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12 meses (anual)</td>
+                                        <td>&pi;/6 &asymp; 0.524</td>
+                                    </tr>
+                                    <tr>
+                                        <td>12.4 h (mareas)</td>
+                                        <td>2&pi;/12.4 &asymp; 0.507</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: EFECTO DE C Y D ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Efecto del desfase C y la l&iacute;nea base D</h2>
+                <p class="slide-subtitle">D&oacute;nde ocurre el m&aacute;ximo y alrededor de qu&eacute; valor oscila</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = np.linspace(<span class="number">0</span>, <span class="number">4</span>*np.pi, <span class="number">500</span>)
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">5</span>),
+                          layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># === Efecto del desfase C ===</span>
+<span class="keyword">for</span> C <span class="keyword">in</span> [<span class="number">0</span>, np.pi/<span class="number">4</span>, np.pi/<span class="number">2</span>, np.pi]:
+    axes[<span class="number">0</span>].plot(x, np.sin(x - C),
+                  lw=<span class="number">2</span>, label=<span class="string">f'C = {C:.2f}'</span>)
+axes[<span class="number">0</span>].set_title(<span class="string">'Efecto de C: desplaza horizontal'</span>)
+axes[<span class="number">0</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">0</span>].set_ylabel(<span class="string">'sin(x - C)'</span>)
+axes[<span class="number">0</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+axes[<span class="number">0</span>].legend()
+axes[<span class="number">0</span>].axhline(<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.5</span>)
+
+<span class="comment"># === Efecto del desplazamiento vertical D ===</span>
+<span class="keyword">for</span> D <span class="keyword">in</span> [-<span class="number">2</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">4</span>]:
+    axes[<span class="number">1</span>].plot(x, np.sin(x) + D,
+                  lw=<span class="number">2</span>, label=<span class="string">f'D = {D}'</span>)
+    axes[<span class="number">1</span>].axhline(D, ls=<span class="string">'--'</span>, alpha=<span class="number">0.3</span>)
+axes[<span class="number">1</span>].set_title(<span class="string">'Efecto de D: l&iacute;nea base'</span>)
+axes[<span class="number">1</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">1</span>].set_ylabel(<span class="string">'sin(x) + D'</span>)
+axes[<span class="number">1</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+axes[<span class="number">1</span>].legend()
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Desfase C</h4>
+                            <p>Desplaza la onda horizontalmente. C &gt; 0 mueve la onda hacia la derecha, C &lt; 0 hacia la izquierda. En datos temporales, captura "cu&aacute;ndo" ocurre el pico.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>L&iacute;nea base D</h4>
+                            <p>Sube o baja toda la onda. Es el valor promedio alrededor del cual oscila la se&ntilde;al. La amplitud A se mide desde D hasta el pico, no desde 0.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>F&oacute;rmulas pr&aacute;cticas</h4>
+                            <p>D = (m&aacute;x + m&iacute;n) / 2 (promedio)<br>
+                            A = (m&aacute;x &minus; m&iacute;n) / 2 (semi-amplitud)<br>
+                            B = 2&pi; / T (a partir del per&iacute;odo)<br>
+                            C = ubicaci&oacute;n del primer m&aacute;ximo (para forma factorizada con sin)</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Con A, B, C, D podemos describir cualquier oscilaci&oacute;n peri&oacute;dica del mundo real: temperatura, mareas, demanda el&eacute;ctrica, contaminaci&oacute;n, ventas estacionales.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 8: SYMPY IDENTIDADES + ECUACIONES ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Identidades y ecuaciones trigonom&eacute;tricas en SymPy</h2>
+                <p class="slide-subtitle">Verificaci&oacute;n simb&oacute;lica y soluci&oacute;n en intervalos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> *
+
+x = symbols(<span class="string">'x'</span>)
+
+<span class="comment"># === Verificar identidad pitag&oacute;rica ===</span>
+expr = sin(x)**<span class="number">2</span> + cos(x)**<span class="number">2</span>
+<span class="keyword">print</span>(trigsimp(expr))  <span class="comment"># &rarr; 1</span>
+
+<span class="comment"># === Expandir identidad de suma ===</span>
+<span class="keyword">print</span>(expand_trig(sin(x + pi/<span class="number">3</span>)))
+<span class="comment"># &rarr; sin(x)/2 + sqrt(3)*cos(x)/2</span>
+
+<span class="comment"># === &Aacute;ngulo doble ===</span>
+<span class="keyword">print</span>(expand_trig(cos(<span class="number">2</span>*x)))
+<span class="comment"># &rarr; 2*cos(x)**2 - 1</span>
+
+<span class="comment"># === Resolver ecuaci&oacute;n en [0, 2&pi;) ===</span>
+sol1 = solveset(<span class="number">2</span>*sin(x)**<span class="number">2</span> - <span class="number">1</span>, x,
+                 domain=Interval(<span class="number">0</span>, <span class="number">2</span>*pi,
+                 <span class="keyword">False</span>, <span class="keyword">True</span>))
+<span class="keyword">print</span>(sol1)
+<span class="comment"># &rarr; {&pi;/4, 3&pi;/4, 5&pi;/4, 7&pi;/4}</span>
+
+<span class="comment"># === Factorizaci&oacute;n con sustituci&oacute;n ===</span>
+<span class="comment"># 2cos&sup2;(x) + cos(x) - 1 = 0</span>
+sol2 = solveset(<span class="number">2</span>*cos(x)**<span class="number">2</span> + cos(x) - <span class="number">1</span>, x,
+                 domain=Interval(<span class="number">0</span>, <span class="number">2</span>*pi,
+                 <span class="keyword">False</span>, <span class="keyword">True</span>))
+<span class="keyword">print</span>(sol2)
+<span class="comment"># &rarr; {&pi;/3, &pi;, 5&pi;/3}</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Funci&oacute;n SymPy</th>
+                                        <th>Qu&eacute; hace</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><code>trigsimp(expr)</code></td>
+                                        <td>Simplifica expresiones trigonom&eacute;tricas</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>expand_trig(expr)</code></td>
+                                        <td>Expande sin(A+B), cos(2x), etc.</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>solveset(eq, x, domain)</code></td>
+                                        <td>Resuelve ecuaciones en un intervalo</td>
+                                    </tr>
+                                    <tr>
+                                        <td><code>Interval(0, 2*pi, False, True)</code></td>
+                                        <td>Intervalo [0, 2&pi;) (cerrado-abierto)</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Conexi&oacute;n con la teor&iacute;a</h4>
+                            <p>SymPy hace exactamente las mismas manipulaciones simb&oacute;licas que hicimos a mano: identidad pitag&oacute;rica, factorizaci&oacute;n con sustituci&oacute;n u = cos(x), soluciones generales con +2n&pi;.</p>
+                        </div>
+                        <div class="output-box">
+{&pi;/4, 3&pi;/4, 5&pi;/4, 7&pi;/4}
+{&pi;/3, &pi;, 5&pi;/3}
+                        </div>
+                        <div class="highlight-box">
+                            <p>Aplicaci&oacute;n: si modelamos la generaci&oacute;n solar como P(t) = A&middot;sin(B(t&minus;C))+D, resolver P(t) = umbral nos dice las horas en que la generaci&oacute;n supera ese nivel.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: DIVISOR ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">Aplicaciones a ciencia de datos</p>
+            <h2 class="section-title">De la sinusoide al modelo real</h2>
+            <p class="section-subtitle">Codificaci&oacute;n c&iacute;clica, ajuste con curve_fit y aplicaciones a ML moderno</p>
+        </div>
+
+        <!-- ==================== SLIDE 10: CODIFICACION CICLICA ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Codificaci&oacute;n c&iacute;clica de variables temporales</h2>
+                <p class="slide-subtitle">El "problema de medianoche" y c&oacute;mo resolverlo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="keyword">def</span> <span class="func">codificar_ciclico</span>(df, columna, periodo):
+    <span class="comment">"""Mapea una variable c&iacute;clica al c&iacute;rculo unitario."""</span>
+    df[<span class="string">f'{columna}_sin'</span>] = np.sin(
+        <span class="number">2</span> * np.pi * df[columna] / periodo)
+    df[<span class="string">f'{columna}_cos'</span>] = np.cos(
+        <span class="number">2</span> * np.pi * df[columna] / periodo)
+    <span class="keyword">return</span> df
+
+<span class="comment"># Ejemplo: codificar hora del d&iacute;a</span>
+df = pd.DataFrame({<span class="string">'hora'</span>: range(<span class="number">24</span>)})
+df = codificar_ciclico(df, <span class="string">'hora'</span>, <span class="number">24</span>)
+
+<span class="comment"># Verificar: hora 23 y hora 0 est&aacute;n CERCA</span>
+h23 = np.array([df.loc[<span class="number">23</span>, <span class="string">'hora_sin'</span>],
+                df.loc[<span class="number">23</span>, <span class="string">'hora_cos'</span>]])
+h0 = np.array([df.loc[<span class="number">0</span>, <span class="string">'hora_sin'</span>],
+               df.loc[<span class="number">0</span>, <span class="string">'hora_cos'</span>]])
+<span class="keyword">print</span>(<span class="string">f"Distancia 23&rarr;0: {np.linalg.norm(h23-h0):.3f}"</span>)
+<span class="comment"># &asymp; 0.261 (cerca, como debe ser)</span>
+
+<span class="comment"># Comparar con codificaci&oacute;n cruda</span>
+<span class="keyword">print</span>(<span class="string">f"Distancia cruda |23-0|: {abs(23-0)}"</span>)
+<span class="comment"># &asymp; 23 (incorrecto: parecen muy lejanas)</span>
+
+<span class="comment"># Per&iacute;odos comunes:</span>
+<span class="comment"># hora &rarr; 24, d&iacute;a semana &rarr; 7,</span>
+<span class="comment"># mes &rarr; 12, d&iacute;a del a&ntilde;o &rarr; 365.25</span>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>El problema de medianoche</h4>
+                            <p>Si codificamos la hora como un n&uacute;mero (0, 1, ..., 23), un modelo de ML cree que la hora 23 est&aacute; a 23 unidades de la hora 0. Pero en realidad est&aacute;n a 1 hora de distancia.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>La soluci&oacute;n: el c&iacute;rculo unitario</h4>
+                            <p>x<sub>sin</sub> = sin(2&pi;&middot;x/T), x<sub>cos</sub> = cos(2&pi;&middot;x/T). Cada valor se mapea a un punto &uacute;nico (sin, cos) sobre el c&iacute;rculo unitario.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>&iquest;Por qu&eacute; ambas componentes?</h4>
+                            <p>Solo con seno: sin(2&pi;&middot;6/24) = sin(2&pi;&middot;18/24) en algunos casos. Las 6 a.m. y las 6 p.m. quedar&iacute;an confundidas. El coseno rompe la ambig&uuml;edad.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Reducci&oacute;n de dimensionalidad: codificar hora + d&iacute;a + mes + d&iacute;a del a&ntilde;o con one-hot necesita 408 columnas. Con sin/cos solo 8 columnas. Reducci&oacute;n del 98%.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: AJUSTE SINUSOIDAL ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ajuste sinusoidal con curve_fit</h2>
+                <p class="slide-subtitle">Encontrar A, B, C, D autom&aacute;ticamente desde datos reales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> curve_fit
+
+<span class="comment"># === Modelo a ajustar ===</span>
+<span class="keyword">def</span> <span class="func">sinusoide</span>(t, A, B, C, D):
+    <span class="keyword">return</span> A * np.sin(B * (t - C)) + D
+
+<span class="comment"># === Datos simulados de demanda CR ===</span>
+np.random.seed(<span class="number">42</span>)
+t_obs = np.arange(<span class="number">0</span>, <span class="number">48</span>, <span class="number">0.5</span>)  <span class="comment"># 2 d&iacute;as</span>
+y_real = sinusoide(t_obs, <span class="number">400</span>, np.pi/<span class="number">12</span>, <span class="number">6</span>, <span class="number">1200</span>)
+y_obs = y_real + np.random.normal(<span class="number">0</span>, <span class="number">30</span>, len(t_obs))
+
+<span class="comment"># === Estimaciones iniciales (CR&Iacute;TICO) ===</span>
+A0 = (y_obs.max() - y_obs.min()) / <span class="number">2</span>  <span class="comment"># &asymp; 400</span>
+D0 = y_obs.mean()                       <span class="comment"># &asymp; 1200</span>
+B0 = <span class="number">2</span> * np.pi / <span class="number">24</span>                  <span class="comment"># per&iacute;odo conocido</span>
+C0 = <span class="number">6</span>
+p0 = [A0, B0, C0, D0]
+
+<span class="comment"># === Ajuste de m&iacute;nimos cuadrados no lineales ===</span>
+popt, pcov = curve_fit(sinusoide, t_obs, y_obs, p0=p0)
+A_fit, B_fit, C_fit, D_fit = popt
+<span class="keyword">print</span>(<span class="string">f"A={A_fit:.1f}, B={B_fit:.3f}, "</span>
+      <span class="string">f"C={C_fit:.2f}, D={D_fit:.1f}"</span>)
+
+<span class="comment"># === R&sup2; (bondad de ajuste) ===</span>
+y_pred = sinusoide(t_obs, *popt)
+ss_res = np.sum((y_obs - y_pred)**<span class="number">2</span>)
+ss_tot = np.sum((y_obs - y_obs.mean())**<span class="number">2</span>)
+r2 = <span class="number">1</span> - ss_res/ss_tot
+<span class="keyword">print</span>(<span class="string">f"R&sup2; = {r2:.4f}"</span>)
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>curve_fit en una l&iacute;nea</h4>
+                            <p>Recibe la funci&oacute;n del modelo, los datos x, los datos y y unas estimaciones iniciales p0. Devuelve los par&aacute;metros &oacute;ptimos popt y la matriz de covarianza pcov.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Las estimaciones iniciales son cr&iacute;ticas</h4>
+                            <p>curve_fit usa Levenberg&ndash;Marquardt, que puede atascarse en m&iacute;nimos locales. La estrategia es: D0 = promedio, A0 = (m&aacute;x&minus;m&iacute;n)/2, B0 desde el per&iacute;odo conocido (o desde la FFT), C0 razonable.</p>
+                        </div>
+                        <div class="output-box">
+A=400.2, B=0.262, C=6.01, D=1200.1
+R&sup2; = 0.9876
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Calidad del ajuste con R&sup2;</h4>
+                            <p>El R&sup2; mide qu&eacute; fracci&oacute;n de la varianza de los datos explica el modelo. R&sup2; &gt; 0.95 en datos peri&oacute;dicos es excelente. Es la misma m&eacute;trica que vimos en regresi&oacute;n lineal y polinomial.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Esta es la t&eacute;cnica est&aacute;ndar en ciencia de datos para modelar cualquier se&ntilde;al peri&oacute;dica: mareas, demanda el&eacute;ctrica, temperatura, ventas estacionales, llegadas tur&iacute;sticas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 12: POSITIONAL ENCODING ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Codificaci&oacute;n posicional en transformers</h2>
+                <p class="slide-subtitle">C&oacute;mo ChatGPT, Claude y Gemini saben la posici&oacute;n de cada palabra</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="keyword">def</span> <span class="func">codificacion_posicional</span>(max_len, d_model):
+    <span class="comment">"""Codificaci&oacute;n posicional sinusoidal de Vaswani 2017."""</span>
+    pe = np.zeros((max_len, d_model))
+    pos = np.arange(max_len)[:, np.newaxis]
+    div = np.exp(np.arange(<span class="number">0</span>, d_model, <span class="number">2</span>)
+                 * -(np.log(<span class="number">10000</span>) / d_model))
+    pe[:, <span class="number">0</span>::<span class="number">2</span>] = np.sin(pos * div)  <span class="comment"># dim pares</span>
+    pe[:, <span class="number">1</span>::<span class="number">2</span>] = np.cos(pos * div)  <span class="comment"># dim impares</span>
+    <span class="keyword">return</span> pe
+
+<span class="comment"># Generar y visualizar</span>
+pe = codificacion_posicional(<span class="number">50</span>, <span class="number">64</span>)
+
+fig, ax = plt.subplots(figsize=(<span class="number">12</span>, <span class="number">5</span>),
+                        layout=<span class="string">'constrained'</span>)
+im = ax.imshow(pe, aspect=<span class="string">'auto'</span>, cmap=<span class="string">'RdYlBu'</span>)
+ax.set_xlabel(<span class="string">'Dimensi&oacute;n del modelo'</span>)
+ax.set_ylabel(<span class="string">'Posici&oacute;n del token'</span>)
+ax.set_title(<span class="string">'Positional encoding sinusoidal'</span>)
+fig.colorbar(im, ax=ax)
+plt.show()
+
+<span class="comment"># Cada fila es la "huella" &uacute;nica de una posici&oacute;n</span>
+<span class="comment"># Las primeras dimensiones cambian r&aacute;pido,</span>
+<span class="comment"># las &uacute;ltimas cambian lento</span>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>El problema</h4>
+                            <p>Los transformers procesan todas las palabras en paralelo. La self-attention es invariante al orden. &iquest;C&oacute;mo le decimos al modelo que "el gato negro" es diferente de "negro gato el"?</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>La soluci&oacute;n: senos y cosenos</h4>
+                            <p>PE(pos, 2i) = sin(pos / 10000<sup>2i/d</sup>)<br>
+                            PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)<br>
+                            Cada dimensi&oacute;n usa una frecuencia distinta. Es como un sistema binario continuo.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Por qu&eacute; funciona</h4>
+                            <p>Por las identidades de suma sin(A+B) y cos(A+B): la posici&oacute;n (pos+k) es una <strong>rotaci&oacute;n</strong> de la posici&oacute;n pos. El modelo aprende a atender por posici&oacute;n relativa, no absoluta.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Esta es la base matem&aacute;tica de RoPE (Rotary Position Embedding), usado por LLaMA, Mistral, Qwen, DeepSeek, Gemma y pr&aacute;cticamente todo LLM moderno. La trigonometr&iacute;a est&aacute; en el coraz&oacute;n de la IA generativa.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 13: SIMILARIDAD COSENO Y FOURIER ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Similaridad coseno y an&aacute;lisis de Fourier</h2>
+                <p class="slide-subtitle">M&eacute;tricas y t&eacute;cnicas para comparar y descomponer se&ntilde;ales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.fft <span class="keyword">import</span> rfft, rfftfreq
+
+<span class="comment"># === Similaridad coseno ===</span>
+<span class="keyword">def</span> <span class="func">sim_coseno</span>(a, b):
+    <span class="keyword">return</span> np.dot(a, b) / (
+        np.linalg.norm(a) * np.linalg.norm(b))
+
+<span class="comment"># Perfiles tur&iacute;sticos de provincias CR</span>
+<span class="comment"># [playa, monta&ntilde;a, cultura, aventura, gastro]</span>
+san_jose = np.array([<span class="number">0.2</span>,<span class="number">0.3</span>,<span class="number">0.9</span>,<span class="number">0.4</span>,<span class="number">0.8</span>])
+guanacaste = np.array([<span class="number">0.95</span>,<span class="number">0.2</span>,<span class="number">0.3</span>,<span class="number">0.7</span>,<span class="number">0.5</span>])
+cartago = np.array([<span class="number">0.1</span>,<span class="number">0.9</span>,<span class="number">0.7</span>,<span class="number">0.5</span>,<span class="number">0.4</span>])
+
+<span class="keyword">print</span>(<span class="string">f"SJ-Cartago:    {sim_coseno(san_jose,cartago):.3f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"SJ-Guanacaste: {sim_coseno(san_jose,guanacaste):.3f}"</span>)
+
+<span class="comment"># === FFT: detectar periodicidad ===</span>
+<span class="comment"># Simular llegadas tur&iacute;sticas mensuales (10 a&ntilde;os)</span>
+meses = np.arange(<span class="number">120</span>)
+turismo = (<span class="number">200000</span> + <span class="number">1000</span>*meses +
+    <span class="number">50000</span>*np.sin(<span class="number">2</span>*np.pi*meses/<span class="number">12</span>) +
+    np.random.normal(<span class="number">0</span>, <span class="number">5000</span>, <span class="number">120</span>))
+
+fft_vals = rfft(turismo - turismo.mean())
+freqs = rfftfreq(len(turismo))
+magnitud = np.abs(fft_vals)
+<span class="comment"># Pico en freq = 1/12 &rarr; per&iacute;odo de 12 meses</span>
+<span class="comment"># confirma estacionalidad anual</span>
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Similaridad coseno</h4>
+                            <p>cos(&theta;) = (a&middot;b) / (||a||&middot;||b||). Mide el &aacute;ngulo entre vectores, no su magnitud. Rango: [&minus;1, 1]. Es la m&eacute;trica est&aacute;ndar en NLP, b&uacute;squeda sem&aacute;ntica y RAG.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>FFT (transformada r&aacute;pida de Fourier)</h4>
+                            <p>Descompone cualquier se&ntilde;al peri&oacute;dica en sus frecuencias componentes. Si una serie tiene estacionalidad anual, la FFT la detecta como un pico en la frecuencia 1/12 (en datos mensuales).</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>El teorema de Fourier</h4>
+                            <p>Toda se&ntilde;al peri&oacute;dica se puede escribir como suma de senos y cosenos de diferentes frecuencias. Es la base de Prophet (Meta) para modelar estacionalidad.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Para sus proyectos: si sospechan estacionalidad en sus datos, scipy.fft.rfft() la detecta directamente. Los picos del espectro les dicen exactamente cu&aacute;les son los per&iacute;odos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 14: CIERRE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cierre del curso te&oacute;rico</h2>
+                <p class="slide-subtitle">Resumen de la semana 14 y entregables pendientes</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Lo que vimos hoy</h4>
+                            <p>Funciones trigonom&eacute;tricas (sin, cos, tan), sus propiedades y la forma general A&middot;sin(B(x&minus;C))+D con sus cuatro par&aacute;metros: amplitud, frecuencia, desfase y l&iacute;nea base.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Aplicaciones a ciencia de datos</h4>
+                            <p>Codificaci&oacute;n c&iacute;clica (resuelve el problema de medianoche), ajuste sinusoidal con curve_fit, codificaci&oacute;n posicional en transformers, similaridad coseno y an&aacute;lisis de Fourier.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Herramientas nuevas</h4>
+                            <p><code>np.sin/cos/tan</code>, <code>np.radians/degrees</code>, <code>scipy.optimize.curve_fit</code>, <code>scipy.fft.rfft</code>, <code>sympy.solveset</code> con <code>Interval</code>.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Entregables y fechas</h3>
+                            <ul>
+                                <li><strong>Quiz 2</strong> (10%): lunes 20 de abril, 11:59 p.m. Cubre semanas 7&ndash;12</li>
+                                <li><strong>Taller 5</strong> (6%): lunes 20 de abril, exponenciales y logar&iacute;tmicas</li>
+                                <li><strong>Entrega final</strong> del proyecto (4%): semana 15</li>
+                                <li><strong>Presentaci&oacute;n final</strong> del proyecto (8%): semana 15, 12 minutos por grupo</li>
+                            </ul>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px;">
+                            <h3>Recordatorios para la semana 15</h3>
+                            <ul>
+                                <li>Llegar con la presentaci&oacute;n lista (todos los miembros participan)</li>
+                                <li>Tener el notebook final del proyecto en Colab</li>
+                                <li>Documento final con conclusiones y recomendaciones</li>
+                                <li>M&iacute;nimo 7 referencias en formato APA 7</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Esta es la &uacute;ltima clase te&oacute;rica del curso. La pr&oacute;xima semana son las presentaciones finales de los proyectos. &iexcl;Mucho &eacute;xito en la preparaci&oacute;n!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end presentation-container -->
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&larr; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft')  changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

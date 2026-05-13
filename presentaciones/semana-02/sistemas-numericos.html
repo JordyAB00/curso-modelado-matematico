@@ -1,0 +1,1259 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 2: Sistemas numéricos - Matemática Básica para Ciencia de Datos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">18</span>
+    </div>
+
+    <div class="presentation-container">
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Sistemas numéricos</h1>
+            <p class="cover-subtitle">Semana 2: de la teoría a Python</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Agenda -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de hoy</h2>
+                <p class="slide-subtitle">Aplicaciones computacionales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. NumPy 2.4.1: arrays y tipos de datos</h4>
+                        <p>Implementación computacional de sistemas numéricos</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Operaciones vectorizadas</h4>
+                        <p>Eficiencia sin loops explícitos</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Notación científica en Python</h4>
+                        <p>Manejo de big data y modelos grandes</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Visualización con Matplotlib</h4>
+                        <p>Recta numérica, métricas de distancia</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>5. Aplicaciones reales</h4>
+                    <p>Normalización, detección de outliers, datasets de Costa Rica</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: De la recta a NumPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">De la recta numérica a NumPy arrays</h2>
+                <p class="slide-subtitle">Puente entre matemáticas y computación</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Concepto matemático vs implementación</h3>
+                    <p>La recta numérica es continua (infinitos puntos). En computación, representamos subconjuntos finitos usando arrays.</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Crear un array de enteros (análogo a subconjunto de ℤ)</span>
+<span class="keyword">enteros</span> = np.<span class="keyword">array</span>([<span class="number">-3</span>, <span class="number">-1</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>], dtype=np.int64)
+<span class="keyword">print</span>(enteros)  <span class="comment"># [-3 -1  0  2  5]</span>
+
+<span class="comment"># Crear un array de floats (análogo a subconjunto de ℝ)</span>
+<span class="keyword">reales</span> = np.<span class="keyword">array</span>([<span class="number">-2.5</span>, <span class="number">0.0</span>, <span class="number">1.414</span>, <span class="number">3.14159</span>], dtype=np.float64)
+<span class="keyword">print</span>(reales)  <span class="comment"># [-2.5     0.      1.414   3.14159]</span>
+
+<span class="comment"># Generar rango uniforme (linspace = "linear space")</span>
+<span class="keyword">rango</span> = np.<span class="keyword">linspace</span>(<span class="number">-5</span>, <span class="number">5</span>, <span class="number">11</span>)  <span class="comment"># 11 puntos de -5 a 5</span>
+<span class="keyword">print</span>(rango)
+<span class="comment"># [-5. -4. -3. -2. -1.  0.  1.  2.  3.  4.  5.]</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>NumPy usa aritmética IEEE 754 de punto flotante, con ~15 dígitos de precisión para float64.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Tipos de datos NumPy 2.4.1 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Tipos de datos en NumPy 2.4.1</h2>
+                <p class="slide-subtitle">Versión actual: enero 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tipo NumPy</th>
+                                    <th>Conjunto</th>
+                                    <th>Bits</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>np.int8</strong></td>
+                                    <td>ℤ</td>
+                                    <td>8</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.int16</strong></td>
+                                    <td>ℤ</td>
+                                    <td>16</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.int32</strong></td>
+                                    <td>ℤ</td>
+                                    <td>32</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.int64</strong></td>
+                                    <td>ℤ</td>
+                                    <td>64</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.float32</strong></td>
+                                    <td>ℝ</td>
+                                    <td>32</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.float64</strong></td>
+                                    <td>ℝ</td>
+                                    <td>64</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>np.complex128</strong></td>
+                                    <td>ℂ</td>
+                                    <td>128</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="content-box">
+                        <h3>Rangos importantes</h3>
+                        <ul>
+                            <li><strong>int8:</strong> -128 a 127</li>
+                            <li><strong>int16:</strong> -32,768 a 32,767</li>
+                            <li><strong>int32:</strong> ±2.1 × 10⁹</li>
+                            <li><strong>int64:</strong> ±9.2 × 10¹⁸</li>
+                            <li><strong>float32:</strong> ~7 dígitos</li>
+                            <li><strong>float64:</strong> ~15 dígitos</li>
+                            <li><strong>complex128:</strong> Dos float64</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Información sobre precisión float64</span>
+<span class="keyword">info</span> = np.<span class="keyword">finfo</span>(np.float64)
+<span class="keyword">print</span>(<span class="string">f"Epsilon: </span>{info.eps:<span class="string">.2e</span>}<span class="string">"</span>)           <span class="comment"># 2.22e-16</span>
+<span class="keyword">print</span>(<span class="string">f"Máximo: </span>{info.max:<span class="string">.2e</span>}<span class="string">"</span>)            <span class="comment"># 1.80e+308</span>
+<span class="keyword">print</span>(<span class="string">f"Mínimo normalizado: </span>{info.min:<span class="string">.2e</span>}<span class="string">"</span>) <span class="comment"># 2.22e-308</span>
+<span class="keyword">print</span>(<span class="string">f"Precisión decimal: </span>{info.precision}<span class="string">"</span>)  <span class="comment"># 15 dígitos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Operaciones vectorizadas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Operaciones vectorizadas</h2>
+                <p class="slide-subtitle">20-50x más rápido que loops Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Forma lenta: loop Python</span>
+<span class="keyword">lista</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
+<span class="keyword">cuadrados</span> = []
+<span class="keyword">for</span> x <span class="keyword">in</span> lista:
+    cuadrados.<span class="keyword">append</span>(x ** <span class="number">2</span>)
+<span class="keyword">print</span>(cuadrados)
+<span class="comment"># [1, 4, 9, 16, 25]</span>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Forma rápida: vectorizada</span>
+<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])
+<span class="keyword">cuadrados</span> = arr ** <span class="number">2</span>
+<span class="keyword">print</span>(cuadrados)
+<span class="comment"># [ 1  4  9 16 25]</span>
+
+<span class="comment"># Una sola línea</span>
+                    </div>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Operaciones elemento por elemento (broadcasting)</span>
+<span class="keyword">a</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="keyword">b</span> = np.<span class="keyword">array</span>([<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
+
+<span class="keyword">print</span>(a + b)        <span class="comment"># [5 7 9]</span>
+<span class="keyword">print</span>(a * b)        <span class="comment"># [ 4 10 18]</span>
+<span class="keyword">print</span>(a ** <span class="number">2</span>)        <span class="comment"># [1 4 9]</span>
+<span class="keyword">print</span>(np.<span class="keyword">sqrt</span>(a))  <span class="comment"># [1.         1.41421356 1.73205081]</span>
+
+<span class="comment"># Operaciones con escalar (broadcasting)</span>
+<span class="keyword">print</span>(a * <span class="number">10</span>)       <span class="comment"># [10 20 30]</span>
+<span class="keyword">print</span>(a + <span class="number">5</span>)        <span class="comment"># [6 7 8]</span>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>NumPy aplica operaciones a todo el array en C optimizado, sin loops Python lentos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Notación científica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Notación científica en Python</h2>
+                <p class="slide-subtitle">Manejo de escalas extremas</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Notación científica en Python: usa 'e' en lugar de '×10^'</span>
+<span class="keyword">grande</span> = <span class="number">5.2e6</span>        <span class="comment"># 5.2 × 10⁶ = 5,200,000</span>
+<span class="keyword">pequeño</span> = <span class="number">4.3e-5</span>      <span class="comment"># 4.3 × 10⁻⁵ = 0.000043</span>
+<span class="keyword">avogadro</span> = <span class="number">6.022e23</span>   <span class="comment"># 6.022 × 10²³</span>
+
+<span class="comment"># Formateo de salida</span>
+<span class="keyword">valor</span> = <span class="number">123456789.123456</span>
+
+<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">e</span>}<span class="string">"</span>)      <span class="comment"># 1.234568e+08 (notación estándar)</span>
+<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">.2e</span>}<span class="string">"</span>)    <span class="comment"># 1.23e+08 (2 decimales)</span>
+<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">.3E</span>}<span class="string">"</span>)    <span class="comment"># 1.235E+08 ('E' mayúscula)</span>
+
+<span class="comment"># NumPy: control de visualización global</span>
+<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">1.6e-10</span>, <span class="number">1.6</span>, <span class="number">1200</span>, <span class="number">1.23e15</span>])
+
+<span class="keyword">print</span>(<span class="string">"Default:"</span>, arr)  <span class="comment"># Mixto de notaciones</span>
+
+<span class="keyword">np</span>.<span class="keyword">set_printoptions</span>(formatter={<span class="string">'float'</span>: <span class="string">'{:.2e}'</span>.<span class="keyword">format</span>})
+<span class="keyword">print</span>(<span class="string">"Forzado científico:"</span>, arr)  <span class="comment"># Todo en notación científica</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Aplicación - Cálculo de memoria GPU -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: cálculo de memoria para modelos de IA</h2>
+                <p class="slide-subtitle">Ejemplo real con LLMs</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="keyword">calcular_memoria_modelo</span>(
+    params_billones: <span class="keyword">float</span>,
+    bits_precision: <span class="keyword">int</span> = <span class="number">16</span>
+) -> <span class="keyword">float</span>:
+    <span class="string">"""Calcula memoria GPU necesaria para un LLM.
+    
+    Args:
+        params_billones: Número de parámetros en billones (1e9)
+        bits_precision: Bits por parámetro (16=FP16, 4=INT4)
+    
+    Returns:
+        Memoria necesaria en GB
+    """</span>
+    bytes_por_param = bits_precision / <span class="number">8</span>
+    total_bytes = params_billones * <span class="number">1e9</span> * bytes_por_param
+    gb_necesarios = total_bytes / (<span class="number">1024</span>**<span class="number">3</span>)
+    <span class="keyword">return</span> gb_necesarios
+
+<span class="comment"># Ejemplos de modelos reales (2024-2026)</span>
+<span class="keyword">modelos</span> = [
+    (<span class="string">"LLaMA 3.1 7B (FP16)"</span>, <span class="number">7</span>, <span class="number">16</span>),
+    (<span class="string">"LLaMA 3.1 7B (INT4)"</span>, <span class="number">7</span>, <span class="number">4</span>),
+    (<span class="string">"LLaMA 3.1 70B (FP16)"</span>, <span class="number">70</span>, <span class="number">16</span>),
+    (<span class="string">"LLaMA 3.1 405B (FP16)"</span>, <span class="number">405</span>, <span class="number">16</span>),
+]
+
+<span class="keyword">for</span> nombre, params, bits <span class="keyword">in</span> modelos:
+    mem = <span class="keyword">calcular_memoria_modelo</span>(params, bits)
+    bytes_total = params * <span class="number">1e9</span> * (bits/<span class="number">8</span>)
+    <span class="keyword">print</span>(<span class="string">f"</span>{nombre:<span class="string">}</span>: {mem:<span class="string">.1f</span>} GB ({bytes_total:<span class="string">.2e</span>} bytes)<span class="string">"</span>)
+
+<span class="comment"># Salida:
+# LLaMA 3.1 7B (FP16): 13.0 GB (1.40e+10 bytes)
+# LLaMA 3.1 7B (INT4): 3.3 GB (3.50e+09 bytes)
+# LLaMA 3.1 70B (FP16): 130.4 GB (1.40e+11 bytes)
+# LLaMA 3.1 405B (FP16): 754.2 GB (8.10e+11 bytes)</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Visualización recta numérica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Visualización de la recta numérica</h2>
+                <p class="slide-subtitle">Matplotlib básico</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Crear figura</span>
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = plt.<span class="keyword">subplots</span>(figsize=(<span class="number">12</span>, <span class="number">2</span>))
+
+<span class="comment"># Dibujar la recta numérica</span>
+<span class="keyword">ax</span>.<span class="keyword">axhline</span>(y=<span class="number">0</span>, color=<span class="string">'black'</span>, linewidth=<span class="number">2</span>)
+
+<span class="comment"># Marcar enteros de -5 a 5</span>
+<span class="keyword">enteros</span> = np.<span class="keyword">arange</span>(<span class="number">-5</span>, <span class="number">6</span>)
+<span class="keyword">ax</span>.<span class="keyword">scatter</span>(enteros, np.<span class="keyword">zeros_like</span>(enteros), 
+           color=<span class="string">'#2d2d2d'</span>, s=<span class="number">100</span>, zorder=<span class="number">3</span>)
+
+<span class="comment"># Etiquetas de números</span>
+<span class="keyword">for</span> i <span class="keyword">in</span> enteros:
+    <span class="keyword">ax</span>.<span class="keyword">text</span>(i, <span class="number">-0.15</span>, <span class="keyword">str</span>(i), ha=<span class="string">'center'</span>, fontsize=<span class="number">12</span>)
+
+<span class="comment"># Destacar algunos irracionales</span>
+<span class="keyword">irracionales</span> = {
+    np.<span class="keyword">sqrt</span>(<span class="number">2</span>): <span class="string">'√2'</span>,
+    np.<span class="keyword">pi</span>: <span class="string">'π'</span>,
+    np.<span class="keyword">e</span>: <span class="string">'e'</span>
+}
+
+<span class="keyword">for</span> valor, etiqueta <span class="keyword">in</span> irracionales.<span class="keyword">items</span>():
+    <span class="keyword">ax</span>.<span class="keyword">scatter</span>(valor, <span class="number">0</span>, color=<span class="string">'#FF8C00'</span>, s=<span class="number">150</span>, 
+               marker=<span class="string">'*'</span>, zorder=<span class="number">4</span>)
+    <span class="keyword">ax</span>.<span class="keyword">text</span>(valor, <span class="number">0.15</span>, etiqueta, ha=<span class="string">'center'</span>, 
+            fontsize=<span class="number">11</span>, color=<span class="string">'#FF8C00'</span>)
+
+<span class="keyword">ax</span>.<span class="keyword">set_xlim</span>(<span class="number">-5.5</span>, <span class="number">5.5</span>)
+<span class="keyword">ax</span>.<span class="keyword">set_ylim</span>(<span class="number">-0.5</span>, <span class="number">0.5</span>)
+<span class="keyword">ax</span>.<span class="keyword">set_title</span>(<span class="string">'Recta numérica: ℤ y algunos irracionales'</span>, 
+            fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+<span class="keyword">ax</span>.<span class="keyword">axis</span>(<span class="string">'off'</span>)
+
+<span class="keyword">plt</span>.<span class="keyword">tight_layout</span>()
+<span class="keyword">plt</span>.<span class="keyword">show</span>()
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Métricas de distancia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Métricas de distancia en data science</h2>
+                <p class="slide-subtitle">Interpretación geométrica aplicada</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Métrica</th>
+                                <th>Fórmula</th>
+                                <th>Aplicación típica</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Euclidiana (L2)</strong></td>
+                                <td>√Σ(xᵢ-yᵢ)²</td>
+                                <td>Datos numéricos continuos</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Manhattan (L1)</strong></td>
+                                <td>Σ|xᵢ-yᵢ|</td>
+                                <td>Datos de alta dimensionalidad</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Coseno</strong></td>
+                                <td>1 - (a·b)/(|a||b|)</td>
+                                <td>Análisis de texto, NLP</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Dos puntos en el espacio</span>
+<span class="keyword">punto1</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="keyword">punto2</span> = np.<span class="keyword">array</span>([<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
+
+<span class="comment"># Distancia Euclidiana (la más común)</span>
+<span class="keyword">dist_euclidiana</span> = np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto1 - punto2)
+<span class="keyword">print</span>(<span class="string">f"Euclidiana: </span>{dist_euclidiana:<span class="string">.2f</span>}<span class="string">"</span>)  <span class="comment"># 5.20</span>
+
+<span class="comment"># Distancia Manhattan (camino en cuadrícula)</span>
+<span class="keyword">dist_manhattan</span> = np.<span class="keyword">sum</span>(np.<span class="keyword">abs</span>(punto1 - punto2))
+<span class="keyword">print</span>(<span class="string">f"Manhattan: </span>{dist_manhattan:<span class="string">.2f</span>}<span class="string">"</span>)    <span class="comment"># 9.00</span>
+
+<span class="comment"># Similitud coseno (útil para vectores de texto)</span>
+<span class="keyword">coseno</span> = np.<span class="keyword">dot</span>(punto1, punto2) / (np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto1) * np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto2))
+<span class="keyword">print</span>(<span class="string">f"Coseno similitud: </span>{coseno:<span class="string">.4f</span>}<span class="string">"</span>)  <span class="comment"># 0.9746</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Normalización de datos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: normalización de datos</h2>
+                <p class="slide-subtitle">Usando supremo e ínfimo (max/min)</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Min-Max normalization</h3>
+                    <p>Escala datos al rango [0, 1] usando: x_norm = (x - min) / (max - min)</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Dataset: salarios en Costa Rica (en colones)</span>
+<span class="keyword">salarios</span> = np.<span class="keyword">array</span>([
+    <span class="number">450_000</span>, <span class="number">650_000</span>, <span class="number">1_200_000</span>, <span class="number">850_000</span>, 
+    <span class="number">2_500_000</span>, <span class="number">700_000</span>, <span class="number">950_000</span>
+])
+
+<span class="comment"># Encontrar supremo e ínfimo (max y min)</span>
+<span class="keyword">inf_sal</span> = np.<span class="keyword">min</span>(salarios)  <span class="comment"># 450,000 (ínfimo)</span>
+<span class="keyword">sup_sal</span> = np.<span class="keyword">max</span>(salarios)  <span class="comment"># 2,500,000 (supremo)</span>
+
+<span class="keyword">print</span>(<span class="string">f"Rango salarial: ₡</span>{inf_sal:<span class="string">,.0f</span>} - ₡{sup_sal:<span class="string">,.0f</span>}<span class="string">"</span>)
+
+<span class="comment"># Normalización Min-Max al rango [0, 1]</span>
+<span class="keyword">salarios_norm</span> = (salarios - inf_sal) / (sup_sal - inf_sal)
+
+<span class="keyword">print</span>(<span class="string">"
+Salarios normalizados:"</span>)
+<span class="keyword">for</span> original, normalizado <span class="keyword">in</span> <span class="keyword">zip</span>(salarios, salarios_norm):
+    <span class="keyword">print</span>(<span class="string">f"  ₡</span>{original:<span class="string">9,.0f</span>} → {normalizado:<span class="string">.4f</span>}<span class="string">"</span>)
+
+<span class="comment"># Salida:
+# Rango salarial: ₡450,000 - ₡2,500,000
+# 
+# Salarios normalizados:
+#   ₡  450,000 → 0.0000
+#   ₡  650,000 → 0.0976
+#   ₡1,200,000 → 0.3659
+#   ₡  850,000 → 0.1951
+#   ₡2,500,000 → 1.0000
+#   ₡  700,000 → 0.1220
+#   ₡  950,000 → 0.2439</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Detección de outliers -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: detección de outliers</h2>
+                <p class="slide-subtitle">Usando propiedades de orden</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="keyword">detectar_outliers_iqr</span>(datos: np.ndarray) -> <span class="keyword">tuple</span>:
+    <span class="string">"""Detecta outliers usando el método IQR (Interquartile Range).
+    
+    Outliers son valores fuera del rango [Q1 - 1.5×IQR, Q3 + 1.5×IQR]
+    
+    Returns:
+        (outliers_inferiores, outliers_superiores, limites)
+    """</span>
+    <span class="keyword">Q1</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">25</span>)
+    <span class="keyword">Q3</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">75</span>)
+    <span class="keyword">IQR</span> = Q3 - Q1
+    
+    <span class="keyword">limite_inf</span> = Q1 - <span class="number">1.5</span> * IQR
+    <span class="keyword">limite_sup</span> = Q3 + <span class="number">1.5</span> * IQR
+    
+    <span class="keyword">outliers_inf</span> = datos[datos < limite_inf]
+    <span class="keyword">outliers_sup</span> = datos[datos > limite_sup]
+    
+    <span class="keyword">return</span> outliers_inf, outliers_sup, (limite_inf, limite_sup)
+
+<span class="comment"># Precios de casas en San José (millones de colones)</span>
+<span class="keyword">precios</span> = np.<span class="keyword">array</span>([
+    <span class="number">45</span>, <span class="number">52</span>, <span class="number">48</span>, <span class="number">60</span>, <span class="number">55</span>, <span class="number">58</span>, <span class="number">51</span>, 
+    <span class="number">150</span>,  <span class="comment"># ← Outlier superior</span>
+    <span class="number">53</span>, <span class="number">49</span>, <span class="number">15</span>,  <span class="comment"># ← Outlier inferior</span>
+    <span class="number">57</span>, <span class="number">54</span>, <span class="number">61</span>
+])
+
+<span class="keyword">out_inf</span>, <span class="keyword">out_sup</span>, (lim_inf, lim_sup) = <span class="keyword">detectar_outliers_iqr</span>(precios)
+
+<span class="keyword">print</span>(<span class="string">f"Límites normales: [₡</span>{lim_inf:<span class="string">.1f</span>}M, ₡{lim_sup:<span class="string">.1f</span>}M]<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"Outliers inferiores: </span>{out_inf}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"Outliers superiores: </span>{out_sup}<span class="string">"</span>)
+
+<span class="comment"># Salida:
+# Límites normales: [₡37.5M, ₡73.5M]
+# Outliers inferiores: [15]
+# Outliers superiores: [150]</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Dataset real Costa Rica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación: dataset real de Costa Rica</h2>
+                <p class="slide-subtitle">Tipo de cambio BCCR</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Tipo de cambio colón-dólar (simulado, valores típicos 2024-2025)</span>
+<span class="comment"># En proyecto real: obtener de API del BCCR</span>
+<span class="keyword">dias</span> = np.<span class="keyword">arange</span>(<span class="number">0</span>, <span class="number">365</span>)
+<span class="keyword">tc_base</span> = <span class="number">530</span>  <span class="comment"># Tipo de cambio promedio</span>
+<span class="keyword">tc</span> = tc_base + <span class="number">15</span> * np.<span class="keyword">sin</span>(dias / <span class="number">60</span>) + np.<span class="keyword">random</span>.<span class="keyword">normal</span>(<span class="number">0</span>, <span class="number">2</span>, <span class="number">365</span>)
+
+<span class="comment"># Estadísticas descriptivas usando propiedades de orden</span>
+<span class="keyword">tc_min</span> = np.<span class="keyword">min</span>(tc)      <span class="comment"># Ínfimo (mínimo)</span>
+<span class="keyword">tc_max</span> = np.<span class="keyword">max</span>(tc)      <span class="comment"># Supremo (máximo)</span>
+<span class="keyword">tc_promedio</span> = np.<span class="keyword">mean</span>(tc)
+<span class="keyword">tc_mediana</span> = np.<span class="keyword">median</span>(tc)
+
+<span class="keyword">print</span>(<span class="string">f"Tipo de cambio anual (colones por dólar):"</span>)
+<span class="keyword">print</span>(<span class="string">f"  Mínimo:   ₡</span>{tc_min:<span class="string">.2f</span>}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"  Máximo:   ₡</span>{tc_max:<span class="string">.2f</span>}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"  Promedio: ₡</span>{tc_promedio:<span class="string">.2f</span>}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">f"  Mediana:  ₡</span>{tc_mediana:<span class="string">.2f</span>}<span class="string">"</span>)
+
+<span class="comment"># Visualización</span>
+<span class="keyword">plt</span>.<span class="keyword">figure</span>(figsize=(<span class="number">12</span>, <span class="number">5</span>))
+<span class="keyword">plt</span>.<span class="keyword">plot</span>(dias, tc, color=<span class="string">'#2d2d2d'</span>, linewidth=<span class="number">1.5</span>, label=<span class="string">'Tipo de cambio'</span>)
+<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_promedio, color=<span class="string">'#FF8C00'</span>, linestyle=<span class="string">'--'</span>, 
+            linewidth=<span class="number">2</span>, label=<span class="string">f'Promedio: ₡</span>{tc_promedio:<span class="string">.2f</span>}<span class="string">'</span>)
+<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_min, color=<span class="string">'green'</span>, linestyle=<span class="string">':'</span>, alpha=<span class="number">0.7</span>, label=<span class="string">f'Mín: ₡</span>{tc_min:<span class="string">.2f</span>}<span class="string">'</span>)
+<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_max, color=<span class="string">'red'</span>, linestyle=<span class="string">':'</span>, alpha=<span class="number">0.7</span>, label=<span class="string">f'Máx: ₡</span>{tc_max:<span class="string">.2f</span>}<span class="string">'</span>)
+
+<span class="keyword">plt</span>.<span class="keyword">xlabel</span>(<span class="string">'Día del año'</span>, fontsize=<span class="number">12</span>)
+<span class="keyword">plt</span>.<span class="keyword">ylabel</span>(<span class="string">'Colones por dólar'</span>, fontsize=<span class="number">12</span>)
+<span class="keyword">plt</span>.<span class="keyword">title</span>(<span class="string">'Tipo de cambio colón-dólar (2025)'</span>, fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
+<span class="keyword">plt</span>.<span class="keyword">legend</span>()
+<span class="keyword">plt</span>.<span class="keyword">grid</span>(True, alpha=<span class="number">0.3</span>)
+<span class="keyword">plt</span>.<span class="keyword">tight_layout</span>()
+<span class="keyword">plt</span>.<span class="keyword">show</span>()
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Cambios NumPy 2.0+ -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Novedades NumPy 2.4.1</h2>
+                <p class="slide-subtitle">Cambios importantes desde 2.0</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>StringDType (nuevo en 2.0)</h3>
+                        <ul>
+                            <li>Strings de longitud variable nativos</li>
+                            <li>Soporte para valores nulos</li>
+                            <li>Más eficiente que object arrays</li>
+                        </ul>
+                    </div>
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Nuevo StringDType</span>
+<span class="keyword">arr</span> = np.<span class="keyword">array</span>(
+    [<span class="string">"Costa Rica"</span>, <span class="string">"Nicaragua"</span>], 
+    dtype=np.dtypes.<span class="keyword">StringDType</span>()
+)
+<span class="keyword">print</span>(arr.dtype)  
+<span class="comment"># StringDType()</span>
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 20px;">
+                    <div class="content-box">
+                        <h3>NEP 50 - Promoción de tipos</h3>
+                        <p>Comportamiento cambiado para preservar precisión del escalar</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># NumPy 1.x: retornaba float64</span>
+<span class="comment"># NumPy 2.x: preserva float32</span>
+<span class="keyword">result</span> = np.<span class="keyword">float32</span>(<span class="number">3</span>) + <span class="number">3.0</span>
+<span class="keyword">print</span>(result.dtype)  
+<span class="comment"># float32 (nuevo)</span>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Cambios de API desde NumPy 2.0: np.float_ → np.float64, np.trapz → np.trapezoid, np.in1d → np.isin</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Mejores prácticas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Mejores prácticas NumPy 2.4.1</h2>
+                <p class="slide-subtitle">Código profesional</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> numpy.typing <span class="keyword">import</span> NDArray
+
+<span class="comment"># 1. Operaciones vectorizadas (no loops)</span>
+<span class="keyword">arr</span> = np.<span class="keyword">arange</span>(<span class="number">1_000_000</span>)
+<span class="keyword">result</span> = np.<span class="keyword">square</span>(arr)  <span class="comment"># NO: [x**2 for x in arr]</span>
+
+<span class="comment"># 2. Especificar dtypes explícitamente</span>
+<span class="keyword">datos</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], dtype=np.float32)  <span class="comment"># Eficiente en memoria</span>
+
+<span class="comment"># 3. Operaciones in-place cuando sea posible</span>
+<span class="keyword">arr</span> += <span class="number">5</span>  <span class="comment"># NO: arr = arr + 5 (crea copia)</span>
+
+<span class="comment"># 4. Broadcasting en lugar de tile/repeat</span>
+<span class="keyword">a</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
+<span class="keyword">b</span> = np.<span class="keyword">array</span>([[<span class="number">1</span>], [<span class="number">2</span>], [<span class="number">3</span>]])
+<span class="keyword">result</span> = a + b  <span class="comment"># Broadcasting automático</span>
+
+<span class="comment"># 5. Comparación de punto flotante con tolerancia</span>
+<span class="keyword">print</span>(np.<span class="keyword">isclose</span>(<span class="number">0.1</span> + <span class="number">0.2</span>, <span class="number">0.3</span>))  <span class="comment"># True</span>
+<span class="comment"># NO usar: 0.1 + 0.2 == 0.3  # False por error de redondeo</span>
+
+<span class="comment"># 6. Type hints modernos</span>
+<span class="keyword">def</span> <span class="keyword">procesar</span>(data: NDArray[np.float64]) -> NDArray[np.float64]:
+    <span class="keyword">return</span> np.<span class="keyword">sqrt</span>(data)
+
+<span class="comment"># 7. Casting seguro (NumPy 2.4+)</span>
+<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>], dtype=np.int64)
+<span class="keyword">arr_float</span> = arr.<span class="keyword">astype</span>(np.float64, casting=<span class="string">"same_value"</span>)  <span class="comment"># Previene pérdida de datos</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Comparación Listas vs NumPy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Listas vs NumPy: cuándo usar cada uno</h2>
+                <p class="slide-subtitle">Guía práctica</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Característica</th>
+                                    <th>Listas Python</th>
+                                    <th>NumPy Arrays</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Tipos</strong></td>
+                                    <td>Mixtos</td>
+                                    <td>Un solo tipo</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Memoria</strong></td>
+                                    <td>Dispersa</td>
+                                    <td>Contigua</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Velocidad</strong></td>
+                                    <td>Lenta</td>
+                                    <td>20-50x más rápida</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="comparison-table">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Característica</th>
+                                    <th>Listas Python</th>
+                                    <th>NumPy Arrays</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Operaciones</strong></td>
+                                    <td>Requiere loops</td>
+                                    <td>Vectorizadas</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Dimensiones</strong></td>
+                                    <td>Solo 1D</td>
+                                    <td>Multidimensional</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Uso ideal</strong></td>
+                                    <td>Datos mixtos</td>
+                                    <td>Cálculos grandes</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>Regla general: usa listas para colecciones pequeñas de datos mixtos, NumPy para operaciones matemáticas intensivas o datasets grandes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Ejercicio práctico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ejercicio práctico</h2>
+                <p class="slide-subtitle">Sistema de ranking con propiedades de orden</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Desafío: ranking de estudiantes</h3>
+                    <p>Implementa un sistema de ranking que utiliza propiedades de orden para clasificar estudiantes según sus calificaciones.</p>
+                </div>
+                <div class="code-box" style="margin-top: 20px;">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> rankdata
+
+<span class="comment"># Calificaciones de 10 estudiantes (escala 0-100)</span>
+<span class="keyword">calificaciones</span> = np.<span class="keyword">array</span>([<span class="number">85</span>, <span class="number">92</span>, <span class="number">78</span>, <span class="number">92</span>, <span class="number">88</span>, <span class="number">95</span>, <span class="number">82</span>, <span class="number">90</span>, <span class="number">78</span>, <span class="number">87</span>])
+<span class="keyword">nombres</span> = np.<span class="keyword">array</span>([
+    <span class="string">"Ana"</span>, <span class="string">"Carlos"</span>, <span class="string">"María"</span>, <span class="string">"José"</span>, <span class="string">"Laura"</span>, 
+    <span class="string">"Diego"</span>, <span class="string">"Sofía"</span>, <span class="string">"Pedro"</span>, <span class="string">"Elena"</span>, <span class="string">"Luis"</span>
+], dtype=np.dtypes.<span class="keyword">StringDType</span>())
+
+<span class="comment"># Ranking descendente (mejor = 1)</span>
+<span class="comment"># method='average' maneja empates con promedio de posiciones</span>
+<span class="keyword">ranking</span> = rankdata(<span class="number">-</span>calificaciones, method=<span class="string">'average'</span>)
+
+<span class="comment"># Ordenar por ranking</span>
+<span class="keyword">orden</span> = np.<span class="keyword">argsort</span>(ranking)
+
+<span class="keyword">print</span>(<span class="string">"Ranking final:
+"</span>)
+<span class="keyword">print</span>(<span class="string">f"</span>{<span class="string">'Rank'</span>:<span class="number">4</span>} {<span class="string">'Nombre'</span>:<span class="number">10</span>} {<span class="string">'Calificación'</span>:<span class="number">15</span>}<span class="string">"</span>)
+<span class="keyword">print</span>(<span class="string">"-"</span> * <span class="number">30</span>)
+
+<span class="keyword">for</span> i <span class="keyword">in</span> orden:
+    <span class="keyword">print</span>(<span class="string">f"</span>{ranking[i]:<span class="string">4.1f</span>} {<span class="keyword">str</span>(nombres[i]):<span class="number">10</span>} {calificaciones[i]:<span class="number">15</span>}<span class="string">"</span>)
+
+<span class="comment"># Salida esperada:
+# Rank Nombre     Calificación   
+# ------------------------------
+# 1.0  Diego                   95
+# 2.5  Carlos                  92
+# 2.5  José                    92
+# 4.0  Pedro                   90
+# 5.0  Laura                   88
+# 6.0  Luis                    87
+# 7.0  Ana                     85
+# 8.0  Sofía                   82
+# 9.5  María                   78
+# 9.5  Elena                   78</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Recursos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Recursos adicionales</h2>
+                <p class="slide-subtitle">Para profundizar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Documentación oficial</h3>
+                        <ul>
+                            <li><strong>NumPy 2.4.1:</strong> numpy.org/doc/stable/</li>
+                            <li><strong>Guía de migración NumPy 2.0:</strong> numpy.org/devdocs/numpy_2_0_migration_guide.html</li>
+                            <li><strong>Matplotlib:</strong> matplotlib.org/stable/gallery/</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Herramientas visuales</h3>
+                        <ul>
+                            <li><strong>GeoGebra:</strong> geogebra.org (recta numérica interactiva)</li>
+                            <li><strong>Desmos:</strong> desmos.com (graficación)</li>
+                            <li><strong>3Blue1Brown:</strong> Essence of Linear Algebra (YouTube)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Libros de referencia</h3>
+                    <ul>
+                        <li><strong>STEWART, James.</strong> Pre-cálculo. Matemática para cálculo (6ª ed.). Cengage Learning, 2012</li>
+                        <li><strong>JOHANSSON, Robert.</strong> Numerical Python: Scientific Computing and Data Science Applications (2ª ed.). Apress, 2019</li>
+                        <li><strong>VANDERPLAS, Jake.</strong> Python Data Science Handbook. O'Reilly Media, 2016. Disponible en: jakevdp.github.io/PythonDataScienceHandbook/</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Resumen y próxima semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen y próximos pasos</h2>
+                <p class="slide-subtitle">De la teoría a la práctica</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Jerarquía numérica en código</h4>
+                    <p>ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ se implementa con tipos de datos NumPy: int8/int64, float32/float64. Elegir el tipo correcto optimiza memoria y precisión.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Propiedades de orden en algoritmos</h4>
+                    <p>Ranking, normalización, detección de outliers: todas usan supremo/ínfimo, propiedades de transitividad y orden.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Notación científica es indispensable</h4>
+                    <p>Big data (120 ZB = 1.2 × 10²³ bytes), modelos de IA (GPT-4 = 1.8 × 10¹² parámetros), memoria GPU. Sin notación científica, estos números son inmanejables.</p>
+                </div>
+                <div class="content-box" style="margin-top: 20px;">
+                    <h3>Próxima semana: álgebra y SymPy</h3>
+                    <p>Exponentes, radicales, expresiones algebraicas, productos notables, factorización. Manipulación simbólica con SymPy para resolver ecuaciones algebraicas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+            
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>

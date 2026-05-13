@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 9: Funciones cuadráticas en Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "\25B8";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: visible;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .comparison-table thead tr:first-child th:first-child {
+            border-top-left-radius: 15px;
+        }
+
+        .comparison-table thead tr:first-child th:last-child {
+            border-top-right-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:first-child {
+            border-bottom-left-radius: 15px;
+        }
+
+        .comparison-table tbody tr:last-child td:last-child {
+            border-bottom-right-radius: 15px;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .comparison-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #fafafa;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string  { color: #ce9178; }
+        .code-box .number  { color: #b5cea8; }
+        .code-box .func    { color: #dcdcaa; }
+        .code-box .orange  { color: #FF8C00; font-weight: bold; }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 54px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0%   { background-position: 0% 50%; }
+            50%  { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .formula-box {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            border-radius: 12px;
+            padding: 20px 28px;
+            text-align: center;
+            color: #ffffff;
+            font-size: 22px;
+            font-family: 'Times New Roman', serif;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .output-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-family: 'Courier New', monospace;
+            color: #58a6ff;
+            font-size: 13px;
+            margin-top: 10px;
+            border-left: 3px solid #238636;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2d2d2d, #3d3d3d);
+            border-radius: 14px;
+            padding: 22px;
+            color: white;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #FF8C00;
+            margin-bottom: 6px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .ml-card {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 14px;
+            padding: 18px;
+            color: white;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .ml-card h4 {
+            color: #FF8C00;
+            font-size: 17px;
+            margin-bottom: 8px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .ml-card p {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #FF8C00;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 14px 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .step-text h5 {
+            font-size: 16px;
+            color: #2d2d2d;
+            margin-bottom: 2px;
+        }
+
+        .step-text p {
+            font-size: 13px;
+            color: #6e6e73;
+        }
+
+        .arrow-connector {
+            text-align: center;
+            font-size: 22px;
+            color: #FF8C00;
+            font-weight: bold;
+            margin: 2px 0;
+        }
+
+        .section-divider {
+            background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 80px 140px 80px;
+        }
+
+        .section-divider .section-label {
+            font-size: 18px;
+            color: #FF8C00;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .section-divider .section-title {
+            font-size: 52px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .section-divider .section-subtitle {
+            font-size: 22px;
+            color: rgba(255,255,255,0.7);
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">16</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- ==================== SLIDE 1: PORTADA ==================== -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Funciones cuadráticas en Python</h1>
+            <p class="cover-subtitle">Semana 9: del vértice a la regresión cuadrática</p>
+            <div class="cover-info">
+                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 2: PUENTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que vimos en el iPad, ahora en código</h2>
+                <p class="slide-subtitle">De la teoría a la implementación computacional</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-card">
+                        <div class="stat-value">SymPy</div>
+                        <div class="stat-label">Manipulación simbólica de cuadráticas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">np.polyfit(x,y,2)</div>
+                        <div class="stat-label">Regresión cuadrática</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">Lineal vs cuadrático</div>
+                        <div class="stat-label">Comparación de modelos</div>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Concepto matemático</th>
+                                <th>Herramienta Python</th>
+                                <th>Aplicación en DS/ML</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>f(x) = ax2 + bx + c</td>
+                                <td><code>def f(x): return a*x**2 + b*x + c</code></td>
+                                <td>Modelo cuadrático de datos</td>
+                            </tr>
+                            <tr>
+                                <td>Vértice (h, k)</td>
+                                <td><code>h = -b/(2*a); k = f(h)</code></td>
+                                <td>Óptimo predicho por el modelo</td>
+                            </tr>
+                            <tr>
+                                <td>Completar el cuadrado</td>
+                                <td><code>SymPy factor() / expand()</code></td>
+                                <td>Convertir entre formas</td>
+                            </tr>
+                            <tr>
+                                <td>Ajuste cuadrático</td>
+                                <td><code>np.polyfit(x, y, 2)</code></td>
+                                <td>Regresión polinomial grado 2</td>
+                            </tr>
+                            <tr>
+                                <td>R2 lineal vs R2 cuadrático</td>
+                                <td><code>sklearn + cross_val_score</code></td>
+                                <td>Selección de modelos</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>La semana pasada: y = mx + b (grado 1). Hoy: y = ax2 + bx + c (grado 2). El salto clave es que ahora podemos capturar curvatura en los datos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 3: CUADRATICA EN PYTHON ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Definir y graficar funciones cuadráticas</h2>
+                <p class="slide-subtitle">def, SymPy y Matplotlib trabajando juntos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, solve, factor, expand
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># === Definir con SymPy ===</span>
+x = symbols(<span class="string">'x'</span>)
+f = <span class="number">2</span>*x**<span class="number">2</span> - <span class="number">8</span>*x + <span class="number">6</span>
+
+<span class="comment"># Factorizar</span>
+<span class="keyword">print</span>(factor(f))     <span class="comment"># => 2*(x - 1)*(x - 3)</span>
+
+<span class="comment"># Raices</span>
+raices = solve(f, x)
+<span class="keyword">print</span>(raices)         <span class="comment"># => [1, 3]</span>
+
+<span class="comment"># Evaluar en un punto</span>
+<span class="keyword">print</span>(f.subs(x, <span class="number">2</span>))  <span class="comment"># => -2 (vertice)</span>
+
+<span class="comment"># === Definir con def + NumPy ===</span>
+<span class="keyword">def</span> <span class="func">cuadratica</span>(x, a, b, c):
+    <span class="keyword">return</span> a*x**<span class="number">2</span> + b*x + c
+
+a, b, c = <span class="number">2</span>, -<span class="number">8</span>, <span class="number">6</span>
+h = -b / (<span class="number">2</span>*a)         <span class="comment"># h = 2</span>
+k = cuadratica(h, a, b, c)  <span class="comment"># k = -2</span>
+
+<span class="comment"># === Graficar ===</span>
+x_vals = np.linspace(-<span class="number">1</span>, <span class="number">5</span>, <span class="number">300</span>)
+y_vals = cuadratica(x_vals, a, b, c)
+
+fig, ax = plt.subplots(figsize=(<span class="number">9</span>,<span class="number">6</span>), layout=<span class="string">'constrained'</span>)
+ax.plot(x_vals, y_vals, color=<span class="string">'#FF8C00'</span>, lw=<span class="number">2.5</span>)
+ax.plot(h, k, <span class="string">'ro'</span>, ms=<span class="number">10</span>, zorder=<span class="number">5</span>,
+        label=<span class="string">f'Vertice ({h},{k})'</span>)
+ax.axvline(h, color=<span class="string">'gray'</span>, ls=<span class="string">'--'</span>, alpha=<span class="number">0.6</span>)
+ax.scatter([<span class="number">1</span>,<span class="number">3</span>], [<span class="number">0</span>,<span class="number">0</span>], c=<span class="string">'green'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>SymPy para entender</h4>
+                            <p><code>factor()</code> revela las raices. <code>solve()</code> las calcula. <code>expand()</code> convierte de forma factorizada a general. <code>subs()</code> evalua en puntos exactos.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>NumPy + Matplotlib para visualizar</h4>
+                            <p><code>np.linspace()</code> genera el dominio. La función <code>def</code> evalúa sobre arrays completos. <code>plt.plot()</code> dibuja la parábola.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Vértice en código</h4>
+                            <p><code>h = -b/(2*a)</code> y <code>k = f(h)</code>. Estas dos líneas resuelven cualquier problema de optimización cuadrática.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>SymPy da respuestas exactas (enteros, fracciones). NumPy da aproximaciones decimales para miles de puntos. Usar cada uno para su propósito.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 4: TRES FORMAS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Las tres formas con SymPy</h2>
+                <p class="slide-subtitle">Convertir entre forma general, estándar y factorizada</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sympy <span class="keyword">import</span> symbols, factor, expand, solve, sqrt
+x = symbols(<span class="string">'x'</span>)
+
+<span class="comment"># Forma general</span>
+f_general = <span class="number">2</span>*x**<span class="number">2</span> - <span class="number">8</span>*x + <span class="number">6</span>
+
+<span class="comment"># --- General -> Factorizada ---</span>
+f_factor = factor(f_general)
+<span class="keyword">print</span>(f_factor)   <span class="comment"># 2*(x - 1)*(x - 3)</span>
+
+<span class="comment"># --- General -> Estándar (vertice) ---</span>
+a, b, c = <span class="number">2</span>, -<span class="number">8</span>, <span class="number">6</span>
+h = -b / (<span class="number">2</span>*a)       <span class="comment"># h = 2</span>
+k = c - b**<span class="number">2</span>/(<span class="number">4</span>*a)  <span class="comment"># k = -2</span>
+f_vertice = a*(x - h)**<span class="number">2</span> + k
+<span class="keyword">print</span>(f_vertice)  <span class="comment"># 2*(x - 2)**2 - 2</span>
+
+<span class="comment"># --- Verificar equivalencia ---</span>
+<span class="keyword">print</span>(expand(f_vertice))  <span class="comment"># 2*x**2 - 8*x + 6</span>
+<span class="keyword">print</span>(expand(f_factor))   <span class="comment"># 2*x**2 - 8*x + 6</span>
+
+<span class="comment"># --- Discriminante ---</span>
+disc = b**<span class="number">2</span> - <span class="number">4</span>*a*c
+<span class="keyword">print</span>(<span class="string">f"Delta = {disc}"</span>)  <span class="comment"># 16 > 0: 2 raices</span>
+
+<span class="comment"># --- Raices con formula general ---</span>
+r1 = (-b - sqrt(disc)) / (<span class="number">2</span>*a)
+r2 = (-b + sqrt(disc)) / (<span class="number">2</span>*a)
+<span class="keyword">print</span>(<span class="string">f"r1={r1}, r2={r2}"</span>)  <span class="comment"># r1=1, r2=3</span>
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Forma</th>
+                                        <th>Expresión</th>
+                                        <th>Operacion SymPy</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>General</td>
+                                        <td>ax2 + bx + c</td>
+                                        <td><code>expand()</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Factorizada</td>
+                                        <td>a(x-r1)(x-r2)</td>
+                                        <td><code>factor()</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Estándar</td>
+                                        <td>a(x-h)2 + k</td>
+                                        <td>Manual: h, k</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="three-columns" style="margin-top: 15px;">
+                            <div class="ml-card">
+                                <div class="badge">General</div>
+                                <h4>expand()</h4>
+                                <p>Revela c (intercepto y) y permite calcular el discriminante.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Factorizada</div>
+                                <h4>factor()</h4>
+                                <p>Revela las raíces (donde el modelo cruza cero).</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Estándar</div>
+                                <h4>h = -b/(2a)</h4>
+                                <p>Revela el vértice (el óptimo del modelo).</p>
+                            </div>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 12px;">
+                            <p>En regresión, los algoritmos producen la forma general [a, b, c]. Para interpretar el modelo, convertimos a forma estándar (vértice = óptimo predicho) o factorizada (puntos de equilibrio).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 5: VERTICE + GRAFICA COMPLETA ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Vértice, eje de simetría y gráfica completa</h2>
+                <p class="slide-subtitle">Todos los elementos de la parábola en un solo gráfico</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+a, b, c = -<span class="number">2</span>, <span class="number">12</span>, <span class="number">5</span>
+h = -b / (<span class="number">2</span>*a)
+k = c - b**<span class="number">2</span> / (<span class="number">4</span>*a)
+
+x = np.linspace(-<span class="number">1</span>, <span class="number">8</span>, <span class="number">300</span>)
+y = a*x**<span class="number">2</span> + b*x + c
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>, <span class="number">7</span>), layout=<span class="string">'constrained'</span>)
+ax.plot(x, y, <span class="string">'#FF8C00'</span>, lw=<span class="number">2.5</span>,
+        label=<span class="string">f'f(x) = {a}x2 + {b}x + {c}'</span>)
+
+<span class="comment"># Vertice</span>
+ax.plot(h, k, <span class="string">'ro'</span>, ms=<span class="number">10</span>, zorder=<span class="number">5</span>)
+ax.annotate(<span class="string">f'Vertice ({h:.1f}, {k:.1f})\nMaximo = {k:.1f}'</span>,
+            xy=(h, k), xytext=(h+<span class="number">1</span>, k-<span class="number">5</span>),
+            fontsize=<span class="number">11</span>,
+            arrowprops=<span class="func">dict</span>(arrowstyle=<span class="string">'->'</span>, color=<span class="string">'red'</span>),
+            bbox=<span class="func">dict</span>(boxstyle=<span class="string">'round,pad=0.3'</span>,
+                     facecolor=<span class="string">'lightyellow'</span>))
+
+<span class="comment"># Eje de simetria</span>
+ax.axvline(h, color=<span class="string">'gray'</span>, ls=<span class="string">'--'</span>, alpha=<span class="number">0.7</span>,
+           label=<span class="string">f'Eje: x = {h:.1f}'</span>)
+
+<span class="comment"># Raices (si existen)</span>
+disc = b**<span class="number">2</span> - <span class="number">4</span>*a*c
+<span class="keyword">if</span> disc >= <span class="number">0</span>:
+    r1 = (-b - np.sqrt(disc)) / (<span class="number">2</span>*a)
+    r2 = (-b + np.sqrt(disc)) / (<span class="number">2</span>*a)
+    ax.plot([r1,r2], [<span class="number">0</span>,<span class="number">0</span>], <span class="string">'gs'</span>, ms=<span class="number">8</span>,
+            label=<span class="string">f'Raices: {r1:.2f}, {r2:.2f}'</span>)
+
+<span class="comment"># Region positiva</span>
+ax.fill_between(x, y, <span class="number">0</span>, where=(y><span class="number">0</span>),
+                alpha=<span class="number">0.15</span>, color=<span class="string">'blue'</span>)
+ax.axhline(<span class="number">0</span>, color=<span class="string">'k'</span>, lw=<span class="number">0.5</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Parabola completa'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Elementos del gráfico</h3>
+                            <ul>
+                                <li><code>ax.plot()</code> traza la curva de la parábola</li>
+                                <li><code>ax.annotate()</code> marca el vértice con flecha y texto</li>
+                                <li><code>ax.axvline()</code> dibuja el eje de simetría</li>
+                                <li><code>ax.fill_between()</code> sombrea la región positiva</li>
+                                <li>Raíces calculadas con la fórmula general y graficadas como puntos verdes</li>
+                            </ul>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Lectura del gráfico en DS</h4>
+                            <p>Si f(x) modela ingresos: el vértice es el ingreso máximo, las raíces son los puntos de equilibrio, y la región sombreada es donde hay ganancia.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>ax.annotate()</h4>
+                            <p>Fundamental para comunicar resultados. En DS no basta con graficar: hay que etiquetar los puntos clave para que el lector entienda sin leer código.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 6: APLICACION CR - OPTIMIZACION ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación CR: optimización de ingresos</h2>
+                <p class="slide-subtitle">Función cuadrática para maximizar ingresos de un tour en Guanacaste</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Modelo: demanda q(p) = 200 - 4p</span>
+<span class="comment"># Ingreso R(p) = p * q(p) = -4p^2 + 200p</span>
+a, b, c = -<span class="number">4</span>, <span class="number">200</span>, <span class="number">0</span>
+
+<span class="comment"># Precio óptimo (vertice)</span>
+p_optimo = -b / (<span class="number">2</span>*a)   <span class="comment"># 25 dolares</span>
+r_maximo = a*p_optimo**<span class="number">2</span> + b*p_optimo
+<span class="keyword">print</span>(<span class="string">f"Precio óptimo: ${p_optimo:.0f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Ingreso máximo: ${r_maximo:.0f}"</span>)
+
+<span class="comment"># Tours vendidos al precio optimo</span>
+q_optimo = <span class="number">200</span> - <span class="number">4</span>*p_optimo
+<span class="keyword">print</span>(<span class="string">f"Tours vendidos: {q_optimo:.0f}"</span>)
+
+<span class="comment"># Graficar</span>
+p = np.linspace(<span class="number">0</span>, <span class="number">55</span>, <span class="number">300</span>)
+R = a*p**<span class="number">2</span> + b*p
+
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>,<span class="number">6</span>), layout=<span class="string">'constrained'</span>)
+ax.plot(p, R, <span class="string">'#FF8C00'</span>, lw=<span class="number">2.5</span>)
+ax.plot(p_optimo, r_maximo, <span class="string">'ro'</span>, ms=<span class="number">12</span>, zorder=<span class="number">5</span>)
+ax.annotate(<span class="string">f'Optimo: ${p_optimo:.0f}, R=${r_maximo:,.0f}'</span>,
+            xy=(p_optimo, r_maximo),
+            xytext=(p_optimo+<span class="number">5</span>, r_maximo-<span class="number">200</span>),
+            fontsize=<span class="number">12</span>,
+            arrowprops=<span class="func">dict</span>(arrowstyle=<span class="string">'->'</span>),
+            bbox=<span class="func">dict</span>(boxstyle=<span class="string">'round'</span>,
+                     fc=<span class="string">'lightyellow'</span>))
+ax.fill_between(p, R, <span class="number">0</span>, where=(R><span class="number">0</span>),
+                alpha=<span class="number">0.1</span>, color=<span class="string">'green'</span>)
+ax.set_xlabel(<span class="string">'Precio ($)'</span>)
+ax.set_ylabel(<span class="string">'Ingreso ($)'</span>)
+ax.set_title(<span class="string">'Optimizacion de ingresos - Tour Guanacaste'</span>)
+ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="four-columns">
+                            <div class="stat-card">
+                                <div class="stat-value">$25</div>
+                                <div class="stat-label">Precio óptimo</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">$2,500</div>
+                                <div class="stat-label">Ingreso máximo</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">100</div>
+                                <div class="stat-label">Tours al mes</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value">$0-$50</div>
+                                <div class="stat-label">Rango rentable</div>
+                            </div>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>La pregunta de negocio</h4>
+                            <p>"¿Cuál es el precio que maximiza mis ingresos?" es exactamente encontrar el vértice de la parábola: h = -b/(2a).</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Lectura del resultado</h3>
+                            <ul>
+                                <li>A $25/tour se venden 100 tours = $2,500/mes</li>
+                                <li>A $50 no se vende ninguno (R = 0)</li>
+                                <li>A $0 se regalan pero no hay ingreso (R = 0)</li>
+                                <li>La región sombreada muestra precios rentables</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>Este patrón aplica a cualquier negocio con demanda lineal. El vértice de la parábola de ingresos da la respuesta óptima.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 7: DIVISOR SECCION ==================== -->
+        <div class="slide section-divider">
+            <p class="section-label">De la teoría al modelo</p>
+            <h2 class="section-title">Regresión cuadrática</h2>
+            <p class="section-subtitle">Ajustar parábolas a datos reales con NumPy y scikit-learn</p>
+        </div>
+
+        <!-- ==================== SLIDE 8: np.polyfit grado 2 ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regresión cuadrática con np.polyfit</h2>
+                <p class="slide-subtitle">El camino más directo: cambiar deg=1 por deg=2</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+<span class="comment"># Datos: generacion solar (MW) por hora</span>
+<span class="comment"># Fuente: CENCE (ICE) - dia soleado tipico</span>
+hora = np.array([<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>,<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>,<span class="number">13</span>,<span class="number">14</span>,<span class="number">15</span>,<span class="number">16</span>,<span class="number">17</span>,<span class="number">18</span>],
+                dtype=float)
+mw = np.array([<span class="number">5</span>,<span class="number">28</span>,<span class="number">65</span>,<span class="number">110</span>,<span class="number">155</span>,<span class="number">185</span>,<span class="number">198</span>,<span class="number">190</span>,
+               <span class="number">168</span>,<span class="number">130</span>,<span class="number">82</span>,<span class="number">35</span>,<span class="number">8</span>], dtype=float)
+
+<span class="comment"># --- Regresion cuadratica ---</span>
+coefs = np.polyfit(hora, mw, <span class="number">2</span>)   <span class="comment"># [a, b, c]</span>
+p = np.poly1d(coefs)
+a, b, c = coefs
+<span class="keyword">print</span>(<span class="string">f"f(t) = {a:.2f}t2 + {b:.2f}t + {c:.2f}"</span>)
+
+<span class="comment"># Vertice = hora de maxima generacion</span>
+h_max = -b / (<span class="number">2</span>*a)
+mw_max = p(h_max)
+<span class="keyword">print</span>(<span class="string">f"Pico solar: {h_max:.1f}h, {mw_max:.0f} MW"</span>)
+
+<span class="comment"># R2 manual</span>
+y_pred = p(hora)
+ss_res = np.sum((mw - y_pred)**<span class="number">2</span>)
+ss_tot = np.sum((mw - np.mean(mw))**<span class="number">2</span>)
+r2 = <span class="number">1</span> - ss_res / ss_tot
+<span class="keyword">print</span>(<span class="string">f"R2 = {r2:.4f}"</span>)
+
+<span class="comment"># Graficar</span>
+t_smooth = np.linspace(<span class="number">5.5</span>, <span class="number">18.5</span>, <span class="number">200</span>)
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>,<span class="number">6</span>), layout=<span class="string">'constrained'</span>)
+ax.scatter(hora, mw, c=<span class="string">'#2d2d2d'</span>, s=<span class="number">70</span>, zorder=<span class="number">5</span>,
+           label=<span class="string">'Datos CENCE'</span>)
+ax.plot(t_smooth, p(t_smooth), <span class="string">'#FF8C00'</span>, lw=<span class="number">2.5</span>,
+        label=<span class="string">f'Modelo (R2={r2:.3f})'</span>)
+ax.plot(h_max, mw_max, <span class="string">'r*'</span>, ms=<span class="number">15</span>, zorder=<span class="number">5</span>,
+        label=<span class="string">f'Pico: {h_max:.1f}h'</span>)
+ax.set_xlabel(<span class="string">'Hora del dia'</span>)
+ax.set_ylabel(<span class="string">'Generacion solar (MW)'</span>)
+ax.set_title(<span class="string">'Generación solar diaria - Costa Rica'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>Solo un cambio: deg=2</h4>
+                            <p>La semana pasada usamos <code>np.polyfit(x, y, 1)</code>. Hoy: <code>np.polyfit(x, y, 2)</code>. NumPy retorna <code>[a, b, c]</code> de mayor a menor grado.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>El vértice tiene significado real</h4>
+                            <p>En este ejemplo, el vértice predice la hora de máxima generación solar y la potencia pico. No es solo un punto matemático, es información accionable.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Contexto: energía solar en CR</h3>
+                            <ul>
+                                <li>Costa Rica genera 94.9% de electricidad renovable</li>
+                                <li>412 MW nuevos de solar/eólica en instalación (2025-2026)</li>
+                                <li>La curva solar diaria es una parábola invertida natural</li>
+                                <li>El CENCE publica datos en tiempo real (CSV/JSON)</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>np.polyfit es ideal para enseñar el concepto. Para producción o análisis más completo, usamos sklearn (siguiente slide).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 9: sklearn Pipeline ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regresión cuadrática con scikit-learn</h2>
+                <p class="slide-subtitle">PolynomialFeatures + LinearRegression en un Pipeline</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Datos (mismos del ejemplo anterior)</span>
+X = hora.reshape(-<span class="number">1</span>, <span class="number">1</span>)   <span class="comment"># sklearn: X en 2D</span>
+y = mw
+
+<span class="comment"># --- Pipeline cuadratico ---</span>
+modelo_cuad = make_pipeline(
+    PolynomialFeatures(degree=<span class="number">2</span>, include_bias=<span class="keyword">False</span>),
+    LinearRegression()
+)
+modelo_cuad.fit(X, y)
+
+<span class="comment"># Acceder a coeficientes</span>
+lr = modelo_cuad.named_steps[<span class="string">'linearregression'</span>]
+<span class="keyword">print</span>(<span class="string">f"Intercepto: {lr.intercept_:.2f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"Coefs: {lr.coef_}"</span>)
+<span class="comment"># coef_[0] = beta1 (x), coef_[1] = beta2 (x^2)</span>
+
+<span class="comment"># R2 directo</span>
+r2 = modelo_cuad.score(X, y)
+<span class="keyword">print</span>(<span class="string">f"R2 = {r2:.4f}"</span>)
+
+<span class="comment"># Predecir</span>
+y_pred = modelo_cuad.predict(X)
+nueva_hora = np.array([[<span class="number">12.5</span>]])
+<span class="keyword">print</span>(<span class="string">f"Pred 12:30 = {modelo_cuad.predict(nueva_hora)[0]:.1f} MW"</span>)
+
+<span class="comment"># Vertice desde coeficientes sklearn</span>
+b1, b2 = lr.coef_     <span class="comment"># b1*x + b2*x^2</span>
+b0 = lr.intercept_
+h_vert = -b1 / (<span class="number">2</span>*b2)
+k_vert = b0 - b1**<span class="number">2</span> / (<span class="number">4</span>*b2)
+<span class="keyword">print</span>(<span class="string">f"Vertice: ({h_vert:.2f}, {k_vert:.1f})"</span>)
+                    </div>
+                    <div>
+                        <div class="comparison-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Aspecto</th>
+                                        <th>np.polyfit</th>
+                                        <th>sklearn Pipeline</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Input X</td>
+                                        <td>Array 1D</td>
+                                        <td>Array 2D (n,1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Coeficientes</td>
+                                        <td>[a, b, c] (mayor a menor)</td>
+                                        <td>coef_=[b1, b2], intercept_=b0</td>
+                                    </tr>
+                                    <tr>
+                                        <td>R2</td>
+                                        <td>Manual</td>
+                                        <td><code>.score(X, y)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Predicción</td>
+                                        <td><code>p(x_new)</code></td>
+                                        <td><code>.predict(X_new)</code></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Cross-val</td>
+                                        <td>No soportado</td>
+                                        <td><code>cross_val_score()</code></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="key-point" style="margin-top: 15px;">
+                            <h4>Atención con el orden de coeficientes</h4>
+                            <p>np.polyfit retorna [a, b, c] (grado mayor primero). sklearn retorna coef_=[beta1, beta2] donde beta1 es para x y beta2 para x2. El intercepto va aparte.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>El Pipeline encapsula transformación + modelo en un solo objeto. Esto previene data leakage en validación cruzada y es la mejor práctica en ML.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 10: COMPARACION LINEAL VS CUADRATICO ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lineal vs cuadrático: comparación de modelos</h2>
+                <p class="slide-subtitle">R2, R2 ajustado y validación cruzada como árbitros</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score
+
+<span class="comment"># Modelo lineal</span>
+modelo_lin = make_pipeline(
+    PolynomialFeatures(<span class="number">1</span>, include_bias=<span class="keyword">False</span>),
+    LinearRegression()
+)
+modelo_lin.fit(X, y)
+r2_lin = modelo_lin.score(X, y)
+
+<span class="comment"># Modelo cuadratico (ya definido)</span>
+r2_cuad = modelo_cuad.score(X, y)
+
+<span class="keyword">print</span>(<span class="string">f"R2 Lineal:     {r2_lin:.4f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"R2 Cuadratico: {r2_cuad:.4f}"</span>)
+
+<span class="comment"># R2 ajustado</span>
+n = <span class="func">len</span>(y)
+<span class="keyword">def</span> <span class="func">r2_adj</span>(r2, n, k):
+    <span class="keyword">return</span> <span class="number">1</span> - (<span class="number">1</span>-r2)*(n-<span class="number">1</span>)/(n-k-<span class="number">1</span>)
+
+<span class="keyword">print</span>(<span class="string">f"R2adj Lineal:     {r2_adj(r2_lin, n, 1):.4f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"R2adj Cuadratico: {r2_adj(r2_cuad, n, 2):.4f}"</span>)
+
+<span class="comment"># RMSE con validacion cruzada</span>
+cv_lin = cross_val_score(modelo_lin, X, y,
+    cv=<span class="number">5</span>, scoring=<span class="string">'neg_mean_squared_error'</span>)
+cv_cuad = cross_val_score(modelo_cuad, X, y,
+    cv=<span class="number">5</span>, scoring=<span class="string">'neg_mean_squared_error'</span>)
+
+<span class="keyword">print</span>(<span class="string">f"RMSE CV Lineal:     {np.sqrt(-cv_lin.mean()):.2f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"RMSE CV Cuadratico: {np.sqrt(-cv_cuad.mean()):.2f}"</span>)
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Métricas de comparación</h3>
+                            <ul>
+                                <li><b>R2:</b> proporción de varianza explicada (mayor = mejor, pero sesgado)</li>
+                                <li><b>R2 ajustado:</b> penaliza parámetros extra (puede bajar si x2 no aporta)</li>
+                                <li><b>RMSE CV:</b> error fuera de muestra (menor = mejor, el más honesto)</li>
+                            </ul>
+                        </div>
+                        <div class="formula-box" style="margin-top: 12px; font-size: 18px;">
+                            R2adj = 1 - (1-R2)(n-1) / (n-k-1)
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Regla de decisión</h4>
+                            <p>Si R2adj del cuadrático es mayor que el del lineal, Y el RMSE de validación cruzada es menor, entonces el modelo cuadrático está justificado.</p>
+                        </div>
+                        <div class="highlight-box">
+                            <p>R2 SIEMPRE aumenta al agregar variables. Por eso usamos R2 ajustado y validación cruzada: necesitamos árbitros que penalicen la complejidad innecesaria.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 11: RESIDUOS CURVOS ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Residuos: la evidencia visual</h2>
+                <p class="slide-subtitle">Si los residuos del modelo lineal son curvos, el cuadrático está justificado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Residuos de ambos modelos</span>
+res_lin = y - modelo_lin.predict(X)
+res_cuad = y - modelo_cuad.predict(X)
+
+fig, axes = plt.subplots(<span class="number">1</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">5</span>),
+                         layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># Panel 1: Residuos del modelo lineal</span>
+axes[<span class="number">0</span>].scatter(X.flatten(), res_lin,
+               c=<span class="string">'steelblue'</span>, s=<span class="number">60</span>)
+axes[<span class="number">0</span>].axhline(<span class="number">0</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>)
+axes[<span class="number">0</span>].set_title(<span class="string">'Residuos: modelo lineal'</span>)
+axes[<span class="number">0</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">0</span>].set_ylabel(<span class="string">'Residuo'</span>)
+axes[<span class="number">0</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># Panel 2: Residuos del modelo cuadratico</span>
+axes[<span class="number">1</span>].scatter(X.flatten(), res_cuad,
+               c=<span class="string">'#FF8C00'</span>, s=<span class="number">60</span>)
+axes[<span class="number">1</span>].axhline(<span class="number">0</span>, color=<span class="string">'red'</span>, ls=<span class="string">'--'</span>)
+axes[<span class="number">1</span>].set_title(<span class="string">'Residuos: modelo cuadratico'</span>)
+axes[<span class="number">1</span>].set_xlabel(<span class="string">'x'</span>)
+axes[<span class="number">1</span>].set_ylabel(<span class="string">'Residuo'</span>)
+axes[<span class="number">1</span>].grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+plt.show()
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Cómo leer los residuos</h3>
+                            <ul>
+                                <li><b>Patrón curvo (forma de U):</b> el modelo lineal no captura la curvatura. Necesita término cuadrático</li>
+                                <li><b>Dispersión aleatoria:</b> el modelo es adecuado. No hay estructura sin capturar</li>
+                                <li><b>Embudo:</b> heterocedasticidad (varianza no constante). Problema diferente</li>
+                            </ul>
+                        </div>
+                        <div class="two-columns" style="margin-top: 12px;">
+                            <div class="ml-card">
+                                <div class="badge">Lineal</div>
+                                <h4>Residuos curvos</h4>
+                                <p>Los residuos forman una U o U invertida. Esto demuestra que hay patrón sistemático no capturado.</p>
+                            </div>
+                            <div class="ml-card">
+                                <div class="badge">Cuadratico</div>
+                                <h4>Residuos aleatorios</h4>
+                                <p>Los residuos se dispersan sin patrón alrededor de cero. El modelo captura la estructura de los datos.</p>
+                            </div>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 12px;">
+                            <p>El gráfico de residuos es la herramienta diagnóstica más importante. Un R2 de 0.85 con residuos curvos es peor que un R2 de 0.95 con residuos aleatorios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 12: DASHBOARD COMPLETO ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Dashboard de comparación: 4 paneles</h2>
+                <p class="slide-subtitle">Una vista completa para decidir entre modelos</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> scipy.stats <span class="keyword">as</span> stats
+
+fig, axes = plt.subplots(<span class="number">2</span>, <span class="number">2</span>, figsize=(<span class="number">14</span>, <span class="number">10</span>), layout=<span class="string">'constrained'</span>)
+
+<span class="comment"># (1) Datos + ambos ajustes</span>
+ax = axes[<span class="number">0</span>, <span class="number">0</span>]
+ax.scatter(X.flatten(), y, c=<span class="string">'gray'</span>, s=<span class="number">40</span>, edgecolors=<span class="string">'k'</span>, label=<span class="string">'Datos'</span>)
+x_s = np.linspace(X.min(), X.max(), <span class="number">200</span>).reshape(-<span class="number">1</span>,<span class="number">1</span>)
+ax.plot(x_s, modelo_lin.predict(x_s), <span class="string">'b--'</span>, lw=<span class="number">2</span>, label=<span class="string">f'Lineal (R2={r2_lin:.3f})'</span>)
+ax.plot(x_s, modelo_cuad.predict(x_s), <span class="string">'#FF8C00'</span>, lw=<span class="number">2</span>, label=<span class="string">f'Cuadratico (R2={r2_cuad:.3f})'</span>)
+ax.legend(); ax.set_title(<span class="string">'Ajustes sobre los datos'</span>); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># (2) Residuos comparados</span>
+ax = axes[<span class="number">0</span>, <span class="number">1</span>]
+ax.scatter(X.flatten(), res_lin, alpha=<span class="number">0.6</span>, label=<span class="string">'Lineal'</span>, color=<span class="string">'blue'</span>, marker=<span class="string">'o'</span>)
+ax.scatter(X.flatten(), res_cuad, alpha=<span class="number">0.6</span>, label=<span class="string">'Cuadratico'</span>, color=<span class="string">'#FF8C00'</span>, marker=<span class="string">'x'</span>, s=<span class="number">60</span>)
+ax.axhline(<span class="number">0</span>, color=<span class="string">'k'</span>, ls=<span class="string">'--'</span>); ax.legend(); ax.set_title(<span class="string">'Residuos vs x'</span>); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+
+<span class="comment"># (3) Barras de metricas</span>
+ax = axes[<span class="number">1</span>, <span class="number">0</span>]
+metricas = [<span class="string">'R2'</span>, <span class="string">'R2 Adj'</span>, <span class="string">'RMSE'</span>]
+x_bar = np.arange(<span class="func">len</span>(metricas))
+ax.bar(x_bar - <span class="number">0.2</span>, [r2_lin, r2_adj_lin, rmse_lin], <span class="number">0.35</span>, label=<span class="string">'Lineal'</span>, color=<span class="string">'steelblue'</span>)
+ax.bar(x_bar + <span class="number">0.2</span>, [r2_cuad, r2_adj_cuad, rmse_cuad], <span class="number">0.35</span>, label=<span class="string">'Cuadratico'</span>, color=<span class="string">'darkorange'</span>)
+ax.set_xticks(x_bar); ax.set_xticklabels(metricas); ax.legend()
+ax.set_title(<span class="string">'Comparación de métricas'</span>)
+
+<span class="comment"># (4) Q-Q plot de residuos cuadraticos</span>
+ax = axes[<span class="number">1</span>, <span class="number">1</span>]
+stats.probplot(res_cuad, dist=<span class="string">"norm"</span>, plot=ax)
+ax.set_title(<span class="string">'Q-Q Plot (residuos cuadraticos)'</span>)
+
+plt.show()
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Este dashboard de 4 paneles es el estándar profesional para reportar comparación de modelos: datos + ajustes, residuos, métricas, y normalidad.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 13: APLICACION CR - TURISMO ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Aplicación CR: recuperación turística post-COVID</h2>
+                <p class="slide-subtitle">Datos del ICT -- comparando modelo lineal vs cuadrático</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> PolynomialFeatures
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+
+<span class="comment"># Llegadas aereas anuales (miles) - ICT</span>
+anio = np.array([<span class="number">2019</span>,<span class="number">2020</span>,<span class="number">2021</span>,<span class="number">2022</span>,<span class="number">2023</span>,<span class="number">2024</span>,<span class="number">2025</span>],
+                dtype=float)
+llegadas = np.array([<span class="number">2104</span>, <span class="number">440</span>, <span class="number">1348</span>, <span class="number">1905</span>,
+                     <span class="number">2456</span>, <span class="number">2645</span>, <span class="number">2710</span>], dtype=float)
+t = (anio - <span class="number">2019</span>).reshape(-<span class="number">1</span>, <span class="number">1</span>)  <span class="comment"># t: 0,1,2,3,4,5,6</span>
+
+<span class="comment"># Ajustar ambos modelos (periodo 2020-2025)</span>
+t_rec = t[<span class="number">1</span>:]     <span class="comment"># desde 2020</span>
+y_rec = llegadas[<span class="number">1</span>:]
+
+m_lin = make_pipeline(PolynomialFeatures(<span class="number">1</span>, include_bias=<span class="keyword">False</span>),
+                      LinearRegression()).fit(t_rec, y_rec)
+m_cuad = make_pipeline(PolynomialFeatures(<span class="number">2</span>, include_bias=<span class="keyword">False</span>),
+                       LinearRegression()).fit(t_rec, y_rec)
+
+<span class="keyword">print</span>(<span class="string">f"R2 Lineal:     {m_lin.score(t_rec, y_rec):.4f}"</span>)
+<span class="keyword">print</span>(<span class="string">f"R2 Cuadratico: {m_cuad.score(t_rec, y_rec):.4f}"</span>)
+
+<span class="comment"># Graficar</span>
+fig, ax = plt.subplots(figsize=(<span class="number">10</span>,<span class="number">6</span>), layout=<span class="string">'constrained'</span>)
+ax.scatter(anio, llegadas, c=<span class="string">'#2d2d2d'</span>, s=<span class="number">80</span>, zorder=<span class="number">5</span>,
+           label=<span class="string">'Datos ICT'</span>)
+t_s = np.linspace(<span class="number">1</span>,<span class="number">6</span>,<span class="number">100</span>).reshape(-<span class="number">1</span>,<span class="number">1</span>)
+ax.plot(t_s.flatten()+<span class="number">2019</span>, m_lin.predict(t_s),
+        <span class="string">'b--'</span>, lw=<span class="number">2</span>, label=<span class="string">'Lineal'</span>)
+ax.plot(t_s.flatten()+<span class="number">2019</span>, m_cuad.predict(t_s),
+        <span class="string">'#FF8C00'</span>, lw=<span class="number">2.5</span>, label=<span class="string">'Cuadratico'</span>)
+ax.axhline(<span class="number">2104</span>, ls=<span class="string">':'</span>, color=<span class="string">'red'</span>, alpha=<span class="number">0.5</span>,
+           label=<span class="string">'Nivel pre-COVID (2019)'</span>)
+ax.set_ylabel(<span class="string">'Llegadas aereas (miles)'</span>)
+ax.legend(); ax.grid(<span class="keyword">True</span>, alpha=<span class="number">0.3</span>)
+ax.set_title(<span class="string">'Recuperación turística post-COVID'</span>)
+plt.show()
+                    </div>
+                    <div>
+                        <div class="key-point">
+                            <h4>¿Por qué cuadrático?</h4>
+                            <p>La recuperación turística muestra desaceleración: el crecimiento fue +207% (2021), +41% (2022), +29% (2023), +7.7% (2024). Las tasas decrecientes sugieren una parábola que se aplana.</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 12px;">
+                            <h3>Datos del ICT (2019-2025)</h3>
+                            <ul>
+                                <li>2019: 2.10M (línea base pre-COVID)</li>
+                                <li>2020: 0.44M (caída del -79%)</li>
+                                <li>2021-2025: recuperación con tasas decrecientes</li>
+                                <li>2025: 2.71M (superó nivel pre-COVID)</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box">
+                            <p>El modelo lineal predice crecimiento indefinido. El cuadrático captura la saturación: hay un techo natural para la capacidad turística. ¿Cuál es más realista?</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 14: CUIDADO CON EL SOBREAJUSTE ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuidado con el sobreajuste</h2>
+                <p class="slide-subtitle">Más grado no siempre es mejor -- el principio de parsimonia</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="code-box" style="margin-bottom: 15px;">
+<span class="comment"># Comparar grados 1, 2, 3, 5 sobre pocos datos</span>
+<span class="keyword">for</span> deg <span class="keyword">in</span> [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">5</span>]:
+    m = make_pipeline(
+        PolynomialFeatures(deg, include_bias=<span class="keyword">False</span>),
+        LinearRegression()
+    )
+    m.fit(X, y)
+    r2_train = m.score(X, y)
+    cv = cross_val_score(m, X, y, cv=<span class="number">5</span>,
+        scoring=<span class="string">'neg_mean_squared_error'</span>)
+    rmse_cv = np.sqrt(-cv.mean())
+    <span class="keyword">print</span>(<span class="string">f"Grado {deg}: R2={r2_train:.4f},"</span>
+          <span class="string">f" RMSE_CV={rmse_cv:.2f}"</span>)
+                        </div>
+                        <div class="output-box">
+Grado 1: R2=0.7234, RMSE_CV=45.12
+Grado 2: R2=0.9891, RMSE_CV=12.38
+Grado 3: R2=0.9923, RMSE_CV=14.05
+Grado 5: R2=0.9998, RMSE_CV=89.47
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Lectura del resultado</h3>
+                            <ul>
+                                <li><b>Grado 1:</b> R2 bajo + RMSE_CV alto. Modelo insuficiente (subajuste)</li>
+                                <li><b>Grado 2:</b> R2 alto + RMSE_CV mínimo. Modelo adecuado</li>
+                                <li><b>Grado 3:</b> R2 ligeramente mejor, pero RMSE_CV ya sube. No justificado</li>
+                                <li><b>Grado 5:</b> R2 casi perfecto pero RMSE_CV explota. Sobreajuste severo</li>
+                            </ul>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>La curva en U del error</h4>
+                            <p>El error de entrenamiento siempre baja al subir el grado. El error de validación tiene forma de U: baja primero, luego sube. El punto óptimo es donde la U tiene su mínimo.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Regla práctica</h4>
+                            <p>Mínimo 10-20 observaciones por coeficiente. Grado 2 = 3 coeficientes = mínimo ~30 datos. Raramente usar grado mayor a 4-5.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 15: FLUJO COMPLETO ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Flujo completo de modelización cuadrática</h2>
+                <p class="slide-subtitle">De los datos a la decisión, paso a paso</p>
+            </div>
+            <div class="slide-content">
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div class="step-row">
+                        <div class="step-number">1</div>
+                        <div class="step-text">
+                            <h5>Explorar y visualizar los datos</h5>
+                            <p>Scatter plot. Si se ve curvatura, el modelo cuadrático es candidato.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-connector">&#x2193;</div>
+                    <div class="step-row">
+                        <div class="step-number">2</div>
+                        <div class="step-text">
+                            <h5>Ajustar ambos modelos (lineal y cuadrático)</h5>
+                            <p>np.polyfit(x, y, 1) y np.polyfit(x, y, 2), o Pipeline de sklearn.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-connector">&#x2193;</div>
+                    <div class="step-row">
+                        <div class="step-number">3</div>
+                        <div class="step-text">
+                            <h5>Comparar métricas: R2, R2 ajustado, RMSE de validación cruzada</h5>
+                            <p>Si el cuadrático mejora significativamente, está justificado.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-connector">&#x2193;</div>
+                    <div class="step-row">
+                        <div class="step-number">4</div>
+                        <div class="step-text">
+                            <h5>Analizar residuos de ambos modelos</h5>
+                            <p>Residuos curvos en lineal = evidencia visual para el cuadrático.</p>
+                        </div>
+                    </div>
+                    <div class="arrow-connector">&#x2193;</div>
+                    <div class="step-row">
+                        <div class="step-number">5</div>
+                        <div class="step-text">
+                            <h5>Interpretar el modelo ganador</h5>
+                            <p>Convertir a forma estándar: el vértice es el óptimo predicho. Las raíces son los puntos de equilibrio.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Este flujo de 5 pasos es exactamente lo que deben aplicar en el Taller 4 y en el proyecto final. No se trata solo de ajustar, sino de comparar, diagnosticar e interpretar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SLIDE 16: RESUMEN ==================== -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Resumen semana 9</h2>
+                <p class="slide-subtitle">Funciones cuadráticas: del álgebra a la regresión</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div>
+                        <div class="key-point">
+                            <h4>Cuadráticas en Python</h4>
+                            <p>SymPy para manipulación simbólica (factor, expand, solve). NumPy + Matplotlib para evaluación masiva y graficación. El flujo SymPy -> lambdify -> NumPy sigue vigente.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Vértice = optimización</h4>
+                            <p>h = -b/(2a), k = f(h). El vértice responde la pregunta de optimización: precio óptimo, hora pico, mínimo de costo. Dos líneas de código.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Regresión cuadrática</h4>
+                            <p>np.polyfit(x,y,2) o Pipeline con PolynomialFeatures(2). Misma lógica que la lineal, pero captura curvatura.</p>
+                        </div>
+                        <div class="key-point" style="margin-top: 12px;">
+                            <h4>Comparación de modelos</h4>
+                            <p>R2 ajustado + RMSE de validación cruzada + gráfico de residuos. Los tres deben concordar para justificar el modelo cuadrático.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="content-box">
+                            <h3>Taller 4 (asignado hoy)</h3>
+                            <ul>
+                                <li>Tema: funciones cuadráticas + regresión cuadrática</li>
+                                <li>Ejercicios manuales: vértice, completar cuadrado, discriminante</li>
+                                <li>Implementación Python: ajuste cuadrático con datos reales</li>
+                                <li>Comparar modelo lineal vs cuadrático (R2, residuos)</li>
+                                <li>Entrega: semana 11</li>
+                            </ul>
+                        </div>
+                        <div class="highlight-box" style="margin-top: 15px;">
+                            <p>Próxima semana: funciones polinomiales de grado superior. Veremos cómo extender la regresión a grado 3, 4... y cuándo detenerse (sobreajuste vs parsimonia).</p>
+                        </div>
+                        <div class="content-box" style="margin-top: 15px;">
+                            <h3>Recordatorios</h3>
+                            <p>El Taller 3 (funciones lineales + regresión) se entrega esta semana. Los grupos que recibieron retroalimentación del Avance 1 deben incorporar las mejoras para el Avance 2.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end presentation-container -->
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&larr; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &rarr;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowLeft')  changeSlide(-1);
+            if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
