@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 1: Fundamentos del modelado matemático - BCD5105</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 14px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 64px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 32px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .quote-block {
+            background: linear-gradient(135deg, #ffffff 0%, #fff5e6 100%);
+            border-radius: 15px;
+            padding: 25px 30px;
+            border: 1px solid #e5e5e7;
+            border-left: 6px solid #FF8C00;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .quote-block p.quote {
+            font-size: 22px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .quote-block p.author {
+            font-size: 15px;
+            color: #6e6e73;
+            text-align: right;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">25</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Modelado matemático</h1>
+            <p class="cover-subtitle">Semana 1: fundamentos del modelado matemático</p>
+            <div class="cover-info">
+                <p>BCD5105<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                II Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Bienvenida -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Bienvenidos al curso</h2>
+                <p class="slide-subtitle">El puente entre la matemática rigurosa y las decisiones del mundo real</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>De qué se trata este curso</h3>
+                    <p>Este es un curso teórico-práctico en el que aprenderán a formular, implementar y validar modelos matemáticos para resolver problemas reales. Van a aprender la maquinaria matemática que hay detrás de casi todo lo que llamamos hoy ciencia de datos: ecuaciones diferenciales, cadenas de Markov, simulación de Monte Carlo, regresión, series temporales, optimización, teoría de grafos y aprendizaje por refuerzo.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>Modalidad</h4>
+                        <p>Virtual, miércoles de 7:00 a 10:00 p.m. Recomendado con cámara encendida y participación activa en el chat.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Lenguajes y herramientas</h4>
+                        <p>Python y R sobre Google Colab y Jupyter, con GitHub para el control de versiones y la entrega del proyecto.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Al final del curso, no van a poder mirar un noticiero, una tarifa eléctrica, una predicción del tiempo o un sistema de recomendación sin reconocer detrás un modelo matemático que decidió algo importante por ustedes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Agenda -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Agenda de hoy</h2>
+                <p class="slide-subtitle">Lo que vamos a cubrir en esta primera sesión</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. Qué es un modelo matemático</h4>
+                        <p>Definición intuitiva, el mapa que no es el territorio y modelos cotidianos que decidieron por ustedes hoy</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Historia y propósito</h4>
+                        <p>De Newton a los modelos de fundación: una línea de tiempo de tres siglos en diez minutos</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Propiedades de los modelos</h4>
+                        <p>Validación, calibración, identificabilidad, sensibilidad y parsimonia</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Éxitos y fracasos célebres</h4>
+                        <p>Casos donde los modelos salvaron millones y casos donde los hundieron</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>5. Modelado en Costa Rica</h4>
+                        <p>El equipo de la UCR que llegó a Nature, el BCCR, el ICE, el IMN y más</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>6. Demo en Colab</h4>
+                        <p>Modelando el crecimiento poblacional de Costa Rica con dos modelos: lineal y logístico</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: ¿Qué es un modelo matemático? -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Qué es un modelo matemático?</h2>
+                <p class="slide-subtitle">Una definición rigurosa, pero accesible</p>
+            </div>
+            <div class="slide-content">
+                <div class="quote-block">
+                    <p class="quote">Un modelo matemático es una representación formal, expresada en lenguaje matemático, de un fenómeno o sistema del mundo real, construida con un propósito específico de comprensión, predicción o decisión.</p>
+                </div>
+                <div class="three-columns" style="margin-top: 15px;">
+                    <div class="feature-card">
+                        <h4>Formal</h4>
+                        <p>Lo que no se puede escribir en notación matemática (ecuaciones, grafos, distribuciones, algoritmos) no es modelo matemático.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Intencional</h4>
+                        <p>Todo modelo se construye para algo. No existe un modelo verdadero, solo modelos útiles para preguntas concretas.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Simplificado</h4>
+                        <p>El modelo no es el sistema. Es una caricatura intencional, un mapa, una idealización del fenómeno.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>El modelo no busca copiar la realidad. Busca resaltar lo que importa para responder una pregunta concreta y tomar una decisión.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: El mapa no es el territorio -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El mapa no es el territorio</h2>
+                <p class="slide-subtitle">Tres metáforas para entender la relación modelo-realidad</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El mapa del metro de Londres</h3>
+                    <p>El famoso diagrama del metro que Harry Beck dibujó en 1933 es geográficamente incorrecto: estira distancias, endereza curvas e inventa ángulos rectos. Y sin embargo, es uno de los mejores mapas jamás creados, porque responde con perfección a la pregunta correcta: ¿cómo llego de A a B en metro? Un modelo bueno no copia la realidad, la simplifica con criterio.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>La caricatura política</h4>
+                        <p>Un buen caricaturista exagera ciertos rasgos para hacer visible la esencia. Como dijo el Dr. Fabio Sánchez de la UCR sobre su modelo COVID: trata de hacer una caricatura de la realidad.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El mapa-territorio de Korzybski</h4>
+                        <p>"A map is not the territory" (Alfred Korzybski, 1931). Todo modelo es un mapa: útil si nos lleva al destino, peligroso si lo confundimos con la realidad misma.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>La pregunta correcta no es "¿es verdadero el modelo?", sino "¿es lo suficientemente útil para la decisión que tengo que tomar?"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Modelos cotidianos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Cuántos modelos decidieron por ustedes hoy?</h2>
+                <p class="slide-subtitle">El modelado matemático ya está en todas partes</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Mañana</div>
+                        <h4>El filtro de su correo</h4>
+                        <p>Un clasificador bayesiano (o un transformer moderno) decidió qué correos vieron en la bandeja principal y cuáles fueron al spam, según un modelo probabilístico entrenado con millones de mensajes.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Transporte</div>
+                        <h4>Waze y el ICE</h4>
+                        <p>Waze calculó su ruta resolviendo el problema del camino mínimo en un grafo (Dijkstra). El ICE pronosticó la demanda eléctrica residencial para decidir cuánta agua liberar en Reventazón.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Mediodía</div>
+                        <h4>Recomendaciones y precios</h4>
+                        <p>Spotify, Netflix y Amazon les recomendaron contenido con modelos de factorización matricial. Uber Eats calculó el precio dinámico con un modelo de oferta y demanda en tiempo real.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Tarde</div>
+                        <h4>El BCCR y su banco</h4>
+                        <p>El BCCR ajustó la tasa de política monetaria usando un modelo macroeconómico DSGE. Su banco le aprobó (o negó) una tarjeta de crédito con un modelo de credit scoring.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Probablemente más de 30 modelos matemáticos tomaron decisiones por ustedes solo entre que despertaron y llegaron a esta clase. La pregunta no es si confiamos en los modelos, sino si los entendemos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Mapa del curso -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Mapa del curso</h2>
+                <p class="slide-subtitle">15 semanas, doce temas, dos pruebas y un proyecto integrador</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Semanas</th>
+                                <th>Tema</th>
+                                <th>Herramienta principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>1</strong></td>
+                                <td>Fundamentos del modelado matemático</td>
+                                <td>Google Colab, GitHub</td>
+                            </tr>
+                            <tr>
+                                <td><strong>2</strong></td>
+                                <td>Modelos con ecuaciones diferenciales</td>
+                                <td>scipy.integrate</td>
+                            </tr>
+                            <tr>
+                                <td><strong>3</strong></td>
+                                <td>Cadenas y procesos de Markov</td>
+                                <td>NumPy, NetworkX</td>
+                            </tr>
+                            <tr>
+                                <td><strong>4</strong></td>
+                                <td>Monte Carlo y MCMC</td>
+                                <td>PyMC</td>
+                            </tr>
+                            <tr>
+                                <td><strong>5</strong></td>
+                                <td>Regresión clásica y regularizada</td>
+                                <td>scikit-learn, Bambi</td>
+                            </tr>
+                            <tr>
+                                <td><strong>6-7</strong></td>
+                                <td>Series temporales clásicas y modernas</td>
+                                <td>statsmodels, fpp3 (R), Prophet, Chronos</td>
+                            </tr>
+                            <tr>
+                                <td><strong>9-10</strong></td>
+                                <td>Optimización clásica y con restricciones</td>
+                                <td>scipy.optimize, cvxpy</td>
+                            </tr>
+                            <tr>
+                                <td><strong>11-12</strong></td>
+                                <td>Optimización moderna y heurística</td>
+                                <td>PyTorch, JAX</td>
+                            </tr>
+                            <tr>
+                                <td><strong>13</strong></td>
+                                <td>Teoría de grafos y network science</td>
+                                <td>NetworkX</td>
+                            </tr>
+                            <tr>
+                                <td><strong>14-15</strong></td>
+                                <td>Teoría de la decisión y aprendizaje secuencial</td>
+                                <td>NumPy, simuladores propios</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Historia - parte 1 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Historia del modelado matemático I</h2>
+                <p class="slide-subtitle">De Newton a Kermack: cuando la matemática conquistó la realidad</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>1687 — Newton</h4>
+                        <p>Las leyes del movimiento y la gravitación universal son el primer gran sistema de ecuaciones diferenciales que predice el comportamiento del mundo físico con precisión asombrosa.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>1705 — Halley</h4>
+                        <p>Usando la mecánica de Newton, Edmond Halley predice el regreso del cometa en 1758. El cometa apareció. Triunfo paradigmático del modelado predictivo.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>1838 — Verhulst</h4>
+                        <p>Modelo logístico de crecimiento poblacional. La primera respuesta matemática a Malthus que reconoce la saturación de recursos. Lo veremos hoy en la demo.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>1925-1926 — Lotka y Volterra</h4>
+                        <p>Ecuaciones depredador-presa. Volterra las dedujo intentando explicar por qué los tiburones aumentaron en el Adriático cuando bajó la pesca durante la I Guerra Mundial.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h4>1927 — Kermack y McKendrick: el modelo SIR</h4>
+                    <p>Dividen a la población en Susceptibles, Infectados y Recuperados. Es el ancestro directo de todos los modelos COVID que vimos en el 2020. Su gran aporte: el número básico de reproducción R₀, el indicador que dictó las cuarentenas del mundo entero.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Historia - parte 2 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Historia del modelado matemático II</h2>
+                <p class="slide-subtitle">De Fisher a TabPFN: la era de los datos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>1925-1948 — Era estadística</h4>
+                        <p>Fisher (verosimilitud, ANOVA), Neyman-Pearson (pruebas de hipótesis), Kolmogorov (probabilidad moderna), Wiener (cibernética). Las herramientas para razonar con datos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>1970 — Box y Jenkins</h4>
+                        <p>Publican <em>Time Series Analysis</em>. Nacen los modelos ARIMA que dominarán el pronóstico por cinco décadas. En la semana 6 los estudiaremos a fondo.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>1986-2012 — Era del machine learning</h4>
+                        <p>Backpropagation (Rumelhart, Hinton), SVMs (Vapnik), Random Forests (Breiman), Deep Learning (AlexNet en 2012). La estadística se encuentra con la computación masiva.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>2017 — Transformers</h4>
+                        <p>Vaswani y colaboradores publican <em>Attention Is All You Need</em>. Es la arquitectura matemática detrás de ChatGPT, Claude, Gemini y de prácticamente toda la IA generativa actual.</p>
+                    </div>
+                </div>
+                <div class="feature-card">
+                    <h4>2020-2026 — Modelos de fundación</h4>
+                    <p>AlphaFold resuelve el plegamiento de proteínas (2020). ChatGPT cambia la conversación pública (2022). Aparecen modelos de fundación para tareas científicas: Chronos y TimesFM para series temporales, TabPFN para datos tabulares. Por primera vez, un modelo pre-entrenado supera a XGBoost sin ajuste alguno.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: La cita de Box -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">George Box, 1976</h2>
+                <p class="slide-subtitle">La frase más famosa de la historia del modelado</p>
+            </div>
+            <div class="slide-content">
+                <div class="quote-block">
+                    <p class="quote">All models are wrong, but some are useful.</p>
+                    <p class="author">— George E. P. Box (1919-2013)</p>
+                </div>
+                <div class="content-box" style="margin-top: 15px;">
+                    <h3>El contexto que pocos conocen</h3>
+                    <p>Box no era nihilista. En su libro de 1987 con Draper escribió la versión completa: <em>"Remember that all models are wrong; the practical question is how wrong do they have to be to not be useful."</em> Es decir, toda aproximación es imperfecta, por tanto la pregunta científica útil no es si el modelo es verdadero, sino si es lo suficientemente útil para la decisión que se va a tomar.</p>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="quote-block">
+                        <p class="quote" style="font-size: 17px;">Since all models are wrong the scientist cannot obtain a 'correct' one by excessive elaboration.</p>
+                        <p class="author">— Box (1976)</p>
+                    </div>
+                    <div class="quote-block">
+                        <p class="quote" style="font-size: 17px;">Statisticians, like artists, have the bad habit of falling in love with their models.</p>
+                        <p class="author">— Box (1976)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Tipos de modelos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Tipos de modelos matemáticos</h2>
+                <p class="slide-subtitle">Cuatro formas útiles de clasificarlos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Por origen</h4>
+                        <p><strong>Mecanísticos</strong> (basados en leyes físicas o biológicas), <strong>fenomenológicos</strong> (basados en observaciones), <strong>estadísticos</strong> (basados en datos), <strong>híbridos</strong> (combinan los tres).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Por naturaleza</h4>
+                        <p><strong>Determinísticos</strong>: misma entrada produce siempre la misma salida. <strong>Estocásticos</strong>: incorporan azar y producen distribuciones de probabilidad sobre los resultados.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Por tiempo</h4>
+                        <p><strong>Estáticos</strong>: una foto del sistema. <strong>Dinámicos</strong>: describen evolución temporal, ya sea en tiempo continuo (EDOs) o discreto (cadenas de Markov, series temporales).</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Por propósito</h4>
+                        <p><strong>Descriptivos</strong> (resumir), <strong>explicativos</strong> (entender causas), <strong>predictivos</strong> (anticipar), <strong>prescriptivos</strong> (recomendar acciones) y <strong>generativos</strong> (crear nuevos datos).</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Un mismo problema admite varios tipos de modelo. La elección no es objetiva: depende de los datos disponibles, de la pregunta y de las consecuencias de equivocarse.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Validación y calibración -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Validación y calibración</h2>
+                <p class="slide-subtitle">Cómo saber si el modelo sirve antes de creerle</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Validación</h3>
+                        <p style="margin-bottom: 10px;">Comprobar que el modelo cumple su propósito en datos que no se usaron para construirlo. Técnicas que veremos:</p>
+                        <ul>
+                            <li>Hold-out: separar entrenamiento y prueba</li>
+                            <li>k-fold cross-validation</li>
+                            <li>Validación cruzada para series temporales</li>
+                            <li>Validación externa con poblaciones distintas</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Calibración</h3>
+                        <p style="margin-bottom: 10px;">Un modelo está calibrado si, cuando dice 70% de probabilidad, efectivamente acierta el 70% de las veces. Métodos clave:</p>
+                        <ul>
+                            <li>Platt scaling (sigmoide logística)</li>
+                            <li>Isotonic regression (no paramétrica)</li>
+                            <li>Temperature scaling (estándar en redes neuronales)</li>
+                            <li>Reliability diagrams y ECE</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Un modelo puede ser muy preciso y muy mal calibrado al mismo tiempo. Es típico en redes neuronales modernas: aciertan mucho, pero cuando dicen 99% de seguridad, en realidad están al 85%. Las consecuencias en medicina o finanzas son enormes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Propiedades formales -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Tres propiedades que todo modelo debe tener</h2>
+                <p class="slide-subtitle">Identificabilidad, sensibilidad y parsimonia</p>
+            </div>
+            <div class="slide-content">
+                <div class="feature-card">
+                    <h4>Identificabilidad</h4>
+                    <p>¿Pueden recuperarse los parámetros del modelo a partir de los datos disponibles? Si dos combinaciones distintas de parámetros producen exactamente el mismo ajuste, el modelo no es identificable. Es un problema invisible que arruina silenciosamente a muchos análisis.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Sensibilidad</h4>
+                    <p>¿Cómo cambia el resultado del modelo si perturbamos sus inputs o parámetros? El análisis local (derivadas parciales) y el global (índices de Sobol, screening de Morris) nos dicen qué parámetros importan de verdad y cuáles son irrelevantes. Si una política pública depende de un parámetro con altísima sensibilidad, vale la pena invertir en medirlo mejor.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Parsimonia (la navaja de Occam)</h4>
+                    <p>Dada igualdad de poder explicativo, prefiérase el modelo más simple. Se formaliza con criterios como AIC y BIC, y con técnicas modernas de regularización como Ridge, Lasso y Elastic Net (las veremos en la semana 5). Box lo decía así: <em>la sobreelaboración y la sobreparametrización son la marca de la mediocridad.</em></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Casos célebres -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Éxitos y fracasos célebres</h2>
+                <p class="slide-subtitle">Modelos que cambiaron el mundo, para bien y para mal</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box" style="border-left: 4px solid #2d8a2d;">
+                        <h3 style="color: #2d8a2d;">Éxitos</h3>
+                        <ul>
+                            <li><strong>SIR durante COVID-19</strong>: la modelación apoyó la vacunación que, según The Lancet, evitó 14.4 millones de muertes solo en el primer año</li>
+                            <li><strong>Black-Scholes (1973)</strong>: ecuación para precios de opciones. Nobel de Economía 1997. Base de un mercado de cientos de billones de dólares</li>
+                            <li><strong>Pronóstico meteorológico numérico</strong>: hoy a 10 días es tan bueno como a 3 días en 1980</li>
+                            <li><strong>AlphaFold 2 (2020)</strong>: predijo más de 200 millones de estructuras de proteínas</li>
+                            <li><strong>GPS</strong>: sin correcciones de relatividad acumularía 10 km de error por día</li>
+                        </ul>
+                    </div>
+                    <div class="content-box" style="border-left: 4px solid #ce4040;">
+                        <h3 style="color: #ce4040;">Fracasos</h3>
+                        <ul>
+                            <li><strong>LTCM (1998)</strong>: dos Nobel en el equipo, modelos con normalidad asumida; perdieron 4.6 mil millones de dólares en meses y la Fed tuvo que organizar un rescate</li>
+                            <li><strong>Crisis subprime 2008</strong>: copulas gaussianas subestimaron la correlación de defaults; daño global estimado en 15 billones de dólares según el FMI</li>
+                            <li><strong>Google Flu Trends</strong>: funcionó años, luego falló en más del 50%</li>
+                            <li><strong>Zillow Offers (2021)</strong>: modelos de precios fallaron tras la pandemia; pérdidas superiores a 500 millones</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>La diferencia entre éxitos y fracasos no es la sofisticación matemática, es la humildad: entender los supuestos, validar fuera de la muestra, monitorear el drift y nunca creerle al modelo más allá de lo que los datos justifican.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Pipeline moderno -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Pipeline moderno del modelado</h2>
+                <p class="slide-subtitle">Del problema a la decisión, no del problema al notebook</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Las diez etapas modernas</h3>
+                    <ul>
+                        <li><strong>1. Definir el problema</strong>: convertir una pregunta de negocio en una cuantitativa</li>
+                        <li><strong>2. Recolectar y curar datos</strong>: fuentes, ETL, gobernanza, calidad</li>
+                        <li><strong>3. Analizar exploratoriamente (EDA)</strong>: distribuciones, faltantes, outliers, drift</li>
+                        <li><strong>4. Formular el modelo</strong>: mecanístico, estadístico, ML o híbrido; supuestos explícitos</li>
+                        <li><strong>5. Implementar y entrenar</strong>: optimización, control de versiones</li>
+                        <li><strong>6. Validar</strong>: cross-validation, calibración, fairness</li>
+                        <li><strong>7. Desplegar</strong>: contenedores, APIs, batch o streaming</li>
+                        <li><strong>8. Monitorear</strong>: drift de datos, drift de concepto, métricas de negocio</li>
+                        <li><strong>9. Comunicar a stakeholders</strong>: dashboards, intervalos, escenarios</li>
+                        <li><strong>10. Iterar</strong>: el modelo v1 entra a producción rápido; las versiones siguientes mejoran con feedback real</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>El modelado no termina cuando se publica un número. Termina cuando una decisión se toma, se ejecuta y produce un resultado medible en el mundo real.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Frameworks -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Frameworks contemporáneos</h2>
+                <p class="slide-subtitle">CRISP-DM, OSEMN, TDSP y MLOps</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>CRISP-DM (1999)</h4>
+                        <p>Cross-Industry Standard Process for Data Mining. Seis fases iterativas: Business Understanding, Data Understanding, Data Preparation, Modeling, Evaluation, Deployment. Sigue siendo el framework más usado en proyectos rigurosos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>OSEMN</h4>
+                        <p>Obtain, Scrub, Explore, Model, iNterpret. Más operativo, estilo Unix. Ideal para análisis exploratorios y proyectos de corta duración.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>TDSP (Microsoft, 2016)</h4>
+                        <p>Team Data Science Process. Agrega gestión de proyectos, plantillas de Git y roles definidos (Solution Architect, Data Scientist, Project Lead). Más alineado con equipos ágiles.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>MLOps</h4>
+                        <p>DevOps aplicado a machine learning. Versionado de datos y modelos, pipelines automatizados, monitoreo en producción, feature stores. Lo que diferencia un notebook de un sistema real.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>El código de producción es típicamente 10 a 100 veces más extenso que el código del modelo (Sculley et al., 2015, "Hidden Technical Debt"). Construir el modelo es la parte fácil.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Modelado en Costa Rica I -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Modelado matemático en Costa Rica I</h2>
+                <p class="slide-subtitle">El CIMPA-UCR y el modelo COVID que llegó a Nature</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El equipo costarricense que sorprendió al mundo</h3>
+                    <p>Durante la pandemia, el Centro de Investigación en Matemática Pura y Aplicada (CIMPA) de la UCR, junto con la Escuela de Matemática, desarrolló un modelo de redes multicapa con cinco millones de nodos, uno por habitante del país. El modelo distingue cuatro tipos de relaciones (familia, trabajo, amigos, esporádicas), cada una con tasas de transmisión propias. El trabajo fue publicado en Scientific Reports, del grupo Nature, en febrero de 2022.</p>
+                </div>
+                <div class="three-columns" style="margin-top: 15px;">
+                    <div class="feature-card">
+                        <h4>Dr. Fabio Sánchez</h4>
+                        <p>Coordinador. PhD en Matemática Biológica de Cornell. Lidera la modelación de enfermedades transmisibles en el CIMPA.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Dr. Juan Gabriel Calvo</h4>
+                        <p>Matemática aplicada y EDPs. Desarrolla modelos SIR con estructura de edad y trabaja en métodos numéricos para epidemiología.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Dr. Luis Barboza</h4>
+                        <p>Estadística bayesiana y Approximate Bayesian Computation. Calibra los modelos a datos reales del Ministerio de Salud.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Las proyecciones del modelo alimentaron decisiones de política pública en la Ministra de Salud. El equipo también publicó modelos para Zika (2016-2017) y dengue con técnicas de ML y variables climáticas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Modelado en Costa Rica II -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Modelado matemático en Costa Rica II</h2>
+                <p class="slide-subtitle">Más allá de la academia: el modelado en instituciones nacionales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Política monetaria</div>
+                        <h4>Banco Central de Costa Rica</h4>
+                        <p>Opera dos modelos: el MMPE (Macroeconómico de Pequeña Escala) y el MMPT (Proyección Trimestral). Alimentan el Informe de Política Monetaria trimestral y la decisión sobre la Tasa de Política Monetaria.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>ICE</h4>
+                        <p>Modelos hidrológicos y de demanda eléctrica para planificar la generación. Costa Rica depende en más del 70% de hidroeléctrica: un error del 5% en pronóstico representa millones de dólares en el MER.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Meteorología</div>
+                        <h4>IMN</h4>
+                        <p>Modelos numéricos de pronóstico (WRF) y análisis de fenómenos como El Niño y La Niña. Críticos para zonas vulnerables como Limón y el Pacífico Norte.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Turismo</div>
+                        <h4>ICT</h4>
+                        <p>Modelos de demanda turística post-pandemia, segmentación por país de origen y modelado de capacidad de carga de áreas protegidas. Uno de los carriles sugeridos del proyecto.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>También: AyA con detección de fugas, INEC con modelos demográficos, CENAT con imágenes satelitales, y todos los bancos (BAC, BCR, BN) con modelos de scoring crediticio. El modelado matemático en Costa Rica está en todas partes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Modelado en Latinoamérica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Modelado matemático en Latinoamérica</h2>
+                <p class="slide-subtitle">Centros de excelencia y casos regionales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>IMPA (Brasil)</h4>
+                        <p>Instituto de Matemática Pura e Aplicada, en Río de Janeiro. Uno de los centros matemáticos más prestigiosos del mundo. Artur Avila ganó la Medalla Fields en 2014 como investigador del IMPA.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>CIMAT (México)</h4>
+                        <p>Centro de Investigación en Matemáticas, en Guanajuato. Aplicaciones en estadística, optimización, finanzas y matemática industrial. Trabajos relevantes con el Banco de México.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>CMM (Chile)</h4>
+                        <p>Centro de Modelamiento Matemático de la Universidad de Chile. Pionero en LatAm en aplicaciones a minería, energía y modelos epidemiológicos. Codelco usa modelos del CMM para optimización minera.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>EMBRAPA y la agricultura de precisión</h4>
+                        <p>Brasil lidera la región en modelos agroclimáticos para soja, maíz y caña. Empresas como Solinftec (Brasil) y Auravant (Argentina) combinan teledetección con ML para optimizar cosechas.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>El modelado matemático no es algo lejano ni exclusivo de Stanford o el MIT. Se hace activamente, con excelencia y publicaciones de impacto, en toda la región y en Costa Rica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Tendencias 2025-2026 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Tendencias punteras 2025-2026</h2>
+                <p class="slide-subtitle">Lo que está cambiando el modelado en este preciso momento</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Modelos de fundación para series temporales</h4>
+                        <p>Chronos-2 (Amazon), TimesFM (Google) y Moirai (Salesforce) están reemplazando a ARIMA y Prophet en muchas pipelines industriales. Predicen sin entrenamiento previo (zero-shot). Los veremos en la semana 7.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>TabPFN para datos tabulares</h4>
+                        <p>Publicado en Nature en enero de 2025. La versión 2.5 logra el 100% de victorias contra XGBoost en datasets pequeños, 5.140 veces más rápido. Cambia el juego para la mayoría de aplicaciones empresariales.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Physics-Informed Neural Networks</h4>
+                        <p>Redes neuronales que aprenden respetando ecuaciones diferenciales conocidas. En 2025, SeisPINN localiza epicentros de terremotos en 5 segundos con 0.5 km de error.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Programación diferenciable y renacimiento bayesiano</h4>
+                        <p>JAX y PyTorch permiten optimizar simuladores físicos completos. PyMC y NumPyro corren ahora en GPU, haciendo viable la inferencia bayesiana en datasets grandes.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Y además: ética y gobernanza de modelos. El EU AI Act entró en vigor en 2024 y la Estrategia Nacional de IA del MICITT define el marco costarricense. Todo modelo en producción necesita ahora model card y datasheet for datasets.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Colab y el entorno -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Google Colab: nuestro laboratorio del curso</h2>
+                <p class="slide-subtitle">Plataforma principal de la semana 1 y de las semanas siguientes</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>¿Por qué Colab?</h3>
+                    <p>Notebook en la nube basado en Jupyter, sin instalación, con casi todas las librerías que vamos a usar preinstaladas (NumPy, SciPy, scikit-learn, PyMC, NetworkX, PyTorch, JAX). Funciona en cualquier dispositivo con navegador y cuenta de Google. Desde 2025 incluye al asistente Gemini integrado y el Data Science Agent que genera notebooks completos a partir de instrucciones en lenguaje natural.</p>
+                </div>
+                <div class="three-columns" style="margin-top: 15px;">
+                    <div class="stat-box">
+                        <div class="stat-number">3.12</div>
+                        <div class="stat-label">Python preinstalado</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">16 GB</div>
+                        <div class="stat-label">VRAM en GPU T4 gratis</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">Gemini</div>
+                        <div class="stat-label">Asistente IA integrado</div>
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>Atajos esenciales</h4>
+                        <p>Shift+Enter: ejecutar y avanzar<br>
+                        Ctrl+Enter: ejecutar sin avanzar<br>
+                        Ctrl+M B: nueva celda abajo<br>
+                        Ctrl+M M: convertir a Markdown</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Más adelante en el curso</h4>
+                        <p>Para series temporales con fpp3 usaremos Posit Cloud (R) en la semana 6. Para optimización moderna activaremos GPU T4 a partir de la semana 11.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Demo en vivo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Demo en vivo: crecimiento poblacional de Costa Rica</h2>
+                <p class="slide-subtitle">Dos modelos, una pregunta: ¿cuál es más útil?</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> <span class="keyword">numpy</span> <span class="keyword">as</span> <span class="keyword">np</span>
+<span class="keyword">import</span> <span class="keyword">pandas</span> <span class="keyword">as</span> <span class="keyword">pd</span>
+<span class="keyword">import</span> <span class="keyword">matplotlib.pyplot</span> <span class="keyword">as</span> <span class="keyword">plt</span>
+<span class="keyword">from</span> <span class="keyword">scipy.optimize</span> <span class="keyword">import</span> <span class="keyword">curve_fit</span>
+<span class="keyword">from</span> <span class="keyword">sklearn.linear_model</span> <span class="keyword">import</span> <span class="keyword">LinearRegression</span>
+
+<span class="comment"># Datos de población de Costa Rica (Banco Mundial, INEC)</span>
+<span class="keyword">data</span> = <span class="keyword">pd</span>.<span class="function">DataFrame</span>({
+    <span class="string">"anio"</span>: [<span class="number">1960</span>, <span class="number">1970</span>, <span class="number">1980</span>, <span class="number">1990</span>, <span class="number">2000</span>, <span class="number">2010</span>, <span class="number">2020</span>, <span class="number">2023</span>],
+    <span class="string">"poblacion_M"</span>: [<span class="number">1.33</span>, <span class="number">1.82</span>, <span class="number">2.35</span>, <span class="number">3.08</span>, <span class="number">3.93</span>, <span class="number">4.66</span>, <span class="number">5.12</span>, <span class="number">5.21</span>]
+})
+
+<span class="comment"># Modelo 1: regresión lineal (ingenuo)</span>
+<span class="keyword">lin</span> = <span class="function">LinearRegression</span>().<span class="function">fit</span>(<span class="keyword">data</span>[[<span class="string">"anio"</span>]], <span class="keyword">data</span>[<span class="string">"poblacion_M"</span>])
+
+<span class="comment"># Modelo 2: crecimiento logístico (Verhulst, 1838)</span>
+<span class="keyword">def</span> <span class="function">logistic</span>(<span class="keyword">t</span>, <span class="keyword">K</span>, <span class="keyword">r</span>, <span class="keyword">t0</span>):
+    <span class="keyword">return</span> <span class="keyword">K</span> / (<span class="number">1</span> + <span class="keyword">np</span>.<span class="function">exp</span>(-<span class="keyword">r</span> * (<span class="keyword">t</span> - <span class="keyword">t0</span>)))
+
+<span class="keyword">popt</span>, <span class="keyword">_</span> = <span class="function">curve_fit</span>(<span class="function">logistic</span>, <span class="keyword">data</span>[<span class="string">"anio"</span>], <span class="keyword">data</span>[<span class="string">"poblacion_M"</span>],
+                     <span class="keyword">p0</span>=[<span class="number">6.0</span>, <span class="number">0.04</span>, <span class="number">1990</span>], <span class="keyword">maxfev</span>=<span class="number">10000</span>)
+<span class="keyword">K</span>, <span class="keyword">r</span>, <span class="keyword">t0</span> = <span class="keyword">popt</span>
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Capacidad de carga estimada K = {K:.2f} millones"</span>)
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Preguntas para la clase: ¿cuál modelo predice mejor el 2050? ¿Cuál es más útil para el ICE planificando demanda eléctrica? ¿Qué supuestos hace cada uno? ¿Pueden extrapolar al 2100 con seguridad?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Sistema de evaluación -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Sistema de evaluación</h2>
+                <p class="slide-subtitle">Cómo se compone la nota final</p>
+            </div>
+            <div class="slide-content">
+                <div class="four-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">20%</div>
+                        <div class="stat-label">Prueba parcial individual (semana 8)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">20%</div>
+                        <div class="stat-label">Prueba final individual (semana 14)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">50%</div>
+                        <div class="stat-label">Proyecto integrador (avance + final + presentación)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">10%</div>
+                        <div class="stat-label">Presentación grupal de tema complementario</div>
+                    </div>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>Proyecto integrador</h4>
+                        <p>En grupos de 3 o 4 personas resolveremos un problema real del contexto costarricense con al menos dos métodos del curso. Avance en semana 8 (15%), entrega final en semana 15 (25%) y presentación final (10%).</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Presentaciones grupales</h4>
+                        <p>Cada grupo expondrá un tema complementario moderno (foundation models, GNNs, PINNs, multi-armed bandits, etc.) en una de las semanas 7, 11 o 13. Quince a veinte minutos más cinco de preguntas.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>Política importante: no se aceptan entregas tardías. Si surge una emergencia justificada, comunicarse antes de la fecha de entrega, no después.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Para la próxima clase -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para la próxima semana</h2>
+                <p class="slide-subtitle">Tareas concretas y preparación</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Configuración técnica obligatoria</h3>
+                    <ul>
+                        <li>Crear cuenta en Google si aún no tienen, para acceder a Colab</li>
+                        <li>Crear cuenta en GitHub con correo institucional</li>
+                        <li>Aceptar la invitación al GitHub Classroom del curso que enviaré por correo</li>
+                        <li>Abrir el notebook de bienvenida en Colab y guardar una copia en su GitHub personal</li>
+                        <li>Conformar el grupo de trabajo definitivo (3 o 4 personas) y elegir un tema preliminar del proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box" style="margin-top: 15px;">
+                    <h3>Preparación para la semana 2: ecuaciones diferenciales</h3>
+                    <ul>
+                        <li>Repasar derivadas y ecuaciones diferenciales ordinarias del curso de cálculo</li>
+                        <li>Leer el capítulo introductorio de Brunton y Kutz (disponible gratis en databookuw.com)</li>
+                        <li>Opcional: ver los videos de 3Blue1Brown sobre <em>Differential Equations</em> en YouTube</li>
+                    </ul>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>La próxima semana empezamos a modelar con ecuaciones diferenciales: dinámicas poblacionales, modelos SIR de epidemiología y calibración a datos reales del Ministerio de Salud de Costa Rica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cierre y bienvenida formal</h2>
+                <p class="slide-subtitle">Lo que se llevan de esta primera sesión</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Un modelo no copia la realidad, la simplifica con criterio</h4>
+                    <p>El mapa no es el territorio. Un modelo bueno es el que responde con utilidad a una pregunta concreta, no el que se parece más a la realidad. Box tenía razón: todos los modelos son incorrectos, pero algunos son útiles.</p>
+                </div>
+                <div class="key-point">
+                    <h4>El modelado matemático ya decide por todos nosotros</h4>
+                    <p>Desde el filtro del correo hasta la tasa de política monetaria, desde Waze hasta el ICE: los modelos ya están en todas partes. El profesional de ciencia de datos no es alguien que usa modelos, es alguien que los entiende, los critica y sabe cuándo confiar en ellos.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Esto se hace en Costa Rica y se hace bien</h4>
+                    <p>El CIMPA-UCR llegó a Nature con un modelo COVID, el BCCR opera modelos macroeconómicos sofisticados y el ICE planifica la generación eléctrica del país con modelos que ustedes podrían construir al final de este curso. Estamos en el mejor momento posible para aprender modelado matemático aplicado.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 30px;">
+                    <p style="text-align: center; font-size: 22px;">Bienvenidos al curso. Nos vemos el próximo miércoles con ecuaciones diferenciales.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
