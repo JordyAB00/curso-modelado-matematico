@@ -583,6 +583,8 @@
                 </div>
                 <div class="code-box">
 <span class="keyword">from</span> <span class="keyword">scipy.integrate</span> <span class="keyword">import</span> <span class="keyword">solve_ivp</span>
+<span class="keyword">import</span> <span class="keyword">numpy</span> <span class="keyword">as</span> <span class="keyword">np</span>
+<span class="keyword">import</span> <span class="keyword">matplotlib.pyplot</span> <span class="keyword">as</span> <span class="keyword">plt</span>
 
 <span class="comment"># Una EDO de primer orden: dy/dt = -2y, con y(0) = 1</span>
 <span class="keyword">def</span> <span class="function">campo</span>(<span class="keyword">t</span>, <span class="keyword">y</span>):
@@ -591,7 +593,14 @@
 <span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">campo</span>, <span class="keyword">t_span</span>=(<span class="number">0</span>, <span class="number">5</span>), <span class="keyword">y0</span>=[<span class="number">1.0</span>],
                 <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="number">100</span>))
 
-<span class="comment"># Resultado: solucion aproximada en 100 puntos entre t=0 y t=5</span>
+<span class="comment"># Visualizar la solucion contra la analitica: y(t) = exp(-2t)</span>
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="keyword">figsize</span>=(<span class="number">9</span>, <span class="number">4</span>))
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">label</span>=<span class="string">"numerica"</span>, <span class="keyword">lw</span>=<span class="number">2</span>)
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">np</span>.<span class="function">exp</span>(-<span class="number">2</span>*<span class="keyword">sol</span>.<span class="keyword">t</span>), <span class="keyword">label</span>=<span class="string">"analitica"</span>,
+        <span class="keyword">linestyle</span>=<span class="string">'--'</span>, <span class="keyword">lw</span>=<span class="number">1.5</span>)
+<span class="keyword">ax</span>.<span class="function">set_xlabel</span>(<span class="string">"t"</span>); <span class="keyword">ax</span>.<span class="function">set_ylabel</span>(<span class="string">"y(t)"</span>); <span class="keyword">ax</span>.<span class="function">legend</span>()
+<span class="keyword">ax</span>.<span class="function">set_title</span>(<span class="string">"Decaimiento exponencial: dy/dt = -2y"</span>)
+<span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
             </div>
         </div>
@@ -666,17 +675,23 @@
 
 <span class="keyword">def</span> <span class="function">lotka_volterra</span>(<span class="keyword">t</span>, <span class="keyword">z</span>, <span class="keyword">alpha</span>, <span class="keyword">beta</span>, <span class="keyword">delta</span>, <span class="keyword">gamma</span>):
     <span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">z</span>
-    <span class="keyword">return</span> [<span class="keyword">alpha</span>*<span class="keyword">x</span> - <span class="keyword">beta</span>*<span class="keyword">x</span>*<span class="keyword">y</span>,
-            <span class="keyword">delta</span>*<span class="keyword">x</span>*<span class="keyword">y</span> - <span class="keyword">gamma</span>*<span class="keyword">y</span>]
+    <span class="keyword">return</span> [<span class="keyword">alpha</span>*<span class="keyword">x</span> - <span class="keyword">beta</span>*<span class="keyword">x</span>*<span class="keyword">y</span>, <span class="keyword">delta</span>*<span class="keyword">x</span>*<span class="keyword">y</span> - <span class="keyword">gamma</span>*<span class="keyword">y</span>]
 
 <span class="keyword">params</span> = (<span class="number">1.1</span>, <span class="number">0.4</span>, <span class="number">0.1</span>, <span class="number">0.4</span>)
-<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">lotka_volterra</span>,
-                <span class="keyword">t_span</span>=(<span class="number">0</span>, <span class="number">50</span>), <span class="keyword">y0</span>=[<span class="number">10</span>, <span class="number">5</span>],
+<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">lotka_volterra</span>, <span class="keyword">t_span</span>=(<span class="number">0</span>, <span class="number">50</span>), <span class="keyword">y0</span>=[<span class="number">10</span>, <span class="number">5</span>],
                 <span class="keyword">args</span>=<span class="keyword">params</span>, <span class="keyword">method</span>=<span class="string">'RK45'</span>,
                 <span class="keyword">rtol</span>=<span class="number">1e-8</span>, <span class="keyword">atol</span>=<span class="number">1e-10</span>,
                 <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">50</span>, <span class="number">1000</span>))
 
-<span class="comment"># sol.t: tiempos    |    sol.y[0]: presa    |    sol.y[1]: depredador</span>
+<span class="comment"># Dos paneles: serie temporal y plano de fase</span>
+<span class="keyword">fig</span>, (<span class="keyword">ax1</span>, <span class="keyword">ax2</span>) = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="keyword">figsize</span>=(<span class="number">12</span>, <span class="number">4</span>))
+<span class="keyword">ax1</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">label</span>=<span class="string">"presa"</span>)
+<span class="keyword">ax1</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">label</span>=<span class="string">"depredador"</span>)
+<span class="keyword">ax1</span>.<span class="function">set_xlabel</span>(<span class="string">"tiempo"</span>); <span class="keyword">ax1</span>.<span class="function">legend</span>(); <span class="keyword">ax1</span>.<span class="function">set_title</span>(<span class="string">"Series temporales"</span>)
+<span class="keyword">ax2</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">1</span>])
+<span class="keyword">ax2</span>.<span class="function">set_xlabel</span>(<span class="string">"presa"</span>); <span class="keyword">ax2</span>.<span class="function">set_ylabel</span>(<span class="string">"depredador"</span>)
+<span class="keyword">ax2</span>.<span class="function">set_title</span>(<span class="string">"Plano de fase (orbitas cerradas)"</span>)
+<span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
                 <div class="two-columns" style="margin-top: 15px;">
                     <div class="key-point">
@@ -719,17 +734,28 @@
 <span class="keyword">def</span> <span class="function">logistico</span>(<span class="keyword">t</span>, <span class="keyword">K</span>, <span class="keyword">r</span>, <span class="keyword">N0</span>):
     <span class="keyword">return</span> <span class="keyword">K</span> / (<span class="number">1</span> + ((<span class="keyword">K</span>-<span class="keyword">N0</span>)/<span class="keyword">N0</span>) * <span class="keyword">np</span>.<span class="function">exp</span>(-<span class="keyword">r</span>*<span class="keyword">t</span>))
 
-<span class="comment"># Datos INEC: años 1864 a 2022</span>
+<span class="comment"># Datos INEC: censos 1864 a 2022</span>
 <span class="keyword">anios</span> = <span class="keyword">np</span>.<span class="function">array</span>([<span class="number">1864</span>, <span class="number">1892</span>, <span class="number">1927</span>, <span class="number">1950</span>, <span class="number">1973</span>,
                   <span class="number">1984</span>, <span class="number">2000</span>, <span class="number">2011</span>, <span class="number">2022</span>])
-<span class="keyword">poblacion</span> = <span class="keyword">np</span>.<span class="function">array</span>([<span class="number">120000</span>, <span class="number">243000</span>, <span class="number">472000</span>, <span class="number">800000</span>,
-                      <span class="number">1872000</span>, <span class="number">2417000</span>, <span class="number">3810000</span>,
-                      <span class="number">4301000</span>, <span class="number">5044197</span>])
+<span class="keyword">poblacion</span> = <span class="keyword">np</span>.<span class="function">array</span>([<span class="number">120000</span>, <span class="number">243000</span>, <span class="number">472000</span>, <span class="number">800000</span>, <span class="number">1872000</span>,
+                      <span class="number">2417000</span>, <span class="number">3810000</span>, <span class="number">4301000</span>, <span class="number">5044197</span>])
 
 <span class="keyword">t</span> = <span class="keyword">anios</span> - <span class="keyword">anios</span>[<span class="number">0</span>]
 <span class="keyword">params</span>, _ = <span class="function">curve_fit</span>(<span class="keyword">logistico</span>, <span class="keyword">t</span>, <span class="keyword">poblacion</span>,
                        <span class="keyword">p0</span>=[<span class="number">6e6</span>, <span class="number">0.03</span>, <span class="number">120000</span>])
-<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Capacidad de carga estimada: {params[0]/1e6:.2f} millones"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Capacidad de carga K = {params[0]/1e6:.2f} millones"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Tasa de crecimiento r = {params[1]:.4f} por anio"</span>)
+
+<span class="comment"># Visualizacion: datos vs ajuste</span>
+<span class="keyword">t_smooth</span> = <span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">200</span>, <span class="number">500</span>)
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="keyword">figsize</span>=(<span class="number">10</span>, <span class="number">5</span>))
+<span class="keyword">ax</span>.<span class="function">scatter</span>(<span class="keyword">anios</span>, <span class="keyword">poblacion</span>/<span class="number">1e6</span>, <span class="keyword">s</span>=<span class="number">60</span>, <span class="keyword">label</span>=<span class="string">"Datos INEC"</span>, <span class="keyword">zorder</span>=<span class="number">3</span>)
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">anios</span>[<span class="number">0</span>]+<span class="keyword">t_smooth</span>, <span class="function">logistico</span>(<span class="keyword">t_smooth</span>, *<span class="keyword">params</span>)/<span class="number">1e6</span>,
+        <span class="keyword">label</span>=<span class="string">"Modelo logistico ajustado"</span>, <span class="keyword">lw</span>=<span class="number">2</span>)
+<span class="keyword">ax</span>.<span class="function">axhline</span>(<span class="keyword">params</span>[<span class="number">0</span>]/<span class="number">1e6</span>, <span class="keyword">linestyle</span>=<span class="string">':'</span>, <span class="keyword">color</span>=<span class="string">'gray'</span>,
+           <span class="keyword">label</span>=<span class="keyword">f</span><span class="string">"K = {params[0]/1e6:.2f} M"</span>)
+<span class="keyword">ax</span>.<span class="function">set_xlabel</span>(<span class="string">"Anio"</span>); <span class="keyword">ax</span>.<span class="function">set_ylabel</span>(<span class="string">"Poblacion (millones)"</span>)
+<span class="keyword">ax</span>.<span class="function">legend</span>(); <span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
             </div>
         </div>
@@ -758,6 +784,18 @@
                 <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>),
                 <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">160</span>, <span class="number">500</span>),
                 <span class="keyword">rtol</span>=<span class="number">1e-8</span>)
+
+<span class="comment"># Visualizar las tres curvas y reportar el pico</span>
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="keyword">figsize</span>=(<span class="number">10</span>, <span class="number">5</span>))
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">label</span>=<span class="string">"Susceptibles"</span>, <span class="keyword">lw</span>=<span class="number">2</span>)
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">label</span>=<span class="string">"Infectados"</span>,   <span class="keyword">lw</span>=<span class="number">2</span>)
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">2</span>], <span class="keyword">label</span>=<span class="string">"Recuperados"</span>,  <span class="keyword">lw</span>=<span class="number">2</span>)
+<span class="keyword">ax</span>.<span class="function">set_xlabel</span>(<span class="string">"dia"</span>); <span class="keyword">ax</span>.<span class="function">set_ylabel</span>(<span class="string">"personas"</span>)
+<span class="keyword">ax</span>.<span class="function">set_title</span>(<span class="keyword">f</span><span class="string">"SIR con R0 = {beta/gamma:.1f}"</span>); <span class="keyword">ax</span>.<span class="function">legend</span>()
+<span class="keyword">plt</span>.<span class="function">show</span>()
+
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Pico de infectados: {sol.y[1].max():.0f} en el dia {sol.t[sol.y[1].argmax()]:.1f}"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Total infectados al final: {N - sol.y[0,-1]:.0f} ({100*(N-sol.y[0,-1])/N:.1f} %)"</span>)
                 </div>
                 <div class="two-columns" style="margin-top: 15px;">
                     <div class="key-point">
@@ -791,10 +829,22 @@
 <span class="keyword">pico_infectados</span>.<span class="keyword">direction</span> = -<span class="number">1</span>     <span class="comment"># solo de positivo a negativo</span>
 
 <span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">200</span>), [<span class="keyword">S0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
-                <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>), <span class="keyword">events</span>=<span class="keyword">pico_infectados</span>)
+                <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>),
+                <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">200</span>, <span class="number">500</span>),
+                <span class="keyword">events</span>=<span class="keyword">pico_infectados</span>)
 
-<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Pico de epidemia en el dia {sol.t_events[0][0]:.1f}"</span>)
-<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Infectados en el pico: {sol.y_events[0][0][1]:.0f}"</span>)
+<span class="keyword">t_pico</span>, <span class="keyword">I_pico</span> = <span class="keyword">sol</span>.<span class="keyword">t_events</span>[<span class="number">0</span>][<span class="number">0</span>], <span class="keyword">sol</span>.<span class="keyword">y_events</span>[<span class="number">0</span>][<span class="number">0</span>][<span class="number">1</span>]
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Pico de epidemia en el dia {t_pico:.1f}"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Infectados en el pico: {I_pico:.0f}"</span>)
+
+<span class="comment"># Visualizar el pico marcado sobre la curva</span>
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="keyword">figsize</span>=(<span class="number">10</span>, <span class="number">4</span>))
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol</span>.<span class="keyword">t</span>, <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">lw</span>=<span class="number">2</span>, <span class="keyword">label</span>=<span class="string">"Infectados"</span>)
+<span class="keyword">ax</span>.<span class="function">scatter</span>([<span class="keyword">t_pico</span>], [<span class="keyword">I_pico</span>], <span class="keyword">s</span>=<span class="number">120</span>, <span class="keyword">zorder</span>=<span class="number">3</span>,
+           <span class="keyword">label</span>=<span class="keyword">f</span><span class="string">"Pico: dia {t_pico:.1f}"</span>)
+<span class="keyword">ax</span>.<span class="function">axvline</span>(<span class="keyword">t_pico</span>, <span class="keyword">linestyle</span>=<span class="string">':'</span>, <span class="keyword">alpha</span>=<span class="number">0.5</span>)
+<span class="keyword">ax</span>.<span class="function">set_xlabel</span>(<span class="string">"dia"</span>); <span class="keyword">ax</span>.<span class="function">set_ylabel</span>(<span class="string">"I(t)"</span>); <span class="keyword">ax</span>.<span class="function">legend</span>()
+<span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
                 <div class="highlight-box">
                     <p>En producción real, los eventos sirven para "tomar decisión cuando algo pasa": activar una alarma cuando un tanque se vacía, parar una simulación de mercado cuando un precio cruza un umbral, identificar el día del pico para planificación hospitalaria.</p>
@@ -902,6 +952,16 @@
 <span class="keyword">beta_hat</span>, <span class="keyword">gamma_hat</span> = <span class="keyword">res</span>.<span class="keyword">x</span>
 <span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 real:      {beta_real/gamma_real:.2f}"</span>)
 <span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 estimado:  {beta_hat/gamma_hat:.2f}"</span>)
+
+<span class="comment"># Visualizar datos vs modelo ajustado</span>
+<span class="keyword">sol_fit</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">100</span>), [<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
+                    <span class="keyword">args</span>=(<span class="keyword">beta_hat</span>, <span class="keyword">gamma_hat</span>),
+                    <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">100</span>, <span class="number">500</span>), <span class="keyword">rtol</span>=<span class="number">1e-8</span>)
+<span class="keyword">fig</span>, <span class="keyword">ax</span> = <span class="keyword">plt</span>.<span class="function">subplots</span>(<span class="keyword">figsize</span>=(<span class="number">10</span>, <span class="number">5</span>))
+<span class="keyword">ax</span>.<span class="function">scatter</span>(<span class="keyword">t_data</span>, <span class="keyword">I_data</span>, <span class="keyword">s</span>=<span class="number">30</span>, <span class="keyword">alpha</span>=<span class="number">0.6</span>, <span class="keyword">label</span>=<span class="string">"Datos (sinteticos)"</span>)
+<span class="keyword">ax</span>.<span class="function">plot</span>(<span class="keyword">sol_fit</span>.<span class="keyword">t</span>, <span class="keyword">sol_fit</span>.<span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">lw</span>=<span class="number">2</span>, <span class="keyword">label</span>=<span class="string">"SIR ajustado"</span>)
+<span class="keyword">ax</span>.<span class="function">set_xlabel</span>(<span class="string">"dia"</span>); <span class="keyword">ax</span>.<span class="function">set_ylabel</span>(<span class="string">"infectados I(t)"</span>)
+<span class="keyword">ax</span>.<span class="function">legend</span>(); <span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
                 <div class="key-point" style="margin-top: 15px;">
                     <h4>loss='soft_l1' o 'huber'</h4>
@@ -920,37 +980,36 @@
                 <p style="font-size: 16px; color: #1d1d1f; line-height: 1.5; margin: 0;">Mínimos cuadrados da un valor puntual. La inferencia bayesiana da una distribución completa: "no sé exactamente cuánto es R0, pero con 95 % de probabilidad está entre 2,1 y 2,8". Esto es lo que se usa hoy en epidemiología profesional, finanzas cuantitativas y ML aplicado.</p>
                 <div class="code-box">
 <span class="keyword">import</span> <span class="keyword">pymc</span> <span class="keyword">as</span> <span class="keyword">pm</span>
+<span class="keyword">import</span> <span class="keyword">arviz</span> <span class="keyword">as</span> <span class="keyword">az</span>
 <span class="keyword">from</span> <span class="keyword">pymc.ode</span> <span class="keyword">import</span> <span class="keyword">DifferentialEquation</span>
 
-<span class="comment"># Reutilizamos los datos sinteticos (t_data, I_data, N, I0) del slide anterior</span>
+<span class="comment"># Reutilizamos los datos sinteticos del slide anterior.</span>
+<span class="comment"># pm.ode es lento: usamos menos puntos para que clase sea factible.</span>
+<span class="keyword">t_short</span> = <span class="keyword">t_data</span>[::<span class="number">5</span>]
+<span class="keyword">I_short</span> = <span class="keyword">I_data</span>[::<span class="number">5</span>]
 
-<span class="comment"># El SIR como funcion compatible con pymc.ode</span>
 <span class="keyword">def</span> <span class="function">sir_ode</span>(<span class="keyword">y</span>, <span class="keyword">t</span>, <span class="keyword">p</span>):
     <span class="keyword">S</span>, <span class="keyword">I</span>, <span class="keyword">R</span> = <span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">y</span>[<span class="number">2</span>]
     <span class="keyword">beta</span>, <span class="keyword">gamma</span> = <span class="keyword">p</span>[<span class="number">0</span>], <span class="keyword">p</span>[<span class="number">1</span>]
-    <span class="keyword">return</span> [-<span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span>,
-            <span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span> - <span class="keyword">gamma</span>*<span class="keyword">I</span>,
-            <span class="keyword">gamma</span>*<span class="keyword">I</span>]
+    <span class="keyword">return</span> [-<span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span>, <span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span> - <span class="keyword">gamma</span>*<span class="keyword">I</span>, <span class="keyword">gamma</span>*<span class="keyword">I</span>]
 
-<span class="keyword">sir_model</span> = <span class="function">DifferentialEquation</span>(<span class="keyword">func</span>=<span class="keyword">sir_ode</span>, <span class="keyword">times</span>=<span class="keyword">t_data</span>,
-                                  <span class="keyword">n_states</span>=<span class="number">3</span>, <span class="keyword">n_theta</span>=<span class="number">2</span>)
+<span class="keyword">sir_eq</span> = <span class="function">DifferentialEquation</span>(<span class="keyword">func</span>=<span class="keyword">sir_ode</span>, <span class="keyword">times</span>=<span class="keyword">t_short</span>,
+                            <span class="keyword">n_states</span>=<span class="number">3</span>, <span class="keyword">n_theta</span>=<span class="number">2</span>)
 
-<span class="keyword">with</span> <span class="keyword">pm</span>.<span class="function">Model</span>() <span class="keyword">as</span> <span class="keyword">modelo_sir</span>:
-    <span class="comment"># Priors: lo que sabemos antes de ver los datos</span>
+<span class="keyword">with</span> <span class="keyword">pm</span>.<span class="function">Model</span>() <span class="keyword">as</span> <span class="keyword">modelo</span>:
     <span class="keyword">beta</span>  = <span class="keyword">pm</span>.<span class="function">LogNormal</span>(<span class="string">"beta"</span>,  <span class="keyword">mu</span>=<span class="keyword">np</span>.<span class="function">log</span>(<span class="number">0.3</span>), <span class="keyword">sigma</span>=<span class="number">0.5</span>)
     <span class="keyword">gamma</span> = <span class="keyword">pm</span>.<span class="function">LogNormal</span>(<span class="string">"gamma"</span>, <span class="keyword">mu</span>=<span class="keyword">np</span>.<span class="function">log</span>(<span class="number">0.1</span>), <span class="keyword">sigma</span>=<span class="number">0.5</span>)
-
-    <span class="comment"># Integrar la EDO dentro del modelo bayesiano</span>
-    <span class="keyword">sol</span> = <span class="keyword">sir_model</span>(<span class="keyword">y0</span>=[<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>], <span class="keyword">theta</span>=[<span class="keyword">beta</span>, <span class="keyword">gamma</span>])
-
-    <span class="comment"># Verosimilitud sobre los infectados observados</span>
-    <span class="keyword">pm</span>.<span class="function">NegativeBinomial</span>(<span class="string">"obs"</span>, <span class="keyword">mu</span>=<span class="keyword">sol</span>[:, <span class="number">1</span>], <span class="keyword">alpha</span>=<span class="number">10</span>,
-                       <span class="keyword">observed</span>=<span class="keyword">I_data</span>)
-
-    <span class="keyword">idata</span> = <span class="keyword">pm</span>.<span class="function">sample</span>(<span class="number">2000</span>, <span class="keyword">tune</span>=<span class="number">2000</span>, <span class="keyword">target_accept</span>=<span class="number">0.95</span>)
+    <span class="keyword">sigma</span> = <span class="keyword">pm</span>.<span class="function">HalfNormal</span>(<span class="string">"sigma"</span>, <span class="keyword">sigma</span>=<span class="number">15</span>)
+    <span class="keyword">sol</span>   = <span class="keyword">sir_eq</span>(<span class="keyword">y0</span>=[<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>], <span class="keyword">theta</span>=[<span class="keyword">beta</span>, <span class="keyword">gamma</span>])
+    <span class="keyword">pm</span>.<span class="function">Normal</span>(<span class="string">"obs"</span>, <span class="keyword">mu</span>=<span class="keyword">sol</span>[:, <span class="number">1</span>], <span class="keyword">sigma</span>=<span class="keyword">sigma</span>, <span class="keyword">observed</span>=<span class="keyword">I_short</span>)
+    <span class="keyword">idata</span> = <span class="keyword">pm</span>.<span class="function">sample</span>(<span class="number">1000</span>, <span class="keyword">tune</span>=<span class="number">1000</span>, <span class="keyword">chains</span>=<span class="number">2</span>, <span class="keyword">target_accept</span>=<span class="number">0.95</span>)
 
 <span class="comment"># Distribucion posterior completa de R0 = beta/gamma</span>
-<span class="keyword">R0_post</span> = <span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"beta"</span>] / <span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"gamma"</span>]
+<span class="keyword">R0</span> = (<span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"beta"</span>] / <span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"gamma"</span>]).<span class="keyword">values</span>.<span class="function">flatten</span>()
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 real:    {beta_real/gamma_real:.2f}"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 medio:   {R0.mean():.2f}   IC 95%: [{np.percentile(R0,2.5):.2f}, {np.percentile(R0,97.5):.2f}]"</span>)
+<span class="keyword">az</span>.<span class="function">plot_posterior</span>(<span class="keyword">idata</span>, <span class="keyword">var_names</span>=[<span class="string">"beta"</span>, <span class="string">"gamma"</span>])
+<span class="keyword">plt</span>.<span class="function">show</span>()
                 </div>
             </div>
         </div>
