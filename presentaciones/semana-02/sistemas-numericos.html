@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Semana 2: Sistemas numéricos - Matemática Básica para Ciencia de Datos</title>
+    <title>Clase 2: Modelos con ecuaciones diferenciales - Modelado matemático</title>
     <style>
         * {
             margin: 0;
@@ -121,6 +121,12 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 18px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
         }
 
         .highlight-box {
@@ -252,6 +258,10 @@
             color: #b5cea8;
         }
 
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
         .navigation {
             position: fixed;
             bottom: 40px;
@@ -373,6 +383,60 @@
             color: #1d1d1f;
             line-height: 1.4;
         }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .deprecated {
+            color: #ce4040;
+            text-decoration: line-through;
+        }
+
+        .modern {
+            color: #2d8a2d;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body>
@@ -381,834 +445,812 @@
     </div>
 
     <div class="slide-number">
-        <span id="currentSlide">1</span> / <span id="totalSlides">18</span>
+        <span id="currentSlide">1</span> / <span id="totalSlides">22</span>
     </div>
 
     <div class="presentation-container">
+
         <!-- Slide 1: Portada -->
         <div class="slide cover-slide active">
-            <h1 class="cover-title">Sistemas numéricos</h1>
-            <p class="cover-subtitle">Semana 2: de la teoría a Python</p>
+            <h1 class="cover-title">Modelos con ecuaciones diferenciales</h1>
+            <p class="cover-subtitle">Clase 2: simulación numérica y casos reales</p>
             <div class="cover-info">
-                <p>TTCT0023 - Matemática básica para ciencia de datos<br>
+                <p>BCD5105 Modelado matemático<br>
                 Profesor: Jordy Alfaro Brenes<br>
                 Lead University<br>
-                I Cuatrimestre 2026</p>
+                Miércoles 20 de mayo de 2026</p>
             </div>
         </div>
 
-        <!-- Slide 2: Agenda -->
+        <!-- Slide 2: Recapitulación -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Agenda de hoy</h2>
-                <p class="slide-subtitle">Aplicaciones computacionales</p>
+                <h2 class="slide-title">De la pizarra al código</h2>
+                <p class="slide-subtitle">Lo que cubrimos en la primera parte</p>
             </div>
             <div class="slide-content">
                 <div class="two-columns">
-                    <div class="key-point">
-                        <h4>1. NumPy 2.4.1: arrays y tipos de datos</h4>
-                        <p>Implementación computacional de sistemas numéricos</p>
-                    </div>
-                    <div class="key-point">
-                        <h4>2. Operaciones vectorizadas</h4>
-                        <p>Eficiencia sin loops explícitos</p>
-                    </div>
-                </div>
-                <div class="two-columns">
-                    <div class="key-point">
-                        <h4>3. Notación científica en Python</h4>
-                        <p>Manejo de big data y modelos grandes</p>
-                    </div>
-                    <div class="key-point">
-                        <h4>4. Visualización con Matplotlib</h4>
-                        <p>Recta numérica, métricas de distancia</p>
-                    </div>
-                </div>
-                <div class="key-point">
-                    <h4>5. Aplicaciones reales</h4>
-                    <p>Normalización, detección de outliers, datasets de Costa Rica</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 3: De la recta a NumPy -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">De la recta numérica a NumPy arrays</h2>
-                <p class="slide-subtitle">Puente entre matemáticas y computación</p>
-            </div>
-            <div class="slide-content">
-                <div class="content-box">
-                    <h3>Concepto matemático vs implementación</h3>
-                    <p>La recta numérica es continua (infinitos puntos). En computación, representamos subconjuntos finitos usando arrays.</p>
-                </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Crear un array de enteros (análogo a subconjunto de ℤ)</span>
-<span class="keyword">enteros</span> = np.<span class="keyword">array</span>([<span class="number">-3</span>, <span class="number">-1</span>, <span class="number">0</span>, <span class="number">2</span>, <span class="number">5</span>], dtype=np.int64)
-<span class="keyword">print</span>(enteros)  <span class="comment"># [-3 -1  0  2  5]</span>
-
-<span class="comment"># Crear un array de floats (análogo a subconjunto de ℝ)</span>
-<span class="keyword">reales</span> = np.<span class="keyword">array</span>([<span class="number">-2.5</span>, <span class="number">0.0</span>, <span class="number">1.414</span>, <span class="number">3.14159</span>], dtype=np.float64)
-<span class="keyword">print</span>(reales)  <span class="comment"># [-2.5     0.      1.414   3.14159]</span>
-
-<span class="comment"># Generar rango uniforme (linspace = "linear space")</span>
-<span class="keyword">rango</span> = np.<span class="keyword">linspace</span>(<span class="number">-5</span>, <span class="number">5</span>, <span class="number">11</span>)  <span class="comment"># 11 puntos de -5 a 5</span>
-<span class="keyword">print</span>(rango)
-<span class="comment"># [-5. -4. -3. -2. -1.  0.  1.  2.  3.  4.  5.]</span>
-                </div>
-                <div class="highlight-box" style="margin-top: 20px;">
-                    <p>NumPy usa aritmética IEEE 754 de punto flotante, con ~15 dígitos de precisión para float64.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 4: Tipos de datos NumPy 2.4.1 -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Tipos de datos en NumPy 2.4.1</h2>
-                <p class="slide-subtitle">Versión actual: enero 2026</p>
-            </div>
-            <div class="slide-content">
-                <div class="two-columns">
-                    <div class="comparison-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Tipo NumPy</th>
-                                    <th>Conjunto</th>
-                                    <th>Bits</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>np.int8</strong></td>
-                                    <td>ℤ</td>
-                                    <td>8</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.int16</strong></td>
-                                    <td>ℤ</td>
-                                    <td>16</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.int32</strong></td>
-                                    <td>ℤ</td>
-                                    <td>32</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.int64</strong></td>
-                                    <td>ℤ</td>
-                                    <td>64</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.float32</strong></td>
-                                    <td>ℝ</td>
-                                    <td>32</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.float64</strong></td>
-                                    <td>ℝ</td>
-                                    <td>64</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>np.complex128</strong></td>
-                                    <td>ℂ</td>
-                                    <td>128</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="content-box">
+                        <h3>Lo que ya resolvieron a mano</h3>
+                        <ul>
+                            <li>Qué es una EDO y su clasificación básica</li>
+                            <li>Separación de variables como técnica analítica</li>
+                            <li>Modelo de Malthus: crecimiento exponencial</li>
+                            <li>Modelo logístico: solución completa por fracciones parciales</li>
+                            <li>Equilibrio y estabilidad: diagrama de fase 1D</li>
+                        </ul>
                     </div>
                     <div class="content-box">
-                        <h3>Rangos importantes</h3>
+                        <h3>Lo que viene en esta segunda parte</h3>
                         <ul>
-                            <li><strong>int8:</strong> -128 a 127</li>
-                            <li><strong>int16:</strong> -32,768 a 32,767</li>
-                            <li><strong>int32:</strong> ±2.1 × 10⁹</li>
-                            <li><strong>int64:</strong> ±9.2 × 10¹⁸</li>
-                            <li><strong>float32:</strong> ~7 dígitos</li>
-                            <li><strong>float64:</strong> ~15 dígitos</li>
-                            <li><strong>complex128:</strong> Dos float64</li>
+                            <li>Simulación numérica con scipy.integrate</li>
+                            <li>Resolver el sistema SIR (que no tiene solución cerrada)</li>
+                            <li>Lotka-Volterra y dinámica depredador-presa</li>
+                            <li>Calibración a datos reales costarricenses</li>
+                            <li>El ecosistema diferenciable moderno: Diffrax, PyTorch</li>
                         </ul>
                     </div>
                 </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Información sobre precisión float64</span>
-<span class="keyword">info</span> = np.<span class="keyword">finfo</span>(np.float64)
-<span class="keyword">print</span>(<span class="string">f"Epsilon: </span>{info.eps:<span class="string">.2e</span>}<span class="string">"</span>)           <span class="comment"># 2.22e-16</span>
-<span class="keyword">print</span>(<span class="string">f"Máximo: </span>{info.max:<span class="string">.2e</span>}<span class="string">"</span>)            <span class="comment"># 1.80e+308</span>
-<span class="keyword">print</span>(<span class="string">f"Mínimo normalizado: </span>{info.min:<span class="string">.2e</span>}<span class="string">"</span>) <span class="comment"># 2.22e-308</span>
-<span class="keyword">print</span>(<span class="string">f"Precisión decimal: </span>{info.precision}<span class="string">"</span>)  <span class="comment"># 15 dígitos</span>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p>El 95 % de las EDOs interesantes del mundo real no tiene solución analítica. La diferencia entre saber "cálculo" y saber "modelado matemático" es manejar bien las dos cosas: la teoría que vimos a mano y las herramientas computacionales que vienen ahora.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 5: Operaciones vectorizadas -->
+        <!-- Slide 3: Por qué EDOs importa en 2026 -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Operaciones vectorizadas</h2>
-                <p class="slide-subtitle">20-50x más rápido que loops Python</p>
+                <h2 class="slide-title">Por qué las EDOs importan en ciencia de datos hoy</h2>
+                <p class="slide-subtitle">2026 no es 1980: el rol de las EDOs cambió</p>
             </div>
             <div class="slide-content">
                 <div class="two-columns">
-                    <div class="code-box">
-<span class="comment"># Forma lenta: loop Python</span>
-<span class="keyword">lista</span> = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]
-<span class="keyword">cuadrados</span> = []
-<span class="keyword">for</span> x <span class="keyword">in</span> lista:
-    cuadrados.<span class="keyword">append</span>(x ** <span class="number">2</span>)
-<span class="keyword">print</span>(cuadrados)
-<span class="comment"># [1, 4, 9, 16, 25]</span>
+                    <div class="app-card">
+                        <div class="app-label">Inteligencia artificial generativa</div>
+                        <h4>Stable Diffusion, Sora, FLUX</h4>
+                        <p>Los modelos que generan imágenes y video están definidos por ecuaciones diferenciales estocásticas. El paper que define Stable Diffusion 3 cita explícitamente la teoría de Flow Matching de Lipman et al. (ICLR 2023).</p>
                     </div>
-                    <div class="code-box">
-<span class="comment"># Forma rápida: vectorizada</span>
-<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>])
-<span class="keyword">cuadrados</span> = arr ** <span class="number">2</span>
-<span class="keyword">print</span>(cuadrados)
-<span class="comment"># [ 1  4  9 16 25]</span>
-
-<span class="comment"># Una sola línea</span>
+                    <div class="app-card">
+                        <div class="app-label">Salud y medicina</div>
+                        <h4>Series clínicas con muestreo irregular</h4>
+                        <p>Latent ODEs y Neural ODEs son el enfoque estándar para signos vitales en UCI y farmacocinética. Cuando los datos no llegan en intervalos uniformes, las EDOs son la estructura inductiva correcta.</p>
                     </div>
                 </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Operaciones elemento por elemento (broadcasting)</span>
-<span class="keyword">a</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
-<span class="keyword">b</span> = np.<span class="keyword">array</span>([<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
-
-<span class="keyword">print</span>(a + b)        <span class="comment"># [5 7 9]</span>
-<span class="keyword">print</span>(a * b)        <span class="comment"># [ 4 10 18]</span>
-<span class="keyword">print</span>(a ** <span class="number">2</span>)        <span class="comment"># [1 4 9]</span>
-<span class="keyword">print</span>(np.<span class="keyword">sqrt</span>(a))  <span class="comment"># [1.         1.41421356 1.73205081]</span>
-
-<span class="comment"># Operaciones con escalar (broadcasting)</span>
-<span class="keyword">print</span>(a * <span class="number">10</span>)       <span class="comment"># [10 20 30]</span>
-<span class="keyword">print</span>(a + <span class="number">5</span>)        <span class="comment"># [6 7 8]</span>
-                </div>
-                <div class="highlight-box" style="margin-top: 20px;">
-                    <p>NumPy aplica operaciones a todo el array en C optimizado, sin loops Python lentos.</p>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Epidemiología y salud pública</div>
+                        <h4>Decisiones de política en pandemia</h4>
+                        <p>Durante COVID-19, los modelos compartimentales (SIR, SEIR, SEICR) guiaron las decisiones de confinamiento. En Costa Rica, Tomás de-Camino-Beck (Lead University) publicó un SEICR adaptado al país en mayo de 2020.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Negocios y marketing</div>
+                        <h4>Difusión de productos y adopción</h4>
+                        <p>El modelo de Bass (1969) es la misma matemática que el logístico. Predice adopción de productos: Sinpe Móvil, Netflix, vehículos eléctricos. PyMC-Marketing trae una implementación bayesiana lista para usar.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 6: Notación científica -->
+        <!-- Slide 4: El gancho - difusión generativa -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Notación científica en Python</h2>
-                <p class="slide-subtitle">Manejo de escalas extremas</p>
+                <h2 class="slide-title">El gancho: cómo genera imágenes Stable Diffusion</h2>
+                <p class="slide-subtitle">Una EDO neural transforma ruido en una imagen coherente</p>
             </div>
             <div class="slide-content">
-                <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Notación científica en Python: usa 'e' en lugar de '×10^'</span>
-<span class="keyword">grande</span> = <span class="number">5.2e6</span>        <span class="comment"># 5.2 × 10⁶ = 5,200,000</span>
-<span class="keyword">pequeño</span> = <span class="number">4.3e-5</span>      <span class="comment"># 4.3 × 10⁻⁵ = 0.000043</span>
-<span class="keyword">avogadro</span> = <span class="number">6.022e23</span>   <span class="comment"># 6.022 × 10²³</span>
-
-<span class="comment"># Formateo de salida</span>
-<span class="keyword">valor</span> = <span class="number">123456789.123456</span>
-
-<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">e</span>}<span class="string">"</span>)      <span class="comment"># 1.234568e+08 (notación estándar)</span>
-<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">.2e</span>}<span class="string">"</span>)    <span class="comment"># 1.23e+08 (2 decimales)</span>
-<span class="keyword">print</span>(<span class="string">f"</span>{valor:<span class="string">.3E</span>}<span class="string">"</span>)    <span class="comment"># 1.235E+08 ('E' mayúscula)</span>
-
-<span class="comment"># NumPy: control de visualización global</span>
-<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">1.6e-10</span>, <span class="number">1.6</span>, <span class="number">1200</span>, <span class="number">1.23e15</span>])
-
-<span class="keyword">print</span>(<span class="string">"Default:"</span>, arr)  <span class="comment"># Mixto de notaciones</span>
-
-<span class="keyword">np</span>.<span class="keyword">set_printoptions</span>(formatter={<span class="string">'float'</span>: <span class="string">'{:.2e}'</span>.<span class="keyword">format</span>})
-<span class="keyword">print</span>(<span class="string">"Forzado científico:"</span>, arr)  <span class="comment"># Todo en notación científica</span>
+                <div class="content-box">
+                    <h3>La idea matemática</h3>
+                    <p>Imaginen una imagen como un punto en un espacio de altísima dimensión. La generación tiene dos direcciones:</p>
+                    <ul>
+                        <li><strong>Forward (entrenamiento):</strong> añadir ruido gradualmente a la imagen hasta que sea solo estática. Esto define una EDE forward.</li>
+                        <li><strong>Reverse (generación):</strong> partir de ruido puro y, paso a paso, "denoiser" hasta recuperar una imagen coherente. Esto resuelve una EDO neural cuyo campo vectorial fue aprendido.</li>
+                    </ul>
+                </div>
+                <div class="key-point">
+                    <h4>Flow Matching: el avance de 2023 que cambió el campo</h4>
+                    <p>Lipman, Chen, Ben-Hamu, Nickel y Le (Meta AI, ICLR 2023, arXiv:2210.02747) propusieron entrenar directamente una red neuronal que aprenda el campo vectorial de una EDO: dx/dt = v_θ(x, t). Stable Diffusion 3, Sora y FLUX usan variantes de esta técnica.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>El mensaje para ustedes como futuros ingenieros en ciencia de datos: las ecuaciones diferenciales no son tema antiguo. Son la maquinaria matemática detrás de la IA generativa de 2026.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 7: Aplicación - Cálculo de memoria GPU -->
+        <!-- Slide 5: scipy.integrate panorámica -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Aplicación: cálculo de memoria para modelos de IA</h2>
-                <p class="slide-subtitle">Ejemplo real con LLMs</p>
+                <h2 class="slide-title">scipy.integrate: la herramienta del curso</h2>
+                <p class="slide-subtitle">Cómo resolver una EDO sin escribir la fórmula a mano</p>
             </div>
             <div class="slide-content">
+                <div class="content-box">
+                    <h3>La función estrella: solve_ivp</h3>
+                    <p>SciPy resuelve numéricamente cualquier sistema de EDOs de la forma dy/dt = f(t, y). La documentación oficial v1.17.0 (enero 2026) dice literalmente: <em>"For new code, use scipy.integrate.solve_ivp to solve a differential equation"</em>.</p>
+                </div>
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">solve_ivp</div>
+                        <div class="stat-label">API moderna (usar)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">odeint</div>
+                        <div class="stat-label">API legada (no usar)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">v1.17</div>
+                        <div class="stat-label">SciPy actual (2026)</div>
+                    </div>
+                </div>
                 <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">from</span> <span class="keyword">scipy.integrate</span> <span class="keyword">import</span> <span class="keyword">solve_ivp</span>
 
-<span class="keyword">def</span> <span class="keyword">calcular_memoria_modelo</span>(
-    params_billones: <span class="keyword">float</span>,
-    bits_precision: <span class="keyword">int</span> = <span class="number">16</span>
-) -> <span class="keyword">float</span>:
-    <span class="string">"""Calcula memoria GPU necesaria para un LLM.
-    
-    Args:
-        params_billones: Número de parámetros en billones (1e9)
-        bits_precision: Bits por parámetro (16=FP16, 4=INT4)
-    
-    Returns:
-        Memoria necesaria en GB
-    """</span>
-    bytes_por_param = bits_precision / <span class="number">8</span>
-    total_bytes = params_billones * <span class="number">1e9</span> * bytes_por_param
-    gb_necesarios = total_bytes / (<span class="number">1024</span>**<span class="number">3</span>)
-    <span class="keyword">return</span> gb_necesarios
+<span class="comment"># Una EDO de primer orden: dy/dt = -2y, con y(0) = 1</span>
+<span class="keyword">def</span> <span class="function">campo</span>(<span class="keyword">t</span>, <span class="keyword">y</span>):
+    <span class="keyword">return</span> -<span class="number">2</span> * <span class="keyword">y</span>
 
-<span class="comment"># Ejemplos de modelos reales (2024-2026)</span>
-<span class="keyword">modelos</span> = [
-    (<span class="string">"LLaMA 3.1 7B (FP16)"</span>, <span class="number">7</span>, <span class="number">16</span>),
-    (<span class="string">"LLaMA 3.1 7B (INT4)"</span>, <span class="number">7</span>, <span class="number">4</span>),
-    (<span class="string">"LLaMA 3.1 70B (FP16)"</span>, <span class="number">70</span>, <span class="number">16</span>),
-    (<span class="string">"LLaMA 3.1 405B (FP16)"</span>, <span class="number">405</span>, <span class="number">16</span>),
-]
+<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">campo</span>, <span class="keyword">t_span</span>=(<span class="number">0</span>, <span class="number">5</span>), <span class="keyword">y0</span>=[<span class="number">1.0</span>],
+                <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">5</span>, <span class="number">100</span>))
 
-<span class="keyword">for</span> nombre, params, bits <span class="keyword">in</span> modelos:
-    mem = <span class="keyword">calcular_memoria_modelo</span>(params, bits)
-    bytes_total = params * <span class="number">1e9</span> * (bits/<span class="number">8</span>)
-    <span class="keyword">print</span>(<span class="string">f"</span>{nombre:<span class="string">}</span>: {mem:<span class="string">.1f</span>} GB ({bytes_total:<span class="string">.2e</span>} bytes)<span class="string">"</span>)
-
-<span class="comment"># Salida:
-# LLaMA 3.1 7B (FP16): 13.0 GB (1.40e+10 bytes)
-# LLaMA 3.1 7B (INT4): 3.3 GB (3.50e+09 bytes)
-# LLaMA 3.1 70B (FP16): 130.4 GB (1.40e+11 bytes)
-# LLaMA 3.1 405B (FP16): 754.2 GB (8.10e+11 bytes)</span>
+<span class="comment"># Resultado: solucion aproximada en 100 puntos entre t=0 y t=5</span>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 8: Visualización recta numérica -->
+        <!-- Slide 6: Métodos numéricos disponibles -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Visualización de la recta numérica</h2>
-                <p class="slide-subtitle">Matplotlib básico</p>
-            </div>
-            <div class="slide-content">
-                <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
-
-<span class="comment"># Crear figura</span>
-<span class="keyword">fig</span>, <span class="keyword">ax</span> = plt.<span class="keyword">subplots</span>(figsize=(<span class="number">12</span>, <span class="number">2</span>))
-
-<span class="comment"># Dibujar la recta numérica</span>
-<span class="keyword">ax</span>.<span class="keyword">axhline</span>(y=<span class="number">0</span>, color=<span class="string">'black'</span>, linewidth=<span class="number">2</span>)
-
-<span class="comment"># Marcar enteros de -5 a 5</span>
-<span class="keyword">enteros</span> = np.<span class="keyword">arange</span>(<span class="number">-5</span>, <span class="number">6</span>)
-<span class="keyword">ax</span>.<span class="keyword">scatter</span>(enteros, np.<span class="keyword">zeros_like</span>(enteros), 
-           color=<span class="string">'#2d2d2d'</span>, s=<span class="number">100</span>, zorder=<span class="number">3</span>)
-
-<span class="comment"># Etiquetas de números</span>
-<span class="keyword">for</span> i <span class="keyword">in</span> enteros:
-    <span class="keyword">ax</span>.<span class="keyword">text</span>(i, <span class="number">-0.15</span>, <span class="keyword">str</span>(i), ha=<span class="string">'center'</span>, fontsize=<span class="number">12</span>)
-
-<span class="comment"># Destacar algunos irracionales</span>
-<span class="keyword">irracionales</span> = {
-    np.<span class="keyword">sqrt</span>(<span class="number">2</span>): <span class="string">'√2'</span>,
-    np.<span class="keyword">pi</span>: <span class="string">'π'</span>,
-    np.<span class="keyword">e</span>: <span class="string">'e'</span>
-}
-
-<span class="keyword">for</span> valor, etiqueta <span class="keyword">in</span> irracionales.<span class="keyword">items</span>():
-    <span class="keyword">ax</span>.<span class="keyword">scatter</span>(valor, <span class="number">0</span>, color=<span class="string">'#FF8C00'</span>, s=<span class="number">150</span>, 
-               marker=<span class="string">'*'</span>, zorder=<span class="number">4</span>)
-    <span class="keyword">ax</span>.<span class="keyword">text</span>(valor, <span class="number">0.15</span>, etiqueta, ha=<span class="string">'center'</span>, 
-            fontsize=<span class="number">11</span>, color=<span class="string">'#FF8C00'</span>)
-
-<span class="keyword">ax</span>.<span class="keyword">set_xlim</span>(<span class="number">-5.5</span>, <span class="number">5.5</span>)
-<span class="keyword">ax</span>.<span class="keyword">set_ylim</span>(<span class="number">-0.5</span>, <span class="number">0.5</span>)
-<span class="keyword">ax</span>.<span class="keyword">set_title</span>(<span class="string">'Recta numérica: ℤ y algunos irracionales'</span>, 
-            fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
-<span class="keyword">ax</span>.<span class="keyword">axis</span>(<span class="string">'off'</span>)
-
-<span class="keyword">plt</span>.<span class="keyword">tight_layout</span>()
-<span class="keyword">plt</span>.<span class="keyword">show</span>()
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 9: Métricas de distancia -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Métricas de distancia en data science</h2>
-                <p class="slide-subtitle">Interpretación geométrica aplicada</p>
+                <h2 class="slide-title">Cuándo usar cada método numérico</h2>
+                <p class="slide-subtitle">La tabla que deben tener a mano siempre</p>
             </div>
             <div class="slide-content">
                 <div class="comparison-table">
                     <table>
                         <thead>
                             <tr>
-                                <th>Métrica</th>
-                                <th>Fórmula</th>
-                                <th>Aplicación típica</th>
+                                <th>Método</th>
+                                <th>Tipo</th>
+                                <th>Cuándo usarlo</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td><strong>Euclidiana (L2)</strong></td>
-                                <td>√Σ(xᵢ-yᵢ)²</td>
-                                <td>Datos numéricos continuos</td>
+                                <td><strong>RK45</strong></td>
+                                <td>Runge-Kutta explícito orden 5(4)</td>
+                                <td>Por defecto, problemas "típicos" no rígidos</td>
                             </tr>
                             <tr>
-                                <td><strong>Manhattan (L1)</strong></td>
-                                <td>Σ|xᵢ-yᵢ|</td>
-                                <td>Datos de alta dimensionalidad</td>
+                                <td><strong>RK23</strong></td>
+                                <td>Bogacki-Shampine orden 3(2)</td>
+                                <td>Cuando aceptan tolerancia baja</td>
                             </tr>
                             <tr>
-                                <td><strong>Coseno</strong></td>
-                                <td>1 - (a·b)/(|a||b|)</td>
-                                <td>Análisis de texto, NLP</td>
+                                <td><strong>DOP853</strong></td>
+                                <td>Dormand-Prince orden 8</td>
+                                <td>Alta precisión (rtol &lt; 1e-8)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Radau</strong></td>
+                                <td>Runge-Kutta implícito orden 5</td>
+                                <td>Problemas rígidos con precisión</td>
+                            </tr>
+                            <tr>
+                                <td><strong>BDF</strong></td>
+                                <td>Backward Differentiation Formula</td>
+                                <td>Sistemas rígidos grandes (estilo ode15s)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>LSODA</strong></td>
+                                <td>Adams/BDF con conmutación automática</td>
+                                <td>"No sé si es rígido": dejen que decida</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Dos puntos en el espacio</span>
-<span class="keyword">punto1</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
-<span class="keyword">punto2</span> = np.<span class="keyword">array</span>([<span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>])
-
-<span class="comment"># Distancia Euclidiana (la más común)</span>
-<span class="keyword">dist_euclidiana</span> = np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto1 - punto2)
-<span class="keyword">print</span>(<span class="string">f"Euclidiana: </span>{dist_euclidiana:<span class="string">.2f</span>}<span class="string">"</span>)  <span class="comment"># 5.20</span>
-
-<span class="comment"># Distancia Manhattan (camino en cuadrícula)</span>
-<span class="keyword">dist_manhattan</span> = np.<span class="keyword">sum</span>(np.<span class="keyword">abs</span>(punto1 - punto2))
-<span class="keyword">print</span>(<span class="string">f"Manhattan: </span>{dist_manhattan:<span class="string">.2f</span>}<span class="string">"</span>)    <span class="comment"># 9.00</span>
-
-<span class="comment"># Similitud coseno (útil para vectores de texto)</span>
-<span class="keyword">coseno</span> = np.<span class="keyword">dot</span>(punto1, punto2) / (np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto1) * np.<span class="keyword">linalg</span>.<span class="keyword">norm</span>(punto2))
-<span class="keyword">print</span>(<span class="string">f"Coseno similitud: </span>{coseno:<span class="string">.4f</span>}<span class="string">"</span>)  <span class="comment"># 0.9746</span>
+                <div class="highlight-box">
+                    <p>Regla práctica: empiecen siempre con RK45 (es el predeterminado). Si ven muchos pasos rechazados o advertencias sobre el tamaño del paso, prueben LSODA. Si LSODA conmuta a BDF, su problema es rígido: pasen explícitamente a Radau.</p>
                 </div>
             </div>
         </div>
 
-        <!-- Slide 10: Normalización de datos -->
+        <!-- Slide 7: Demo Lotka-Volterra -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Aplicación: normalización de datos</h2>
-                <p class="slide-subtitle">Usando supremo e ínfimo (max/min)</p>
+                <h2 class="slide-title">Demo en vivo: el modelo Lotka-Volterra</h2>
+                <p class="slide-subtitle">Depredador y presa en código limpio y moderno</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> <span class="keyword">numpy</span> <span class="keyword">as</span> <span class="keyword">np</span>
+<span class="keyword">import</span> <span class="keyword">matplotlib.pyplot</span> <span class="keyword">as</span> <span class="keyword">plt</span>
+<span class="keyword">from</span> <span class="keyword">scipy.integrate</span> <span class="keyword">import</span> <span class="keyword">solve_ivp</span>
+
+<span class="keyword">def</span> <span class="function">lotka_volterra</span>(<span class="keyword">t</span>, <span class="keyword">z</span>, <span class="keyword">alpha</span>, <span class="keyword">beta</span>, <span class="keyword">delta</span>, <span class="keyword">gamma</span>):
+    <span class="keyword">x</span>, <span class="keyword">y</span> = <span class="keyword">z</span>
+    <span class="keyword">return</span> [<span class="keyword">alpha</span>*<span class="keyword">x</span> - <span class="keyword">beta</span>*<span class="keyword">x</span>*<span class="keyword">y</span>,
+            <span class="keyword">delta</span>*<span class="keyword">x</span>*<span class="keyword">y</span> - <span class="keyword">gamma</span>*<span class="keyword">y</span>]
+
+<span class="keyword">params</span> = (<span class="number">1.1</span>, <span class="number">0.4</span>, <span class="number">0.1</span>, <span class="number">0.4</span>)
+<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">lotka_volterra</span>,
+                <span class="keyword">t_span</span>=(<span class="number">0</span>, <span class="number">50</span>), <span class="keyword">y0</span>=[<span class="number">10</span>, <span class="number">5</span>],
+                <span class="keyword">args</span>=<span class="keyword">params</span>, <span class="keyword">method</span>=<span class="string">'RK45'</span>,
+                <span class="keyword">rtol</span>=<span class="number">1e-8</span>, <span class="keyword">atol</span>=<span class="number">1e-10</span>,
+                <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">50</span>, <span class="number">1000</span>))
+
+<span class="comment"># sol.t: tiempos    |    sol.y[0]: presa    |    sol.y[1]: depredador</span>
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>t_eval</h4>
+                        <p>Define en qué puntos queremos la solución. No tiene nada que ver con la malla interna del solver, que es adaptativa.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>rtol y atol</h4>
+                        <p>Tolerancias relativa y absoluta. Valores típicos: rtol=1e-6 y atol=1e-9. Bajar estos valores cuando se necesita precisión.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Modelo logístico con datos INEC -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso real: la población de Costa Rica</h2>
+                <p class="slide-subtitle">Ajustar Verhulst a datos del INEC con curve_fit</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">5,04 M</div>
+                        <div class="stat-label">Habitantes según censo 2022</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">5,19 M</div>
+                        <div class="stat-label">Estimación 2025 (INEC)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">1 %</div>
+                        <div class="stat-label">Tasa actual de crecimiento</div>
+                    </div>
+                </div>
+                <div class="code-box">
+<span class="keyword">from</span> <span class="keyword">scipy.optimize</span> <span class="keyword">import</span> <span class="keyword">curve_fit</span>
+
+<span class="comment"># Solucion analitica del modelo logistico</span>
+<span class="keyword">def</span> <span class="function">logistico</span>(<span class="keyword">t</span>, <span class="keyword">K</span>, <span class="keyword">r</span>, <span class="keyword">N0</span>):
+    <span class="keyword">return</span> <span class="keyword">K</span> / (<span class="number">1</span> + ((<span class="keyword">K</span>-<span class="keyword">N0</span>)/<span class="keyword">N0</span>) * <span class="keyword">np</span>.<span class="function">exp</span>(-<span class="keyword">r</span>*<span class="keyword">t</span>))
+
+<span class="comment"># Datos INEC: años 1864 a 2022</span>
+<span class="keyword">anios</span> = <span class="keyword">np</span>.<span class="function">array</span>([<span class="number">1864</span>, <span class="number">1892</span>, <span class="number">1927</span>, <span class="number">1950</span>, <span class="number">1973</span>,
+                  <span class="number">1984</span>, <span class="number">2000</span>, <span class="number">2011</span>, <span class="number">2022</span>])
+<span class="keyword">poblacion</span> = <span class="keyword">np</span>.<span class="function">array</span>([<span class="number">120000</span>, <span class="number">243000</span>, <span class="number">472000</span>, <span class="number">800000</span>,
+                      <span class="number">1872000</span>, <span class="number">2417000</span>, <span class="number">3810000</span>,
+                      <span class="number">4301000</span>, <span class="number">5044197</span>])
+
+<span class="keyword">t</span> = <span class="keyword">anios</span> - <span class="keyword">anios</span>[<span class="number">0</span>]
+<span class="keyword">params</span>, _ = <span class="function">curve_fit</span>(<span class="keyword">logistico</span>, <span class="keyword">t</span>, <span class="keyword">poblacion</span>,
+                       <span class="keyword">p0</span>=[<span class="number">6e6</span>, <span class="number">0.03</span>, <span class="number">120000</span>])
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Capacidad de carga estimada: {params[0]/1e6:.2f} millones"</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: SIR -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El modelo SIR en código</h2>
+                <p class="slide-subtitle">El sistema que vimos a mano, resuelto numéricamente</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">def</span> <span class="function">sir</span>(<span class="keyword">t</span>, <span class="keyword">y</span>, <span class="keyword">beta</span>, <span class="keyword">gamma</span>):
+    <span class="keyword">S</span>, <span class="keyword">I</span>, <span class="keyword">R</span> = <span class="keyword">y</span>
+    <span class="keyword">N</span> = <span class="keyword">S</span> + <span class="keyword">I</span> + <span class="keyword">R</span>
+    <span class="keyword">dS</span> = -<span class="keyword">beta</span> * <span class="keyword">S</span> * <span class="keyword">I</span> / <span class="keyword">N</span>
+    <span class="keyword">dI</span> =  <span class="keyword">beta</span> * <span class="keyword">S</span> * <span class="keyword">I</span> / <span class="keyword">N</span> - <span class="keyword">gamma</span> * <span class="keyword">I</span>
+    <span class="keyword">dR</span> =  <span class="keyword">gamma</span> * <span class="keyword">I</span>
+    <span class="keyword">return</span> [<span class="keyword">dS</span>, <span class="keyword">dI</span>, <span class="keyword">dR</span>]
+
+<span class="comment"># Parametros tipicos para gripe estacional</span>
+<span class="keyword">beta</span>, <span class="keyword">gamma</span> = <span class="number">0.3</span>, <span class="number">0.1</span>      <span class="comment"># R0 = beta/gamma = 3</span>
+<span class="keyword">N</span> = <span class="number">1000</span>; <span class="keyword">I0</span> = <span class="number">1</span>; <span class="keyword">S0</span> = <span class="keyword">N</span> - <span class="keyword">I0</span>
+
+<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">160</span>), [<span class="keyword">S0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
+                <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>),
+                <span class="keyword">t_eval</span>=<span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">160</span>, <span class="number">500</span>),
+                <span class="keyword">rtol</span>=<span class="number">1e-8</span>)
+                </div>
+                <div class="two-columns" style="margin-top: 15px;">
+                    <div class="key-point">
+                        <h4>Estructura general</h4>
+                        <p>El campo vectorial recibe (t, y, *args) y devuelve una lista de derivadas. La función puede crecer a 10 o 20 compartimentos sin cambiar la estructura.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>R0 explícito</h4>
+                        <p>El parámetro R0 = beta/gamma define si la epidemia crece o se extingue. Para SARS-CoV-2 original era ~2.5; para sarampión es ~15.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Eventos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Detectar eventos durante la simulación</h2>
+                <p class="slide-subtitle">"Avísame cuándo pasa algo importante"</p>
+            </div>
+            <div class="slide-content">
+                <p style="font-size: 16px; color: #1d1d1f; line-height: 1.5; margin: 0;">Una funcionalidad de solve_ivp que no tiene odeint: detectar automáticamente cuándo la solución cruza un umbral (pico epidémico, extinción, primer paso por cero).</p>
+                <div class="code-box">
+<span class="comment"># Detectar el pico de infectados: cuando dI/dt = 0</span>
+<span class="keyword">def</span> <span class="function">pico_infectados</span>(<span class="keyword">t</span>, <span class="keyword">y</span>, <span class="keyword">beta</span>, <span class="keyword">gamma</span>):
+    <span class="keyword">S</span>, <span class="keyword">I</span>, <span class="keyword">R</span> = <span class="keyword">y</span>
+    <span class="keyword">N</span> = <span class="keyword">S</span> + <span class="keyword">I</span> + <span class="keyword">R</span>
+    <span class="keyword">return</span> <span class="keyword">beta</span> * <span class="keyword">S</span> * <span class="keyword">I</span> / <span class="keyword">N</span> - <span class="keyword">gamma</span> * <span class="keyword">I</span>  <span class="comment"># dI/dt</span>
+
+<span class="keyword">pico_infectados</span>.<span class="keyword">terminal</span> = <span class="keyword">False</span>    <span class="comment"># continuar despues del evento</span>
+<span class="keyword">pico_infectados</span>.<span class="keyword">direction</span> = -<span class="number">1</span>     <span class="comment"># solo de positivo a negativo</span>
+
+<span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">200</span>), [<span class="keyword">S0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
+                <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>), <span class="keyword">events</span>=<span class="keyword">pico_infectados</span>)
+
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Pico de epidemia en el dia {sol.t_events[0][0]:.1f}"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"Infectados en el pico: {sol.y_events[0][0][1]:.0f}"</span>)
+                </div>
+                <div class="highlight-box">
+                    <p>En producción real, los eventos sirven para "tomar decisión cuando algo pasa": activar una alarma cuando un tanque se vacía, parar una simulación de mercado cuando un precio cruza un umbral, identificar el día del pico para planificación hospitalaria.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: SEICR Costa Rica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso costarricense insignia: SEICR</h2>
+                <p class="slide-subtitle">Tomás de-Camino-Beck (Lead University, 2020)</p>
             </div>
             <div class="slide-content">
                 <div class="content-box">
-                    <h3>Min-Max normalization</h3>
-                    <p>Escala datos al rango [0, 1] usando: x_norm = (x - min) / (max - min)</p>
+                    <h3>El modelo SEICR aplicado a COVID-19 en Costa Rica</h3>
+                    <p>En mayo de 2020, el doctor Tomás de-Camino-Beck (Automata Innovations y Lead University) publicó en medRxiv un modelo SEIR modificado con un compartimento C de "Confinados", específicamente para Costa Rica.</p>
                 </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Dataset: salarios en Costa Rica (en colones)</span>
-<span class="keyword">salarios</span> = np.<span class="keyword">array</span>([
-    <span class="number">450_000</span>, <span class="number">650_000</span>, <span class="number">1_200_000</span>, <span class="number">850_000</span>, 
-    <span class="number">2_500_000</span>, <span class="number">700_000</span>, <span class="number">950_000</span>
-])
-
-<span class="comment"># Encontrar supremo e ínfimo (max y min)</span>
-<span class="keyword">inf_sal</span> = np.<span class="keyword">min</span>(salarios)  <span class="comment"># 450,000 (ínfimo)</span>
-<span class="keyword">sup_sal</span> = np.<span class="keyword">max</span>(salarios)  <span class="comment"># 2,500,000 (supremo)</span>
-
-<span class="keyword">print</span>(<span class="string">f"Rango salarial: ₡</span>{inf_sal:<span class="string">,.0f</span>} - ₡{sup_sal:<span class="string">,.0f</span>}<span class="string">"</span>)
-
-<span class="comment"># Normalización Min-Max al rango [0, 1]</span>
-<span class="keyword">salarios_norm</span> = (salarios - inf_sal) / (sup_sal - inf_sal)
-
-<span class="keyword">print</span>(<span class="string">"
-Salarios normalizados:"</span>)
-<span class="keyword">for</span> original, normalizado <span class="keyword">in</span> <span class="keyword">zip</span>(salarios, salarios_norm):
-    <span class="keyword">print</span>(<span class="string">f"  ₡</span>{original:<span class="string">9,.0f</span>} → {normalizado:<span class="string">.4f</span>}<span class="string">"</span>)
-
-<span class="comment"># Salida:
-# Rango salarial: ₡450,000 - ₡2,500,000
-# 
-# Salarios normalizados:
-#   ₡  450,000 → 0.0000
-#   ₡  650,000 → 0.0976
-#   ₡1,200,000 → 0.3659
-#   ₡  850,000 → 0.1951
-#   ₡2,500,000 → 1.0000
-#   ₡  700,000 → 0.1220
-#   ₡  950,000 → 0.2439</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 11: Detección de outliers -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Aplicación: detección de outliers</h2>
-                <p class="slide-subtitle">Usando propiedades de orden</p>
-            </div>
-            <div class="slide-content">
-                <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="keyword">def</span> <span class="keyword">detectar_outliers_iqr</span>(datos: np.ndarray) -> <span class="keyword">tuple</span>:
-    <span class="string">"""Detecta outliers usando el método IQR (Interquartile Range).
-    
-    Outliers son valores fuera del rango [Q1 - 1.5×IQR, Q3 + 1.5×IQR]
-    
-    Returns:
-        (outliers_inferiores, outliers_superiores, limites)
-    """</span>
-    <span class="keyword">Q1</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">25</span>)
-    <span class="keyword">Q3</span> = np.<span class="keyword">percentile</span>(datos, <span class="number">75</span>)
-    <span class="keyword">IQR</span> = Q3 - Q1
-    
-    <span class="keyword">limite_inf</span> = Q1 - <span class="number">1.5</span> * IQR
-    <span class="keyword">limite_sup</span> = Q3 + <span class="number">1.5</span> * IQR
-    
-    <span class="keyword">outliers_inf</span> = datos[datos < limite_inf]
-    <span class="keyword">outliers_sup</span> = datos[datos > limite_sup]
-    
-    <span class="keyword">return</span> outliers_inf, outliers_sup, (limite_inf, limite_sup)
-
-<span class="comment"># Precios de casas en San José (millones de colones)</span>
-<span class="keyword">precios</span> = np.<span class="keyword">array</span>([
-    <span class="number">45</span>, <span class="number">52</span>, <span class="number">48</span>, <span class="number">60</span>, <span class="number">55</span>, <span class="number">58</span>, <span class="number">51</span>, 
-    <span class="number">150</span>,  <span class="comment"># ← Outlier superior</span>
-    <span class="number">53</span>, <span class="number">49</span>, <span class="number">15</span>,  <span class="comment"># ← Outlier inferior</span>
-    <span class="number">57</span>, <span class="number">54</span>, <span class="number">61</span>
-])
-
-<span class="keyword">out_inf</span>, <span class="keyword">out_sup</span>, (lim_inf, lim_sup) = <span class="keyword">detectar_outliers_iqr</span>(precios)
-
-<span class="keyword">print</span>(<span class="string">f"Límites normales: [₡</span>{lim_inf:<span class="string">.1f</span>}M, ₡{lim_sup:<span class="string">.1f</span>}M]<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">f"Outliers inferiores: </span>{out_inf}<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">f"Outliers superiores: </span>{out_sup}<span class="string">"</span>)
-
-<span class="comment"># Salida:
-# Límites normales: [₡37.5M, ₡73.5M]
-# Outliers inferiores: [15]
-# Outliers superiores: [150]</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 12: Dataset real Costa Rica -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Aplicación: dataset real de Costa Rica</h2>
-                <p class="slide-subtitle">Tipo de cambio BCCR</p>
-            </div>
-            <div class="slide-content">
-                <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
-
-<span class="comment"># Tipo de cambio colón-dólar (simulado, valores típicos 2024-2025)</span>
-<span class="comment"># En proyecto real: obtener de API del BCCR</span>
-<span class="keyword">dias</span> = np.<span class="keyword">arange</span>(<span class="number">0</span>, <span class="number">365</span>)
-<span class="keyword">tc_base</span> = <span class="number">530</span>  <span class="comment"># Tipo de cambio promedio</span>
-<span class="keyword">tc</span> = tc_base + <span class="number">15</span> * np.<span class="keyword">sin</span>(dias / <span class="number">60</span>) + np.<span class="keyword">random</span>.<span class="keyword">normal</span>(<span class="number">0</span>, <span class="number">2</span>, <span class="number">365</span>)
-
-<span class="comment"># Estadísticas descriptivas usando propiedades de orden</span>
-<span class="keyword">tc_min</span> = np.<span class="keyword">min</span>(tc)      <span class="comment"># Ínfimo (mínimo)</span>
-<span class="keyword">tc_max</span> = np.<span class="keyword">max</span>(tc)      <span class="comment"># Supremo (máximo)</span>
-<span class="keyword">tc_promedio</span> = np.<span class="keyword">mean</span>(tc)
-<span class="keyword">tc_mediana</span> = np.<span class="keyword">median</span>(tc)
-
-<span class="keyword">print</span>(<span class="string">f"Tipo de cambio anual (colones por dólar):"</span>)
-<span class="keyword">print</span>(<span class="string">f"  Mínimo:   ₡</span>{tc_min:<span class="string">.2f</span>}<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">f"  Máximo:   ₡</span>{tc_max:<span class="string">.2f</span>}<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">f"  Promedio: ₡</span>{tc_promedio:<span class="string">.2f</span>}<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">f"  Mediana:  ₡</span>{tc_mediana:<span class="string">.2f</span>}<span class="string">"</span>)
-
-<span class="comment"># Visualización</span>
-<span class="keyword">plt</span>.<span class="keyword">figure</span>(figsize=(<span class="number">12</span>, <span class="number">5</span>))
-<span class="keyword">plt</span>.<span class="keyword">plot</span>(dias, tc, color=<span class="string">'#2d2d2d'</span>, linewidth=<span class="number">1.5</span>, label=<span class="string">'Tipo de cambio'</span>)
-<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_promedio, color=<span class="string">'#FF8C00'</span>, linestyle=<span class="string">'--'</span>, 
-            linewidth=<span class="number">2</span>, label=<span class="string">f'Promedio: ₡</span>{tc_promedio:<span class="string">.2f</span>}<span class="string">'</span>)
-<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_min, color=<span class="string">'green'</span>, linestyle=<span class="string">':'</span>, alpha=<span class="number">0.7</span>, label=<span class="string">f'Mín: ₡</span>{tc_min:<span class="string">.2f</span>}<span class="string">'</span>)
-<span class="keyword">plt</span>.<span class="keyword">axhline</span>(tc_max, color=<span class="string">'red'</span>, linestyle=<span class="string">':'</span>, alpha=<span class="number">0.7</span>, label=<span class="string">f'Máx: ₡</span>{tc_max:<span class="string">.2f</span>}<span class="string">'</span>)
-
-<span class="keyword">plt</span>.<span class="keyword">xlabel</span>(<span class="string">'Día del año'</span>, fontsize=<span class="number">12</span>)
-<span class="keyword">plt</span>.<span class="keyword">ylabel</span>(<span class="string">'Colones por dólar'</span>, fontsize=<span class="number">12</span>)
-<span class="keyword">plt</span>.<span class="keyword">title</span>(<span class="string">'Tipo de cambio colón-dólar (2025)'</span>, fontsize=<span class="number">14</span>, fontweight=<span class="string">'bold'</span>)
-<span class="keyword">plt</span>.<span class="keyword">legend</span>()
-<span class="keyword">plt</span>.<span class="keyword">grid</span>(True, alpha=<span class="number">0.3</span>)
-<span class="keyword">plt</span>.<span class="keyword">tight_layout</span>()
-<span class="keyword">plt</span>.<span class="keyword">show</span>()
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 13: Cambios NumPy 2.0+ -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Novedades NumPy 2.4.1</h2>
-                <p class="slide-subtitle">Cambios importantes desde 2.0</p>
-            </div>
-            <div class="slide-content">
                 <div class="two-columns">
-                    <div class="content-box">
-                        <h3>StringDType (nuevo en 2.0)</h3>
-                        <ul>
-                            <li>Strings de longitud variable nativos</li>
-                            <li>Soporte para valores nulos</li>
-                            <li>Más eficiente que object arrays</li>
-                        </ul>
+                    <div class="key-point">
+                        <h4>La innovación clave</h4>
+                        <p>Las intervenciones no farmacéuticas (confinamiento, distanciamiento) se modelan como un flujo dinámico entre S y C. Al confinar gente, se reduce efectivamente la población susceptible disponible para contagio.</p>
                     </div>
-                    <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-
-<span class="comment"># Nuevo StringDType</span>
-<span class="keyword">arr</span> = np.<span class="keyword">array</span>(
-    [<span class="string">"Costa Rica"</span>, <span class="string">"Nicaragua"</span>], 
-    dtype=np.dtypes.<span class="keyword">StringDType</span>()
-)
-<span class="keyword">print</span>(arr.dtype)  
-<span class="comment"># StringDType()</span>
+                    <div class="key-point">
+                        <h4>El sistema</h4>
+                        <p>S → E → I → R con un flujo paralelo S ↔ C. Los parámetros se calibran a la curva real de casos publicada por el Ministerio de Salud durante marzo y abril de 2020.</p>
                     </div>
                 </div>
-                <div class="two-columns" style="margin-top: 20px;">
-                    <div class="content-box">
-                        <h3>NEP 50 - Promoción de tipos</h3>
-                        <p>Comportamiento cambiado para preservar precisión del escalar</p>
-                    </div>
-                    <div class="code-box">
-<span class="comment"># NumPy 1.x: retornaba float64</span>
-<span class="comment"># NumPy 2.x: preserva float32</span>
-<span class="keyword">result</span> = np.<span class="keyword">float32</span>(<span class="number">3</span>) + <span class="number">3.0</span>
-<span class="keyword">print</span>(result.dtype)  
-<span class="comment"># float32 (nuevo)</span>
-                    </div>
+                <div class="highlight-box">
+                    <p>Es importante para ustedes ver este paper: el autor es profesor de su propia universidad. La modelización matemática que están aprendiendo no es un ejercicio académico abstracto, se aplica activamente para guiar decisiones de salud pública en Costa Rica.</p>
                 </div>
-                <div class="highlight-box" style="margin-top: 20px;">
-                    <p>Cambios de API desde NumPy 2.0: np.float_ → np.float64, np.trapz → np.trapezoid, np.in1d → np.isin</p>
-                </div>
+                <p style="font-size: 14px; color: #6e6e73; text-align: center; margin-top: 10px;">Referencia: de-Camino-Beck, T. (2020). doi:10.1101/2020.05.19.20106492</p>
             </div>
         </div>
 
-        <!-- Slide 14: Mejores prácticas -->
+        <!-- Slide 12: Dengue Costa Rica -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Mejores prácticas NumPy 2.4.1</h2>
-                <p class="slide-subtitle">Código profesional</p>
+                <h2 class="slide-title">Dengue en Costa Rica: el caso del proyecto</h2>
+                <p class="slide-subtitle">Datos reales del Ministerio de Salud 2023-2025</p>
             </div>
             <div class="slide-content">
-                <div class="code-box">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-<span class="keyword">from</span> numpy.typing <span class="keyword">import</span> NDArray
-
-<span class="comment"># 1. Operaciones vectorizadas (no loops)</span>
-<span class="keyword">arr</span> = np.<span class="keyword">arange</span>(<span class="number">1_000_000</span>)
-<span class="keyword">result</span> = np.<span class="keyword">square</span>(arr)  <span class="comment"># NO: [x**2 for x in arr]</span>
-
-<span class="comment"># 2. Especificar dtypes explícitamente</span>
-<span class="keyword">datos</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], dtype=np.float32)  <span class="comment"># Eficiente en memoria</span>
-
-<span class="comment"># 3. Operaciones in-place cuando sea posible</span>
-<span class="keyword">arr</span> += <span class="number">5</span>  <span class="comment"># NO: arr = arr + 5 (crea copia)</span>
-
-<span class="comment"># 4. Broadcasting en lugar de tile/repeat</span>
-<span class="keyword">a</span> = np.<span class="keyword">array</span>([<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>])
-<span class="keyword">b</span> = np.<span class="keyword">array</span>([[<span class="number">1</span>], [<span class="number">2</span>], [<span class="number">3</span>]])
-<span class="keyword">result</span> = a + b  <span class="comment"># Broadcasting automático</span>
-
-<span class="comment"># 5. Comparación de punto flotante con tolerancia</span>
-<span class="keyword">print</span>(np.<span class="keyword">isclose</span>(<span class="number">0.1</span> + <span class="number">0.2</span>, <span class="number">0.3</span>))  <span class="comment"># True</span>
-<span class="comment"># NO usar: 0.1 + 0.2 == 0.3  # False por error de redondeo</span>
-
-<span class="comment"># 6. Type hints modernos</span>
-<span class="keyword">def</span> <span class="keyword">procesar</span>(data: NDArray[np.float64]) -> NDArray[np.float64]:
-    <span class="keyword">return</span> np.<span class="keyword">sqrt</span>(data)
-
-<span class="comment"># 7. Casting seguro (NumPy 2.4+)</span>
-<span class="keyword">arr</span> = np.<span class="keyword">array</span>([<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>], dtype=np.int64)
-<span class="keyword">arr_float</span> = arr.<span class="keyword">astype</span>(np.float64, casting=<span class="string">"same_value"</span>)  <span class="comment"># Previene pérdida de datos</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 15: Comparación Listas vs NumPy -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Listas vs NumPy: cuándo usar cada uno</h2>
-                <p class="slide-subtitle">Guía práctica</p>
-            </div>
-            <div class="slide-content">
-                <div class="two-columns">
-                    <div class="comparison-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Característica</th>
-                                    <th>Listas Python</th>
-                                    <th>NumPy Arrays</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Tipos</strong></td>
-                                    <td>Mixtos</td>
-                                    <td>Un solo tipo</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Memoria</strong></td>
-                                    <td>Dispersa</td>
-                                    <td>Contigua</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Velocidad</strong></td>
-                                    <td>Lenta</td>
-                                    <td>20-50x más rápida</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">30 649</div>
+                        <div class="stat-label">Casos en 2023</div>
                     </div>
-                    <div class="comparison-table">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Característica</th>
-                                    <th>Listas Python</th>
-                                    <th>NumPy Arrays</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><strong>Operaciones</strong></td>
-                                    <td>Requiere loops</td>
-                                    <td>Vectorizadas</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Dimensiones</strong></td>
-                                    <td>Solo 1D</td>
-                                    <td>Multidimensional</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Uso ideal</strong></td>
-                                    <td>Datos mixtos</td>
-                                    <td>Cálculos grandes</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="stat-box">
+                        <div class="stat-number">31 259</div>
+                        <div class="stat-label">Casos en 2024</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">Fallecidos en 2024</div>
                     </div>
                 </div>
-                <div class="highlight-box" style="margin-top: 20px;">
-                    <p>Regla general: usa listas para colecciones pequeñas de datos mixtos, NumPy para operaciones matemáticas intensivas o datasets grandes.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 16: Ejercicio práctico -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Ejercicio práctico</h2>
-                <p class="slide-subtitle">Sistema de ranking con propiedades de orden</p>
-            </div>
-            <div class="slide-content">
                 <div class="content-box">
-                    <h3>Desafío: ranking de estudiantes</h3>
-                    <p>Implementa un sistema de ranking que utiliza propiedades de orden para clasificar estudiantes según sus calificaciones.</p>
-                </div>
-                <div class="code-box" style="margin-top: 20px;">
-<span class="keyword">import</span> numpy <span class="keyword">as</span> np
-<span class="keyword">from</span> scipy.stats <span class="keyword">import</span> rankdata
-
-<span class="comment"># Calificaciones de 10 estudiantes (escala 0-100)</span>
-<span class="keyword">calificaciones</span> = np.<span class="keyword">array</span>([<span class="number">85</span>, <span class="number">92</span>, <span class="number">78</span>, <span class="number">92</span>, <span class="number">88</span>, <span class="number">95</span>, <span class="number">82</span>, <span class="number">90</span>, <span class="number">78</span>, <span class="number">87</span>])
-<span class="keyword">nombres</span> = np.<span class="keyword">array</span>([
-    <span class="string">"Ana"</span>, <span class="string">"Carlos"</span>, <span class="string">"María"</span>, <span class="string">"José"</span>, <span class="string">"Laura"</span>, 
-    <span class="string">"Diego"</span>, <span class="string">"Sofía"</span>, <span class="string">"Pedro"</span>, <span class="string">"Elena"</span>, <span class="string">"Luis"</span>
-], dtype=np.dtypes.<span class="keyword">StringDType</span>())
-
-<span class="comment"># Ranking descendente (mejor = 1)</span>
-<span class="comment"># method='average' maneja empates con promedio de posiciones</span>
-<span class="keyword">ranking</span> = rankdata(<span class="number">-</span>calificaciones, method=<span class="string">'average'</span>)
-
-<span class="comment"># Ordenar por ranking</span>
-<span class="keyword">orden</span> = np.<span class="keyword">argsort</span>(ranking)
-
-<span class="keyword">print</span>(<span class="string">"Ranking final:
-"</span>)
-<span class="keyword">print</span>(<span class="string">f"</span>{<span class="string">'Rank'</span>:<span class="number">4</span>} {<span class="string">'Nombre'</span>:<span class="number">10</span>} {<span class="string">'Calificación'</span>:<span class="number">15</span>}<span class="string">"</span>)
-<span class="keyword">print</span>(<span class="string">"-"</span> * <span class="number">30</span>)
-
-<span class="keyword">for</span> i <span class="keyword">in</span> orden:
-    <span class="keyword">print</span>(<span class="string">f"</span>{ranking[i]:<span class="string">4.1f</span>} {<span class="keyword">str</span>(nombres[i]):<span class="number">10</span>} {calificaciones[i]:<span class="number">15</span>}<span class="string">"</span>)
-
-<span class="comment"># Salida esperada:
-# Rank Nombre     Calificación   
-# ------------------------------
-# 1.0  Diego                   95
-# 2.5  Carlos                  92
-# 2.5  José                    92
-# 4.0  Pedro                   90
-# 5.0  Laura                   88
-# 6.0  Luis                    87
-# 7.0  Ana                     85
-# 8.0  Sofía                   82
-# 9.5  María                   78
-# 9.5  Elena                   78</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Slide 17: Recursos -->
-        <div class="slide">
-            <div class="slide-header">
-                <h2 class="slide-title">Recursos adicionales</h2>
-                <p class="slide-subtitle">Para profundizar</p>
-            </div>
-            <div class="slide-content">
-                <div class="two-columns">
-                    <div class="content-box">
-                        <h3>Documentación oficial</h3>
-                        <ul>
-                            <li><strong>NumPy 2.4.1:</strong> numpy.org/doc/stable/</li>
-                            <li><strong>Guía de migración NumPy 2.0:</strong> numpy.org/devdocs/numpy_2_0_migration_guide.html</li>
-                            <li><strong>Matplotlib:</strong> matplotlib.org/stable/gallery/</li>
-                        </ul>
-                    </div>
-                    <div class="content-box">
-                        <h3>Herramientas visuales</h3>
-                        <ul>
-                            <li><strong>GeoGebra:</strong> geogebra.org (recta numérica interactiva)</li>
-                            <li><strong>Desmos:</strong> desmos.com (graficación)</li>
-                            <li><strong>3Blue1Brown:</strong> Essence of Linear Algebra (YouTube)</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="content-box" style="margin-top: 20px;">
-                    <h3>Libros de referencia</h3>
+                    <h3>Por qué dengue es ideal para modelado</h3>
                     <ul>
-                        <li><strong>STEWART, James.</strong> Pre-cálculo. Matemática para cálculo (6ª ed.). Cengage Learning, 2012</li>
-                        <li><strong>JOHANSSON, Robert.</strong> Numerical Python: Scientific Computing and Data Science Applications (2ª ed.). Apress, 2019</li>
-                        <li><strong>VANDERPLAS, Jake.</strong> Python Data Science Handbook. O'Reilly Media, 2016. Disponible en: jakevdp.github.io/PythonDataScienceHandbook/</li>
+                        <li>Patrón estacional fuerte (asociado al ciclo del vector Aedes aegypti)</li>
+                        <li>Cuatro serotipos circulando, con DENV-3 dominante en el 56 % de las muestras serotipificadas de 2024</li>
+                        <li>Datos semanales públicos del Ministerio de Salud (Boletín Epidemiológico)</li>
+                        <li>Modelos SEIR vectoriales bien establecidos en literatura</li>
+                        <li>2024 fue el segundo año con más muertes por dengue en 31 años en CR</li>
                     </ul>
                 </div>
+                <div class="highlight-box">
+                    <p>Alternativa práctica para no batallar con scraping de PDFs del Ministerio: usar OpenDengue (opendengue.org), un dataset global publicado en Nature Scientific Data 2024 que incluye 56 millones de casos en 102 países, con Costa Rica desde 1924.</p>
+                </div>
             </div>
         </div>
 
-        <!-- Slide 18: Resumen y próxima semana -->
+        <!-- Slide 13: Calibración con least_squares -->
         <div class="slide">
             <div class="slide-header">
-                <h2 class="slide-title">Resumen y próximos pasos</h2>
-                <p class="slide-subtitle">De la teoría a la práctica</p>
+                <h2 class="slide-title">Calibración a datos reales</h2>
+                <p class="slide-subtitle">Ajustar parámetros con mínimos cuadrados robustos</p>
             </div>
             <div class="slide-content">
-                <div class="key-point">
-                    <h4>Jerarquía numérica en código</h4>
-                    <p>ℕ ⊂ ℤ ⊂ ℚ ⊂ ℝ se implementa con tipos de datos NumPy: int8/int64, float32/float64. Elegir el tipo correcto optimiza memoria y precisión.</p>
+                <div class="code-box">
+<span class="keyword">from</span> <span class="keyword">scipy.optimize</span> <span class="keyword">import</span> <span class="keyword">least_squares</span>
+
+<span class="comment"># 1. Generar datos sinteticos con parametros reales conocidos</span>
+<span class="keyword">N</span>, <span class="keyword">I0</span> = <span class="number">1000</span>, <span class="number">1</span>
+<span class="keyword">beta_real</span>, <span class="keyword">gamma_real</span> = <span class="number">0.30</span>, <span class="number">0.10</span>     <span class="comment"># R0 real = 3.0</span>
+<span class="keyword">t_data</span> = <span class="keyword">np</span>.<span class="function">linspace</span>(<span class="number">0</span>, <span class="number">100</span>, <span class="number">50</span>)
+<span class="keyword">sol_real</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">100</span>), [<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
+                     <span class="keyword">args</span>=(<span class="keyword">beta_real</span>, <span class="keyword">gamma_real</span>),
+                     <span class="keyword">t_eval</span>=<span class="keyword">t_data</span>, <span class="keyword">rtol</span>=<span class="number">1e-8</span>)
+<span class="keyword">rng</span> = <span class="keyword">np</span>.<span class="keyword">random</span>.<span class="function">default_rng</span>(<span class="number">42</span>)
+<span class="keyword">I_data</span> = <span class="keyword">sol_real</span>.<span class="keyword">y</span>[<span class="number">1</span>] + <span class="keyword">rng</span>.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">8</span>, <span class="function">len</span>(<span class="keyword">t_data</span>))
+
+<span class="comment"># 2. Definir los residuos y ajustar</span>
+<span class="keyword">def</span> <span class="function">residuos</span>(<span class="keyword">theta</span>):
+    <span class="keyword">beta</span>, <span class="keyword">gamma</span> = <span class="keyword">theta</span>
+    <span class="keyword">sol</span> = <span class="function">solve_ivp</span>(<span class="keyword">sir</span>, (<span class="number">0</span>, <span class="number">100</span>), [<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>],
+                    <span class="keyword">args</span>=(<span class="keyword">beta</span>, <span class="keyword">gamma</span>),
+                    <span class="keyword">t_eval</span>=<span class="keyword">t_data</span>, <span class="keyword">rtol</span>=<span class="number">1e-8</span>)
+    <span class="keyword">return</span> <span class="keyword">sol</span>.<span class="keyword">y</span>[<span class="number">1</span>] - <span class="keyword">I_data</span>
+
+<span class="keyword">res</span> = <span class="function">least_squares</span>(<span class="keyword">residuos</span>, [<span class="number">0.5</span>, <span class="number">0.05</span>],
+                    <span class="keyword">bounds</span>=([<span class="number">0</span>, <span class="number">0</span>], [<span class="number">5</span>, <span class="number">5</span>]),
+                    <span class="keyword">loss</span>=<span class="string">'soft_l1'</span>)           <span class="comment"># robustez ante outliers</span>
+
+<span class="keyword">beta_hat</span>, <span class="keyword">gamma_hat</span> = <span class="keyword">res</span>.<span class="keyword">x</span>
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 real:      {beta_real/gamma_real:.2f}"</span>)
+<span class="function">print</span>(<span class="keyword">f</span><span class="string">"R0 estimado:  {beta_hat/gamma_hat:.2f}"</span>)
                 </div>
-                <div class="key-point">
-                    <h4>Propiedades de orden en algoritmos</h4>
-                    <p>Ranking, normalización, detección de outliers: todas usan supremo/ínfimo, propiedades de transitividad y orden.</p>
-                </div>
-                <div class="key-point">
-                    <h4>Notación científica es indispensable</h4>
-                    <p>Big data (120 ZB = 1.2 × 10²³ bytes), modelos de IA (GPT-4 = 1.8 × 10¹² parámetros), memoria GPU. Sin notación científica, estos números son inmanejables.</p>
-                </div>
-                <div class="content-box" style="margin-top: 20px;">
-                    <h3>Próxima semana: álgebra y SymPy</h3>
-                    <p>Exponentes, radicales, expresiones algebraicas, productos notables, factorización. Manipulación simbólica con SymPy para resolver ecuaciones algebraicas.</p>
+                <div class="key-point" style="margin-top: 15px;">
+                    <h4>loss='soft_l1' o 'huber'</h4>
+                    <p>Usar pérdidas robustas (no cuadráticas) cuando los datos epidemiológicos tienen semanas de sub-reporte u outliers. Es una de las "buenas prácticas modernas" que diferencia un modelo de juguete de uno utilizable en producción.</p>
                 </div>
             </div>
         </div>
+
+        <!-- Slide 14: Calibración bayesiana con PyMC -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Calibración bayesiana: el estándar de 2026</h2>
+                <p class="slide-subtitle">No un valor estimado, una distribución completa</p>
+            </div>
+            <div class="slide-content">
+                <p style="font-size: 16px; color: #1d1d1f; line-height: 1.5; margin: 0;">Mínimos cuadrados da un valor puntual. La inferencia bayesiana da una distribución completa: "no sé exactamente cuánto es R0, pero con 95 % de probabilidad está entre 2,1 y 2,8". Esto es lo que se usa hoy en epidemiología profesional, finanzas cuantitativas y ML aplicado.</p>
+                <div class="code-box">
+<span class="keyword">import</span> <span class="keyword">pymc</span> <span class="keyword">as</span> <span class="keyword">pm</span>
+<span class="keyword">from</span> <span class="keyword">pymc.ode</span> <span class="keyword">import</span> <span class="keyword">DifferentialEquation</span>
+
+<span class="comment"># Reutilizamos los datos sinteticos (t_data, I_data, N, I0) del slide anterior</span>
+
+<span class="comment"># El SIR como funcion compatible con pymc.ode</span>
+<span class="keyword">def</span> <span class="function">sir_ode</span>(<span class="keyword">y</span>, <span class="keyword">t</span>, <span class="keyword">p</span>):
+    <span class="keyword">S</span>, <span class="keyword">I</span>, <span class="keyword">R</span> = <span class="keyword">y</span>[<span class="number">0</span>], <span class="keyword">y</span>[<span class="number">1</span>], <span class="keyword">y</span>[<span class="number">2</span>]
+    <span class="keyword">beta</span>, <span class="keyword">gamma</span> = <span class="keyword">p</span>[<span class="number">0</span>], <span class="keyword">p</span>[<span class="number">1</span>]
+    <span class="keyword">return</span> [-<span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span>,
+            <span class="keyword">beta</span>*<span class="keyword">S</span>*<span class="keyword">I</span>/<span class="keyword">N</span> - <span class="keyword">gamma</span>*<span class="keyword">I</span>,
+            <span class="keyword">gamma</span>*<span class="keyword">I</span>]
+
+<span class="keyword">sir_model</span> = <span class="function">DifferentialEquation</span>(<span class="keyword">func</span>=<span class="keyword">sir_ode</span>, <span class="keyword">times</span>=<span class="keyword">t_data</span>,
+                                  <span class="keyword">n_states</span>=<span class="number">3</span>, <span class="keyword">n_theta</span>=<span class="number">2</span>)
+
+<span class="keyword">with</span> <span class="keyword">pm</span>.<span class="function">Model</span>() <span class="keyword">as</span> <span class="keyword">modelo_sir</span>:
+    <span class="comment"># Priors: lo que sabemos antes de ver los datos</span>
+    <span class="keyword">beta</span>  = <span class="keyword">pm</span>.<span class="function">LogNormal</span>(<span class="string">"beta"</span>,  <span class="keyword">mu</span>=<span class="keyword">np</span>.<span class="function">log</span>(<span class="number">0.3</span>), <span class="keyword">sigma</span>=<span class="number">0.5</span>)
+    <span class="keyword">gamma</span> = <span class="keyword">pm</span>.<span class="function">LogNormal</span>(<span class="string">"gamma"</span>, <span class="keyword">mu</span>=<span class="keyword">np</span>.<span class="function">log</span>(<span class="number">0.1</span>), <span class="keyword">sigma</span>=<span class="number">0.5</span>)
+
+    <span class="comment"># Integrar la EDO dentro del modelo bayesiano</span>
+    <span class="keyword">sol</span> = <span class="keyword">sir_model</span>(<span class="keyword">y0</span>=[<span class="keyword">N</span>-<span class="keyword">I0</span>, <span class="keyword">I0</span>, <span class="number">0</span>], <span class="keyword">theta</span>=[<span class="keyword">beta</span>, <span class="keyword">gamma</span>])
+
+    <span class="comment"># Verosimilitud sobre los infectados observados</span>
+    <span class="keyword">pm</span>.<span class="function">NegativeBinomial</span>(<span class="string">"obs"</span>, <span class="keyword">mu</span>=<span class="keyword">sol</span>[:, <span class="number">1</span>], <span class="keyword">alpha</span>=<span class="number">10</span>,
+                       <span class="keyword">observed</span>=<span class="keyword">I_data</span>)
+
+    <span class="keyword">idata</span> = <span class="keyword">pm</span>.<span class="function">sample</span>(<span class="number">2000</span>, <span class="keyword">tune</span>=<span class="number">2000</span>, <span class="keyword">target_accept</span>=<span class="number">0.95</span>)
+
+<span class="comment"># Distribucion posterior completa de R0 = beta/gamma</span>
+<span class="keyword">R0_post</span> = <span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"beta"</span>] / <span class="keyword">idata</span>.<span class="keyword">posterior</span>[<span class="string">"gamma"</span>]
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: El ecosistema diferenciable moderno -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Más allá de SciPy: el ecosistema diferenciable</h2>
+                <p class="slide-subtitle">Cuando el solver es una capa de una red neuronal</p>
+            </div>
+            <div class="slide-content">
+                <p style="font-size: 16px; color: #1d1d1f; line-height: 1.5; margin: 0;">SciPy resuelve EDOs. Lo que cambió la industria fue poder propagar gradientes a través del solver. Eso significa que los parámetros de un modelo de EDOs se aprenden por descenso de gradiente, igual que los pesos de una red neuronal.</p>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Diffrax (JAX)</h4>
+                        <p>Patrick Kidger, versión 0.7.2 (febrero 2026). Solver unificado para EDOs/EDEs/CDEs en JAX, nativo en GPU, diferenciable. Es el solver de referencia cuando se necesita JIT más GPU más diferenciabilidad. Usado en biología de sistemas, control óptimo, modelado farmacocinético.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>torchdiffeq (PyTorch)</h4>
+                        <p>Ricky Chen, implementación de referencia de los Neural ODEs (NeurIPS 2018, Best Paper). Provee odeint y odeint_adjoint con gradientes O(1) en memoria. Caballo de batalla en PyTorch para EDOs neuronales.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>DifferentialEquations.jl (Julia)</h4>
+                        <p>Chris Rackauckas. El ecosistema técnicamente más maduro y rápido del mundo para EDOs. Mencionado para que sepan que existe, no es nuestro stack del curso.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>NumPyro + Diffrax</h4>
+                        <p>Para Bayesian SIR/SEIR en GPU, la combinación más performante de 2026. Alternativa moderna a PyMC para casos donde el modelo es muy grande o se necesita aceleración.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Neural ODEs en producción -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Neural ODEs en producción real</h2>
+                <p class="slide-subtitle">Dónde se usan hoy las EDOs neuronales</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Healthcare</div>
+                        <h4>Series clínicas irregulares</h4>
+                        <p>Latent ODEs (Rubanova et al., NeurIPS 2019) son el approach estándar académico para signos vitales en UCI, curvas farmacocinéticas y datos de PhysioNet. Cuando las mediciones no son uniformes en el tiempo, las EDOs son la estructura inductiva correcta.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Biología de sistemas</div>
+                        <h4>Modelos cinéticos a gran escala</h4>
+                        <p>Jaxkineticmodel (2025) entrena modelos SBML con miles de parámetros usando Diffrax. Sustituye horas de Matlab/Fortran por minutos en GPU.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas cuantitativas</div>
+                        <h4>Modelado de tick data</h4>
+                        <p>Neural CDEs (Controlled Differential Equations) para datos de mercado financiero con frecuencia irregular. Hedge funds y trading desks empezaron a adoptarlos en 2024.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Forecasting</div>
+                        <h4>Ekimetrics y consultoras</h4>
+                        <p>Casos documentados de Neural ODEs para predicción de demanda en retail con datos faltantes. No reemplaza a Transformers, pero gana cuando la dinámica continua es la estructura correcta.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Mensaje honesto: en producción a gran escala, los Transformers/RNNs siguen ganando en muchos benchmarks. Los Neural ODEs ganan cuando la física o biología subyacente es continua. Saberlos los pone en un grupo pequeño de profesionales con esta habilidad.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: PINNs - realidad vs hype -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">PINNs: redes neuronales informadas por física</h2>
+                <p class="slide-subtitle">Una nota honesta sobre dónde están en 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>La promesa de los PINNs</h3>
+                    <p>Una red neuronal que aprende la solución de una ecuación diferencial parcial directamente, sin necesidad de mallas tradicionales. NVIDIA mantiene PhysicsNeMo como framework comercial; SAP los listó como tema de IA estratégica para 2025.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Dónde sí funcionan</h4>
+                        <p>Problemas inversos (estimar coeficientes desde datos), geometrías complejas sin malla, escasez extrema de datos donde la física es conocida parcialmente.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Donde no funcionan (todavía)</h4>
+                        <p>Problemas multi-escala, dinámicas de alta frecuencia, problemas directos estándar donde CFD o FEM siguen ganando por precisión y velocidad.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Conclusión equilibrada: PINNs son área activa de investigación con resultados mixtos. Reviews recientes (arXiv:2411.18240, ScienceDirect 2025) documentan limitaciones serias. No las descartemos, pero tampoco las traten como solución mágica. En este curso solo las mencionamos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Datasets para el proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Datasets para usar en el proyecto integrador</h2>
+                <p class="slide-subtitle">Fuentes reales costarricenses y regionales</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Dataset</th>
+                                <th>Fuente</th>
+                                <th>Ideal para</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Población CR 1864-2025</td>
+                                <td>INEC, estimaciones CCP-INEC</td>
+                                <td>Malthus, Verhulst, ajuste curve_fit</td>
+                            </tr>
+                            <tr>
+                                <td>Dengue semanal CR</td>
+                                <td>Ministerio de Salud (PDFs)</td>
+                                <td>SEIR vectorial, calibración bayesiana</td>
+                            </tr>
+                            <tr>
+                                <td>Dengue regional (limpio)</td>
+                                <td>OpenDengue, opendengue.org</td>
+                                <td>SEIR comparativo entre países</td>
+                            </tr>
+                            <tr>
+                                <td>Demanda eléctrica CR</td>
+                                <td>ICE, CNFL</td>
+                                <td>EDOs con forzante estacional</td>
+                            </tr>
+                            <tr>
+                                <td>Llegadas de turistas CR</td>
+                                <td>ICT, datos mensuales</td>
+                                <td>Bass diffusion, modelos logísticos generalizados</td>
+                            </tr>
+                            <tr>
+                                <td>Usuarios Sinpe Móvil</td>
+                                <td>BCCR, indicadores económicos</td>
+                                <td>Bass diffusion para adopción tecnológica</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Recordatorio: cada grupo elige un tema diferente del proyecto integrador (no se pueden repetir). En esta clase la idea es que vean qué fuentes están disponibles. La elección formal del tema se hace en la clase 3.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Validación temporal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Validación correcta para EDOs ajustadas a series temporales</h2>
+                <p class="slide-subtitle">Lo que no se aprende en un curso estándar de ML</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Por qué k-fold no funciona aquí</h3>
+                    <p>La validación cruzada estándar (k-fold) baraja los datos aleatoriamente. En series temporales eso rompe la dependencia temporal: el modelo "ve el futuro" durante el entrenamiento.</p>
+                </div>
+                <div class="three-columns">
+                    <div class="feature-card">
+                        <h4>Hold-out hacia adelante</h4>
+                        <p>Entrenar con datos hasta el momento t. Predecir t+h. Repetir incrementalmente.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Backtesting epidemiológico</h4>
+                        <p>Ajustar hasta SE k, predecir SE k+1 a k+4. Repetir desplazando una semana.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>WIS (Weighted Interval Score)</h4>
+                        <p>Métrica estándar en los Forecast Hubs del CDC y otros organismos.</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>Análisis de sensibilidad: SALib</h4>
+                    <p>Herramienta canónica en Python para identificar qué parámetros importan más en la salida del modelo. Métodos Morris (screening barato) y Sobol (descomposición de varianza global). Es lo que distingue un modelo "que ajusta" de un modelo "que se entiende".</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Limitaciones honestas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Limitaciones de los modelos compartimentales</h2>
+                <p class="slide-subtitle">Lo que un modelador serio debe poder enumerar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>1. Asumen mezcla homogénea</h4>
+                        <p>Todos pueden contagiar a todos por igual. Realidad: las redes de contacto son altamente heterogéneas.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>2. Población cerrada</h4>
+                        <p>No hay nacimientos, muertes ni migración a menos que se añadan explícitamente.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>3. Parámetros constantes</h4>
+                        <p>Beta no cambia con intervenciones, estaciones o comportamiento. En la realidad sí cambia.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>4. Determinismo</h4>
+                        <p>A poblaciones pequeñas la estocasticidad importa. Se usan ecuaciones diferenciales estocásticas (EDE).</p>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>5. Identificabilidad</h4>
+                    <p>Distintos pares (beta, gamma) pueden producir curvas similares, especialmente con datos truncados o incompletos. Solucionarlo requiere priors informativos en el enfoque bayesiano.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>Un modelador profesional no se enamora del modelo. Enumera sus limitaciones primero, propone mejoras después. Esta es la diferencia entre el ejercicio académico y el modelado para la toma de decisiones reales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Próximos pasos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Próximos pasos y conexión con el resto del curso</h2>
+                <p class="slide-subtitle">Por dónde seguimos en la clase 3</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Para la próxima clase</h3>
+                        <ul>
+                            <li>Revisar el paper SEICR de de-Camino-Beck (medRxiv 2020)</li>
+                            <li>Capítulo 1 del Giordano "A First Course in Mathematical Modeling"</li>
+                            <li>Capítulo 8 del Brunton-Kutz (Data-Driven Science and Engineering)</li>
+                            <li>Decidir tema preliminar del proyecto integrador en grupo</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Conexión con temas futuros</h3>
+                        <ul>
+                            <li>Semana 3: cadenas de Markov, otro modelo dinámico</li>
+                            <li>Semana 4: simulación Monte Carlo y MCMC para inferencia</li>
+                            <li>Semana 8: optimización clásica (incluye calibración avanzada)</li>
+                            <li>Semana 11: optimización moderna (descenso de gradiente, Adam)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Lo que hicimos hoy es la base. En las próximas semanas vamos a ver otras formas de modelado dinámico (Markov, Monte Carlo) y luego, en la segunda mitad del curso, métodos de optimización y de teoría de grafos. Las EDOs reaparecerán al final cuando hablemos de aprendizaje por refuerzo y procesos de decisión.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Actividad grupal y cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">Lo que harán en los últimos 40 minutos de clase</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li>Grupos estables (los mismos del proyecto integrador)</li>
+                        <li>Cuatro mini-exploraciones: una analítica a mano, tres en Colab</li>
+                        <li>Cada grupo va a una sala virtual reducida</li>
+                        <li>Entregable: notebook compartido vía GitHub Classroom</li>
+                        <li>Fecha de entrega: antes del inicio de la clase 3</li>
+                    </ul>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Mini-exploración 1</h4>
+                        <p>Resolver a mano una EDO por separación de variables. Ley de enfriamiento de Newton.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Mini-exploración 2</h4>
+                        <p>Implementar el modelo logístico con solve_ivp y comparar con la solución analítica.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Mini-exploración 3</h4>
+                        <p>Simular un SIR con tres valores distintos de R0 y comparar las curvas resultantes.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Mini-exploración 4</h4>
+                        <p>Ajustar el modelo logístico a la serie poblacional INEC con curve_fit y estimar K.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Tienen 40 minutos. Distribuyan el trabajo entre los integrantes: alguien lidera la mini-exploración 1, otro la 2, etc. Vuelvan a la sala plenaria para una puesta en común breve antes de cerrar la clase.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div class="navigation">
@@ -1225,7 +1267,7 @@ Salarios normalizados:"</span>)
 
         function showSlide(n) {
             slides.forEach(slide => slide.classList.remove('active'));
-            
+
             if (n >= totalSlides) {
                 currentSlide = totalSlides - 1;
             } else if (n < 0) {
@@ -1233,10 +1275,10 @@ Salarios normalizados:"</span>)
             } else {
                 currentSlide = n;
             }
-            
+
             slides[currentSlide].classList.add('active');
             document.getElementById('currentSlide').textContent = currentSlide + 1;
-            
+
             document.getElementById('prevBtn').disabled = currentSlide === 0;
             document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
         }
