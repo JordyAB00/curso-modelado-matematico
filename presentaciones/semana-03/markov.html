@@ -33,7 +33,7 @@
             transition: opacity 0.6s ease-in-out;
             display: flex;
             flex-direction: column;
-            padding: 35px 70px 90px 70px;
+            padding: 65px 70px 90px 70px;
             background: #f5f5f7;
         }
 
@@ -66,7 +66,7 @@
             justify-content: flex-start;
             gap: 14px;
             overflow-y: auto;
-            max-height: calc(100vh - 200px);
+            max-height: calc(100vh - 230px);
         }
 
         .content-box {
@@ -302,13 +302,13 @@
 
         .logo-area {
             position: fixed;
-            top: 15px;
+            top: 12px;
             left: 20px;
             z-index: 1000;
         }
 
         .logo-image {
-            max-width: 120px;
+            max-width: 85px;
             height: auto;
         }
 
@@ -456,6 +456,65 @@
         .viz-svg svg {
             max-width: 100%;
             height: auto;
+        }
+
+        /* Pantallas pequeñas (laptops 13-14", viewport bajo ~850px) */
+        @media (max-height: 850px) {
+            .slide {
+                padding: 55px 60px 70px 60px;
+            }
+            .slide-header {
+                margin-bottom: 14px;
+            }
+            .slide-title {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+            .slide-subtitle {
+                font-size: 16px;
+            }
+            .slide-content {
+                gap: 10px;
+                max-height: calc(100vh - 180px);
+            }
+            .content-box {
+                padding: 12px 16px;
+            }
+            .content-box h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            .content-box p, .content-box li {
+                font-size: 14px;
+            }
+            .highlight-box {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .highlight-box p {
+                font-size: 14px;
+            }
+            .key-point {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .key-point h4 {
+                font-size: 16px;
+            }
+            .key-point p {
+                font-size: 13px;
+            }
+            .comparison-table th {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .comparison-table td {
+                padding: 6px 10px;
+                font-size: 12.5px;
+            }
+            .logo-image {
+                max-width: 70px;
+            }
         }
     </style>
 </head>
