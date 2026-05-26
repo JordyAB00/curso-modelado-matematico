@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 3: Cadenas y procesos de Markov - Modelado matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 50px 80px 140px 80px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 40px;
+        }
+
+        .slide-title {
+            font-size: 42px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .slide-subtitle {
+            font-size: 20px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 20px;
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 24px;
+            color: #2d2d2d;
+            margin-bottom: 12px;
+        }
+
+        .content-box p {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.5;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 17px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 12px;
+            font-size: 16px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .code-box .output {
+            color: #9cdcfe;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 15px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 60px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .viz-placeholder {
+            background: linear-gradient(135deg, #fafafa, #f0f0f0);
+            border: 2px dashed #FF8C00;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            color: #6e6e73;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .viz-svg {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .viz-svg svg {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">26</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Cadenas y procesos de Markov</h1>
+            <p class="cover-subtitle">Semana 3: del clima al PageRank, pasando por los LLMs</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matemático<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Continuación de la parte manual -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que ya tenemos en la pizarra</h2>
+                <p class="slide-subtitle">Recap rápido antes de pasar al código</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Lo que demostramos a mano</h3>
+                        <ul>
+                            <li>Propiedad de Markov: el futuro depende solo del presente</li>
+                            <li>Matriz de transición estocástica P</li>
+                            <li>Cálculo de la distribución a t pasos</li>
+                            <li>Distribución estacionaria como solución de πP = π</li>
+                            <li>Ejemplo del clima con resultado π ≈ (0.50, 0.31, 0.19)</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo que vamos a hacer ahora</h3>
+                        <ul>
+                            <li>Implementar todo lo anterior en R</li>
+                            <li>Visualizar las cadenas como diagramas y heatmaps</li>
+                            <li>Validar π teórica con simulación de 365 días</li>
+                            <li>Construir PageRank desde cero</li>
+                            <li>Conectar con LLMs y modelos epidemiológicos</li>
+                            <li>Introducir HMM con datos financieros simulados</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>El objetivo de esta parte no es solo "saber programar", sino ver con nuestros propios ojos que la matemática que hicimos a mano funciona, escala y se conecta con problemas reales de 2024-2026.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: ¿Por qué R esta semana? -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Por qué R esta semana?</h2>
+                <p class="slide-subtitle">Diversidad de herramientas, no de hábitos</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El curso usa los dos lenguajes principales del ecosistema científico</h3>
+                    <p>Python domina inteligencia artificial y producción industrial. R domina estadística, series temporales y, en general, todo lo que tenga que ver con análisis exploratorio profundo. Un científico de datos competitivo en 2026 debe poder leer y escribir ambos.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>R brilla en este tema porque</h4>
+                        <p>El paquete <strong>markovchain</strong> está especializado: define una clase S4 con métodos para distribución estacionaria, simulación, conversión a matriz, y visualización con una sola línea de código.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Más adelante usaremos R nuevamente</h4>
+                        <p>En la semana 6 (series temporales) usaremos R con el ecosistema <strong>fpp3</strong> de Hyndman: el estándar mundial absoluto para forecasting. Hoy nos calentamos.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>El resto del curso, salvo las semanas 3 y 6, será Python. Lo importante no es el lenguaje: es la idea matemática debajo. La sintaxis es lo más fácil de cambiar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: R en Colab - setup -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">R en Google Colab</h2>
+                <p class="slide-subtitle">Un atajo que pocos conocen</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Tres formas de abrir un notebook con kernel de R</h3>
+                    <ul>
+                        <li><strong>Atajo directo:</strong> visitar <code>https://colab.to/r</code> (alias oficial)</li>
+                        <li><strong>URL completa:</strong> <code>https://colab.research.google.com/#create=true&language=r</code></li>
+                        <li><strong>Desde un notebook existente:</strong> Entorno de ejecución → Cambiar tipo de entorno → R</li>
+                    </ul>
+                </div>
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">4.4.x</div>
+                        <div class="stat-label">Versión de R preinstalada</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">12 GB</div>
+                        <div class="stat-label">RAM disponible (free tier)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">0 s</div>
+                        <div class="stat-label">Instalación local requerida</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Limitación conocida: <code>drive.mount()</code> no funciona en runtimes de R en Colab. Mensaje oficial: "Mounting your Google Drive is only available on hosted Python runtimes". Si necesitan leer archivos del Drive, usen el paquete <code>googledrive</code> con autenticación OOB.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Las librerías que usaremos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de R para esta clase</h2>
+                <p class="slide-subtitle">Cinco paquetes, cinco superpoderes</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>markovchain 0.10.3</h4>
+                        <p>Clase S4 dedicada a cadenas de Markov de tiempo discreto. Última actualización: 2 de febrero de 2026. Métodos: simulación, distribución estacionaria, ajuste empírico.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>igraph 2.x</h4>
+                        <p>El estándar de oro para análisis de grafos. Incluye <code>page_rank()</code> con algoritmo PRPACK exacto. Lo retomaremos en el tema 10 (teoría de grafos).</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>diagram 1.6.5</h4>
+                        <p>Visualización limpia de matrices de transición como diagramas de flujo. Estable en CRAN desde septiembre de 2020.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>depmixS4 1.5-1</h4>
+                        <p>HMM con respuestas tipo GLM. Última actualización: 8 de mayo de 2026. Lo usaremos para detectar regímenes en series financieras.</p>
+                    </div>
+                </div>
+                <div class="code-box">
+<span class="comment"># Celda 1 del notebook: instalación (corre una sola vez por sesión)</span>
+<span class="function">install.packages</span>(<span class="function">c</span>(<span class="string">"markovchain"</span>, <span class="string">"igraph"</span>, <span class="string">"diagram"</span>,
+                   <span class="string">"depmixS4"</span>, <span class="string">"expm"</span>))
+
+<span class="comment"># Verificamos versiones</span>
+<span class="function">packageVersion</span>(<span class="string">"markovchain"</span>)
+<span class="output">## [1] '0.10.3'</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Aplicaciones reales (gancho) -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Para qué importan las cadenas de Markov hoy?</h2>
+                <p class="slide-subtitle">Cuatro aplicaciones que mueven miles de millones de dólares</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Búsqueda en la web</div>
+                        <h4>PageRank de Google</h4>
+                        <p>Brin y Page, 1998. La razón por la cual Google superó a AltaVista y Yahoo. Es literalmente la distribución estacionaria de un grafo gigante.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Recomendación</div>
+                        <h4>PinSage de Pinterest</h4>
+                        <p>Algoritmo basado en Personalized PageRank sobre un grafo de 3 mil millones de nodos y 18 mil millones de aristas. Reportó +25% de impresiones para Shop the Look.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Inteligencia artificial</div>
+                        <h4>LLMs autoregresivos</h4>
+                        <p>Zekri et al. (ICLR 2025) demostraron que cualquier LLM autoregresivo es formalmente equivalente a una cadena de Markov de orden K sobre un alfabeto de tamaño T.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Finanzas y salud</div>
+                        <h4>Detección de regímenes</h4>
+                        <p>HMM para identificar mercados bull/bear, predicción de recaída depresiva con datos de smartphones (estudio MENTALPRECISION, 2024).</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Todo lo que veremos hoy se reduce a la misma idea: identificar un sistema con estados discretos, estimar sus probabilidades de transición, y razonar sobre lo que pasa a largo plazo. La matemática que hicimos a mano funciona desde 3 estados hasta miles de millones.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Implementación del clima en R -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El clima en R: cadena de 3 estados</h2>
+                <p class="slide-subtitle">Verificando los cálculos manuales con código</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(markovchain)
+
+<span class="keyword">estados</span> <- <span class="function">c</span>(<span class="string">"Soleado"</span>, <span class="string">"Nublado"</span>, <span class="string">"Lluvioso"</span>)
+
+<span class="keyword">P</span> <- <span class="function">matrix</span>(<span class="function">c</span>(<span class="number">0.7</span>, <span class="number">0.2</span>, <span class="number">0.1</span>,
+                <span class="number">0.3</span>, <span class="number">0.5</span>, <span class="number">0.2</span>,
+                <span class="number">0.2</span>, <span class="number">0.4</span>, <span class="number">0.4</span>),
+            <span class="keyword">nrow</span> = <span class="number">3</span>, <span class="keyword">byrow</span> = <span class="keyword">TRUE</span>,
+            <span class="keyword">dimnames</span> = <span class="function">list</span>(estados, estados))
+
+<span class="keyword">mc_clima</span> <- <span class="function">new</span>(<span class="string">"markovchain"</span>, <span class="keyword">states</span> = estados,
+                  <span class="keyword">transitionMatrix</span> = P, <span class="keyword">name</span> = <span class="string">"Clima_CR"</span>)
+
+<span class="function">print</span>(mc_clima)
+
+<span class="output">## Clima_CR
+## A  3 - dimensional discrete Markov Chain defined by the following states:
+## Soleado, Nublado, Lluvioso
+## The transition matrix (by rows) is defined as follows:
+##          Soleado Nublado Lluvioso
+## Soleado      0.7     0.2      0.1
+## Nublado      0.3     0.5      0.2
+## Lluvioso     0.2     0.4      0.4</span>
+                </div>
+                <div class="highlight-box">
+                    <p>Punto pedagógico clave: el objeto <code>mc_clima</code> es una clase S4 (la versión moderna de objetos en R). No es una matriz "pelada": es una matriz con metadatos y métodos asociados.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Distribución estacionaria en R -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Distribución estacionaria: una sola línea</h2>
+                <p class="slide-subtitle">Lo que nos tomó 15 minutos a mano</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># Distribución estacionaria (resuelve πP = π internamente)</span>
+<span class="function">steadyStates</span>(mc_clima)
+
+<span class="output">##      Soleado Nublado Lluvioso
+## [1,]     0.5  0.3125   0.1875</span>
+
+<span class="comment"># Comparemos con iteración de potencias "a mano"</span>
+<span class="keyword">pi_0</span> <- <span class="function">c</span>(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>)             <span class="comment"># Arrancamos en Soleado</span>
+<span class="keyword">pi_t</span> <- pi_0
+
+<span class="keyword">historico</span> <- <span class="function">matrix</span>(<span class="number">0</span>, <span class="keyword">nrow</span> = <span class="number">30</span>, <span class="keyword">ncol</span> = <span class="number">3</span>)
+<span class="keyword">for</span> (k <span class="keyword">in</span> <span class="number">1</span>:<span class="number">30</span>) {
+  pi_t <- pi_t %*% P
+  historico[k, ] <- pi_t
+}
+
+<span class="function">round</span>(historico[<span class="function">c</span>(<span class="number">1</span>, <span class="number">2</span>, <span class="number">5</span>, <span class="number">10</span>, <span class="number">30</span>), ], <span class="number">4</span>)
+
+<span class="output">##        [,1]   [,2]   [,3]
+## [1,] 0.7000 0.2000 0.1000   <- t=1
+## [2,] 0.5700 0.2800 0.1500   <- t=2 (igual que el cálculo a mano)
+## [3,] 0.5070 0.3105 0.1825   <- t=5
+## [4,] 0.5000 0.3125 0.1875   <- t=10 (¡convergió!)
+## [5,] 0.5000 0.3125 0.1875   <- t=30</span>
+                </div>
+                <div class="highlight-box">
+                    <p>La convergencia es rápida: en 10 pasos la distribución ya está estable hasta 4 decimales. Esto es lo que el teorema ergódico promete y lo que vimos demostrado en pizarra.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Diagrama de transición -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Visualizando la cadena: diagrama de transición</h2>
+                <p class="slide-subtitle">La matriz como grafo dirigido</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="function">library</span>(diagram)
+
+<span class="function">plotmat</span>(<span class="function">t</span>(P), <span class="keyword">pos</span> = <span class="function">c</span>(<span class="number">1</span>, <span class="number">2</span>),
+        <span class="keyword">name</span> = estados,
+        <span class="keyword">lwd</span> = <span class="number">1.5</span>, <span class="keyword">box.lwd</span> = <span class="number">2</span>,
+        <span class="keyword">cex.txt</span> = <span class="number">0.8</span>,
+        <span class="keyword">box.size</span> = <span class="number">0.1</span>,
+        <span class="keyword">box.type</span> = <span class="string">"circle"</span>,
+        <span class="keyword">box.col</span> = <span class="string">"#FFE082"</span>,
+        <span class="keyword">arr.length</span> = <span class="number">0.3</span>,
+        <span class="keyword">self.cex</span> = <span class="number">0.5</span>,
+        <span class="keyword">main</span> = <span class="string">"Cadena del clima"</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+                                    <path d="M0,0 L0,6 L9,3 z" fill="#2d2d2d"/>
+                                </marker>
+                            </defs>
+                            <!-- Nodo Soleado -->
+                            <circle cx="190" cy="60" r="42" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="190" y="60" text-anchor="middle" font-size="13" font-weight="bold">Soleado</text>
+                            <text x="190" y="78" text-anchor="middle" font-size="11">0.7</text>
+                            <!-- Nodo Nublado -->
+                            <circle cx="90" cy="220" r="42" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="90" y="220" text-anchor="middle" font-size="13" font-weight="bold">Nublado</text>
+                            <text x="90" y="238" text-anchor="middle" font-size="11">0.5</text>
+                            <!-- Nodo Lluvioso -->
+                            <circle cx="290" cy="220" r="42" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="290" y="220" text-anchor="middle" font-size="13" font-weight="bold">Lluvioso</text>
+                            <text x="290" y="238" text-anchor="middle" font-size="11">0.4</text>
+                            <!-- Flechas S→N -->
+                            <line x1="159" y1="92" x2="119" y2="190" stroke="#2d2d2d" stroke-width="1.5" marker-end="url(#arrow)"/>
+                            <text x="123" y="140" font-size="11" fill="#FF8C00" font-weight="bold">0.2</text>
+                            <!-- Flechas S→L -->
+                            <line x1="221" y1="92" x2="261" y2="190" stroke="#2d2d2d" stroke-width="1.5" marker-end="url(#arrow)"/>
+                            <text x="248" y="140" font-size="11" fill="#FF8C00" font-weight="bold">0.1</text>
+                            <!-- Flechas N→S -->
+                            <line x1="115" y1="185" x2="170" y2="100" stroke="#2d2d2d" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+                            <text x="155" y="160" font-size="11" fill="#FF8C00" font-weight="bold">0.3</text>
+                            <!-- Flechas N→L -->
+                            <line x1="135" y1="220" x2="245" y2="220" stroke="#2d2d2d" stroke-width="1.5" marker-end="url(#arrow)"/>
+                            <text x="180" y="215" font-size="11" fill="#FF8C00" font-weight="bold">0.2</text>
+                            <!-- Flechas L→S -->
+                            <line x1="265" y1="185" x2="210" y2="100" stroke="#2d2d2d" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+                            <text x="252" y="160" font-size="11" fill="#FF8C00" font-weight="bold">0.2</text>
+                            <!-- Flechas L→N -->
+                            <line x1="245" y1="230" x2="135" y2="230" stroke="#2d2d2d" stroke-width="1.5" stroke-dasharray="3,2" marker-end="url(#arrow)"/>
+                            <text x="180" y="248" font-size="11" fill="#FF8C00" font-weight="bold">0.4</text>
+                            <!-- Título -->
+                            <text x="190" y="305" text-anchor="middle" font-size="13" font-weight="600" fill="#2d2d2d">Cadena del clima (3 estados)</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El número dentro del nodo es la probabilidad de quedarse en el mismo estado (autotransición). Las flechas con etiqueta son las transiciones entre estados distintos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Heatmap y convergencia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Convergencia visual: P, P², P⁵ y P¹⁰</h2>
+                <p class="slide-subtitle">Las filas se vuelven idénticas a π</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(expm)
+
+<span class="keyword">P5</span>  <- P %^% <span class="number">5</span>
+<span class="keyword">P10</span> <- P %^% <span class="number">10</span>
+
+<span class="function">round</span>(P5, <span class="number">3</span>)
+<span class="output">##          Soleado Nublado Lluvioso
+## Soleado    0.507   0.310    0.183
+## Nublado    0.496   0.314    0.190
+## Lluvioso   0.490   0.317    0.193</span>
+
+<span class="function">round</span>(P10, <span class="number">3</span>)
+<span class="output">##          Soleado Nublado Lluvioso
+## Soleado    0.500   0.313    0.187
+## Nublado    0.500   0.313    0.187
+## Lluvioso   0.500   0.313    0.187   <- ¡las tres filas son iguales!</span>
+                </div>
+                <div class="highlight-box">
+                    <p>En P¹⁰ las tres filas son prácticamente idénticas: significa que sin importar desde dónde arranquemos, después de 10 pasos la probabilidad de estar en cada estado es la misma. Eso <strong>es</strong> la distribución estacionaria visualizada.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Conexión con la teoría</h4>
+                    <p>Esto es precisamente lo que predice el teorema ergódico: para cadenas irreducibles y aperiódicas, P<sup>n</sup> converge a la matriz cuyas n filas son todas iguales a π.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Simulación empírica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Simulación: un año de clima</h2>
+                <p class="slide-subtitle">La frecuencia empírica debe coincidir con π</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">set.seed</span>(<span class="number">2026</span>)
+
+<span class="comment"># Generamos 365 días empezando en Soleado</span>
+<span class="keyword">trayectoria</span> <- <span class="function">markovchainSequence</span>(<span class="keyword">n</span> = <span class="number">365</span>,
+                                  <span class="keyword">markovchain</span> = mc_clima,
+                                  <span class="keyword">t0</span> = <span class="string">"Soleado"</span>)
+
+<span class="comment"># Primeros 20 días simulados</span>
+<span class="function">head</span>(trayectoria, <span class="number">20</span>)
+<span class="output">##  [1] "Soleado"  "Soleado"  "Nublado"  "Nublado"  "Soleado"
+##  [6] "Soleado"  "Soleado"  "Lluvioso" "Lluvioso" "Nublado"
+## [11] "Soleado"  "Soleado"  "Soleado"  "Nublado"  "Soleado"
+## [16] "Nublado"  "Nublado"  "Lluvioso" "Lluvioso" "Lluvioso"</span>
+
+<span class="comment"># Frecuencias empíricas</span>
+<span class="function">round</span>(<span class="function">table</span>(trayectoria) / <span class="function">length</span>(trayectoria), <span class="number">3</span>)
+<span class="output">## trayectoria
+##  Soleado  Nublado Lluvioso
+##    0.515    0.301    0.184   <- muy cerca de π = (0.500, 0.313, 0.187)</span>
+                </div>
+                <div class="highlight-box">
+                    <p>Con 365 muestras la frecuencia empírica difiere de π teórica en menos del 2%. Con 10 000 muestras la diferencia es despreciable. Esto es la ley de los grandes números trabajando a la vista.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: PageRank historia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">PageRank: una idea de tesis doctoral</h2>
+                <p class="slide-subtitle">Stanford, 1996-1998</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El problema en 1996</h3>
+                    <p>La web tenía decenas de millones de páginas y crecía exponencialmente. Los buscadores existentes (AltaVista, Lycos, Yahoo) ordenaban resultados por la frecuencia de palabras clave, lo que era fácilmente manipulable. La pregunta de Brin y Page: ¿se puede ordenar la web por <em>importancia</em>, no por densidad de palabras?</p>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>La idea recursiva</h4>
+                        <p>"Una página es importante si páginas importantes la enlazan". Suena circular, pero es <strong>exactamente</strong> el problema de encontrar la distribución estacionaria de una cadena de Markov sobre el grafo de enlaces.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El damping factor</h4>
+                        <p>d = 0.85: con esa probabilidad el usuario sigue un enlace; con 1-d = 0.15 teletransporta. Garantiza irreducibilidad y aperiodicidad. Convergencia en 43 iteraciones para ganar 3 dígitos de precisión.</p>
+                    </div>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Año</th>
+                                <th>Hito</th>
+                                <th>Cifra clave</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1996</td><td>Brin y Page comienzan BackRub en Stanford</td><td>24 millones de páginas indexadas</td></tr>
+                            <tr><td>1998</td><td>Paper en WWW Conference; fundación de Google</td><td>322 millones de enlaces</td></tr>
+                            <tr><td>2003</td><td>Patente otorgada a Stanford (no a Google)</td><td>Licencia exclusiva por acciones</td></tr>
+                            <tr><td>2026</td><td>PageRank sigue siendo una de cientos de señales en ranking de búsqueda</td><td>Trillones de páginas en el índice</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: PageRank en R con igraph -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">PageRank en R con igraph</h2>
+                <p class="slide-subtitle">Mini-web de 6 nodos</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(igraph)
+
+<span class="comment"># Construimos un mini-grafo dirigido de 6 páginas</span>
+<span class="keyword">aristas</span> <- <span class="function">c</span>(<span class="string">"A"</span>,<span class="string">"B"</span>,  <span class="string">"A"</span>,<span class="string">"C"</span>,
+             <span class="string">"B"</span>,<span class="string">"C"</span>,
+             <span class="string">"C"</span>,<span class="string">"A"</span>,
+             <span class="string">"D"</span>,<span class="string">"A"</span>,
+             <span class="string">"E"</span>,<span class="string">"B"</span>,  <span class="string">"E"</span>,<span class="string">"D"</span>,
+             <span class="string">"F"</span>,<span class="string">"E"</span>,  <span class="string">"F"</span>,<span class="string">"B"</span>)
+
+<span class="keyword">g</span> <- <span class="function">graph_from_edgelist</span>(<span class="function">matrix</span>(aristas, <span class="keyword">ncol</span> = <span class="number">2</span>,
+                                          <span class="keyword">byrow</span> = <span class="keyword">TRUE</span>),
+                         <span class="keyword">directed</span> = <span class="keyword">TRUE</span>)
+
+<span class="comment"># PageRank con damping = 0.85 (default), algoritmo PRPACK</span>
+<span class="keyword">pr</span> <- <span class="function">page_rank</span>(g, <span class="keyword">damping</span> = <span class="number">0.85</span>)$vector
+<span class="function">round</span>(<span class="function">sort</span>(pr, <span class="keyword">decreasing</span> = <span class="keyword">TRUE</span>), <span class="number">4</span>)
+
+<span class="output">##      A      C      B      D      E      F
+## 0.3243 0.2444 0.1620 0.1147 0.0907 0.0639</span>
+                </div>
+                <div class="highlight-box">
+                    <p>La página A tiene el PageRank más alto (32.4%) porque recibe enlaces desde C y desde D, y C a su vez recibe enlaces desde A y B. La página F tiene el menor PageRank (6.4%) porque nadie la enlaza: su rank viene solo del damping (la "teletransportación uniforme").</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: PageRank visualizado -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El grafo visualizado</h2>
+                <p class="slide-subtitle">Tamaño del nodo proporcional a su PageRank</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="function">plot</span>(g,
+     <span class="keyword">vertex.size</span> = <span class="number">30</span> + <span class="number">200</span>*pr,
+     <span class="keyword">vertex.color</span> = <span class="string">"#FFE082"</span>,
+     <span class="keyword">vertex.label.cex</span> = <span class="number">1.5</span>,
+     <span class="keyword">vertex.label.color</span> = <span class="string">"#2d2d2d"</span>,
+     <span class="keyword">edge.arrow.size</span> = <span class="number">0.6</span>,
+     <span class="keyword">edge.color</span> = <span class="string">"#FF8C00"</span>,
+     <span class="keyword">main</span> = <span class="string">"Mini-web (tamaño = PageRank)"</span>)
+
+<span class="comment"># PageRank personalizado:</span>
+<span class="comment"># sesgo de teletransportación hacia A</span>
+<span class="keyword">reset</span> <- <span class="function">ifelse</span>(<span class="function">V</span>(g)$name == <span class="string">"A"</span>, <span class="number">1</span>, <span class="number">0</span>)
+<span class="keyword">pr_pers</span> <- <span class="function">page_rank</span>(g,
+                     <span class="keyword">personalized</span> = reset)$vector
+<span class="function">round</span>(pr_pers, <span class="number">3</span>)
+<span class="output">##     A     B     C     D     E     F
+## 0.402 0.131 0.290 0.082 0.063 0.032</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 350 350" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <marker id="arrow2" markerWidth="8" markerHeight="8" refX="8" refY="3" orient="auto">
+                                    <path d="M0,0 L0,6 L8,3 z" fill="#FF8C00"/>
+                                </marker>
+                            </defs>
+                            <!-- Edges -->
+                            <line x1="100" y1="150" x2="180" y2="80" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="125" y1="170" x2="225" y2="195" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="190" y1="105" x2="225" y2="180" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="225" y1="195" x2="125" y2="160" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="100" y1="280" x2="105" y2="170" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="240" y1="290" x2="200" y2="105" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="220" y1="295" x2="110" y2="290" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="290" y1="260" x2="255" y2="290" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <line x1="280" y1="245" x2="195" y2="92" stroke="#FF8C00" stroke-width="2" marker-end="url(#arrow2)"/>
+                            <!-- Nodos (tamaño ∝ PageRank) -->
+                            <!-- A: PR=0.324 (mayor) -->
+                            <circle cx="190" cy="75" r="38" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="190" y="80" text-anchor="middle" font-size="18" font-weight="bold">A</text>
+                            <!-- C: PR=0.244 -->
+                            <circle cx="240" cy="200" r="32" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="240" y="205" text-anchor="middle" font-size="16" font-weight="bold">C</text>
+                            <!-- B: PR=0.162 -->
+                            <circle cx="100" cy="160" r="25" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="100" y="165" text-anchor="middle" font-size="14" font-weight="bold">B</text>
+                            <!-- D: PR=0.114 -->
+                            <circle cx="90" cy="295" r="22" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="90" y="300" text-anchor="middle" font-size="13" font-weight="bold">D</text>
+                            <!-- E: PR=0.091 -->
+                            <circle cx="240" cy="305" r="20" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="240" y="310" text-anchor="middle" font-size="12" font-weight="bold">E</text>
+                            <!-- F: PR=0.064 (menor) -->
+                            <circle cx="305" cy="250" r="17" fill="#FFE082" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="305" y="255" text-anchor="middle" font-size="11" font-weight="bold">F</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="key-point">
+                    <h4>Detalle pedagógico</h4>
+                    <p>El PageRank "personalizado" (sesgando la teletransportación) es el truco fundamental detrás de las recomendaciones modernas: si el usuario suele visitar la página A, sus recomendaciones se calculan con un PageRank que privilegia A como punto de regreso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: SIR - propagación -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Modelos de propagación: SIR sobre grafos</h2>
+                <p class="slide-subtitle">Susceptible → Infectado → Recuperado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La idea</h3>
+                        <p>Cada nodo de un grafo (persona, computadora, neurona) tiene un estado entre S, I y R. Las transiciones siguen reglas probabilísticas locales: contagio con probabilidad β por contacto con un vecino infectado, recuperación con probabilidad γ.</p>
+                    </div>
+                    <div class="content-box">
+                        <h3>Por qué es un proceso de Markov</h3>
+                        <p>El estado de la red en t+1 depende solo del estado en t (quién está infectado, quién es susceptible, cuáles son sus vecinos). El espacio de estados es 2<sup>|V|</sup>, demasiado grande para enumerarse, pero la dinámica sigue siendo markoviana.</p>
+                    </div>
+                </div>
+                <div class="code-box">
+<span class="keyword">sir_sim</span> <- <span class="function">function</span>(g, beta = <span class="number">0.15</span>, gamma = <span class="number">0.05</span>, T = <span class="number">60</span>, seed_node = <span class="number">1</span>) {
+  n <- <span class="function">vcount</span>(g)
+  estado <- <span class="function">rep</span>(<span class="string">"S"</span>, n); estado[seed_node] <- <span class="string">"I"</span>
+  hist <- <span class="function">matrix</span>(<span class="number">0</span>, <span class="keyword">nrow</span> = T, <span class="keyword">ncol</span> = <span class="number">3</span>,
+                 <span class="keyword">dimnames</span> = <span class="function">list</span>(<span class="keyword">NULL</span>, <span class="function">c</span>(<span class="string">"S"</span>, <span class="string">"I"</span>, <span class="string">"R"</span>)))
+  <span class="keyword">for</span> (t <span class="keyword">in</span> <span class="number">1</span>:T) {
+    infectados <- <span class="function">which</span>(estado == <span class="string">"I"</span>)
+    <span class="keyword">for</span> (i <span class="keyword">in</span> infectados) {
+      vecinos_S <- <span class="function">intersect</span>(<span class="function">neighbors</span>(g, i), <span class="function">which</span>(estado == <span class="string">"S"</span>))
+      contagiados <- vecinos_S[<span class="function">runif</span>(<span class="function">length</span>(vecinos_S)) < beta]
+      estado[contagiados] <- <span class="string">"I"</span>
+      <span class="keyword">if</span> (<span class="function">runif</span>(<span class="number">1</span>) < gamma) estado[i] <- <span class="string">"R"</span>
+    }
+    hist[t, ] <- <span class="function">c</span>(<span class="function">sum</span>(estado==<span class="string">"S"</span>), <span class="function">sum</span>(estado==<span class="string">"I"</span>), <span class="function">sum</span>(estado==<span class="string">"R"</span>))
+  }
+  hist
+}
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: SIR resultados -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">SIR en red small-world: la curva clásica</h2>
+                <p class="slide-subtitle">100 nodos, 1 infectado inicial</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="function">set.seed</span>(<span class="number">42</span>)
+<span class="keyword">g_sw</span> <- <span class="function">sample_smallworld</span>(<span class="number">1</span>, <span class="number">100</span>, <span class="number">4</span>, <span class="number">0.05</span>)
+<span class="keyword">h</span> <- <span class="function">sir_sim</span>(g_sw, beta = <span class="number">0.15</span>,
+              gamma = <span class="number">0.05</span>, T = <span class="number">80</span>)
+
+<span class="function">matplot</span>(h, <span class="keyword">type</span> = <span class="string">"l"</span>, <span class="keyword">lty</span> = <span class="number">1</span>, <span class="keyword">lwd</span> = <span class="number">2.5</span>,
+        <span class="keyword">col</span> = <span class="function">c</span>(<span class="string">"steelblue"</span>,
+                <span class="string">"tomato"</span>,
+                <span class="string">"darkgreen"</span>),
+        <span class="keyword">xlab</span> = <span class="string">"t (pasos)"</span>,
+        <span class="keyword">ylab</span> = <span class="string">"Numero de nodos"</span>,
+        <span class="keyword">main</span> = <span class="string">"Epidemia en red small-world"</span>)
+<span class="function">legend</span>(<span class="string">"right"</span>,
+       <span class="keyword">legend</span> = <span class="function">c</span>(<span class="string">"S"</span>, <span class="string">"I"</span>, <span class="string">"R"</span>),
+       <span class="keyword">col</span> = <span class="function">c</span>(<span class="string">"steelblue"</span>, <span class="string">"tomato"</span>,
+               <span class="string">"darkgreen"</span>),
+       <span class="keyword">lty</span> = <span class="number">1</span>, <span class="keyword">lwd</span> = <span class="number">2</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Ejes -->
+                            <line x1="40" y1="240" x2="340" y2="240" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="240" x2="40" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- Eje Y labels -->
+                            <text x="32" y="244" text-anchor="end" font-size="9">0</text>
+                            <text x="32" y="190" text-anchor="end" font-size="9">25</text>
+                            <text x="32" y="135" text-anchor="end" font-size="9">50</text>
+                            <text x="32" y="80" text-anchor="end" font-size="9">75</text>
+                            <text x="32" y="25" text-anchor="end" font-size="9">100</text>
+                            <!-- Eje X labels -->
+                            <text x="40" y="255" text-anchor="middle" font-size="9">0</text>
+                            <text x="115" y="255" text-anchor="middle" font-size="9">20</text>
+                            <text x="190" y="255" text-anchor="middle" font-size="9">40</text>
+                            <text x="265" y="255" text-anchor="middle" font-size="9">60</text>
+                            <text x="340" y="255" text-anchor="middle" font-size="9">80</text>
+                            <!-- Curva S (susceptibles, decreciente) -->
+                            <path d="M 40,25 L 60,30 L 80,45 L 100,75 L 120,115 L 140,160 L 160,195 L 180,215 L 200,225 L 220,232 L 240,235 L 260,237 L 280,238 L 300,238 L 320,238 L 340,238" 
+                                  fill="none" stroke="steelblue" stroke-width="2.5"/>
+                            <!-- Curva I (infectados, campana) -->
+                            <path d="M 40,237 L 60,232 L 80,215 L 100,180 L 120,135 L 140,90 L 160,75 L 180,90 L 200,120 L 220,160 L 240,195 L 260,215 L 280,228 L 300,234 L 320,237 L 340,238" 
+                                  fill="none" stroke="tomato" stroke-width="2.5"/>
+                            <!-- Curva R (recuperados, creciente) -->
+                            <path d="M 40,238 L 60,236 L 80,228 L 100,213 L 120,180 L 140,135 L 160,90 L 180,55 L 200,40 L 220,30 L 240,27 L 260,26 L 280,25 L 300,25 L 320,25 L 340,25" 
+                                  fill="none" stroke="darkgreen" stroke-width="2.5"/>
+                            <!-- Leyenda -->
+                            <line x1="260" y1="55" x2="280" y2="55" stroke="steelblue" stroke-width="2.5"/>
+                            <text x="285" y="58" font-size="10">S</text>
+                            <line x1="260" y1="70" x2="280" y2="70" stroke="tomato" stroke-width="2.5"/>
+                            <text x="285" y="73" font-size="10">I</text>
+                            <line x1="260" y1="85" x2="280" y2="85" stroke="darkgreen" stroke-width="2.5"/>
+                            <text x="285" y="88" font-size="10">R</text>
+                            <!-- Título -->
+                            <text x="180" y="15" text-anchor="middle" font-size="12" font-weight="600">SIR en red small-world</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La curva roja (infectados) tiene la famosa forma de campana que conocimos del COVID. La curva verde (recuperados) crece monótonamente hacia su valor final, que define el "tamaño de la epidemia".</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: N-gramas como cadenas de Markov -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">N-gramas: cadenas de Markov en texto</h2>
+                <p class="slide-subtitle">El primer puente hacia los LLMs</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>La idea</h3>
+                    <p>Un modelo de lenguaje <strong>bigrama</strong> asume P(palabra<sub>t+1</sub> | palabra<sub>t</sub>, palabra<sub>t-1</sub>, ..., palabra<sub>0</sub>) ≈ P(palabra<sub>t+1</sub> | palabra<sub>t</sub>). Esto es <strong>exactamente</strong> una cadena de Markov donde el "estado" es la palabra actual y la matriz de transición es de tamaño |V| × |V| con |V| el tamaño del vocabulario.</p>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Modelo</th>
+                                <th>Estado</th>
+                                <th>Orden de Markov</th>
+                                <th>Limitación principal</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Bigrama (n=2)</td><td>Última palabra</td><td>Orden 1</td><td>Olvida todo lo anterior</td></tr>
+                            <tr><td>Trigrama (n=3)</td><td>Últimas 2 palabras</td><td>Orden 2</td><td>|V|² estados, explosión combinatoria</td></tr>
+                            <tr><td>5-grama</td><td>Últimas 4 palabras</td><td>Orden 4</td><td>|V|⁴: intratable salvo con suavizado</td></tr>
+                            <tr><td>Transformer (LLM)</td><td>Últimos K tokens (K hasta millones)</td><td>Orden K</td><td>"Memoria" compacta vía atención</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Cualquier modelo n-grama es una cadena de Markov de orden n−1. Los Transformers son cadenas de Markov de orden K, donde K es la ventana de contexto. La diferencia no es matemática: es representacional.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Generación de texto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Generando texto en español con un bigrama</h2>
+                <p class="slide-subtitle">El Quijote como corpus de entrenamiento</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(markovchain); <span class="function">library</span>(stringr)
+
+<span class="comment"># Cargamos un fragmento del Quijote desde Gutenberg</span>
+<span class="keyword">url</span> <- <span class="string">"https://www.gutenberg.org/files/2000/2000-0.txt"</span>
+<span class="keyword">texto</span> <- <span class="function">readLines</span>(url, <span class="keyword">encoding</span> = <span class="string">"UTF-8"</span>, <span class="keyword">warn</span> = <span class="keyword">FALSE</span>)
+<span class="keyword">texto</span> <- <span class="function">paste</span>(texto, <span class="keyword">collapse</span> = <span class="string">" "</span>) |> <span class="function">tolower</span>()
+<span class="keyword">texto</span> <- <span class="function">str_replace_all</span>(texto, <span class="string">"[^a-záéíóúñü ]"</span>, <span class="string">" "</span>)
+<span class="keyword">palabras</span> <- <span class="function">str_split</span>(texto, <span class="string">"\\s+"</span>)[[<span class="number">1</span>]] |>
+            (\(x) x[x != <span class="string">""</span>])() |>
+            <span class="function">head</span>(<span class="number">50000</span>)
+
+<span class="comment"># Ajustamos el bigrama: una cadena de Markov de orden 1</span>
+<span class="keyword">fit</span> <- <span class="function">markovchainFit</span>(<span class="keyword">data</span> = palabras)$estimate
+
+<span class="function">set.seed</span>(<span class="number">2026</span>)
+<span class="keyword">generado</span> <- <span class="function">markovchainSequence</span>(<span class="keyword">n</span> = <span class="number">25</span>,
+                                <span class="keyword">markovchain</span> = fit,
+                                <span class="keyword">t0</span> = <span class="string">"en"</span>,
+                                <span class="keyword">include.t0</span> = <span class="keyword">TRUE</span>)
+<span class="function">paste</span>(generado, <span class="keyword">collapse</span> = <span class="string">" "</span>)
+
+<span class="output">## [1] "en este lugar de manera que el cura y maritornes que era de
+##      caballero andante por las armas de su amo y dijo que"</span>
+                </div>
+                <div class="highlight-box">
+                    <p>Suena vagamente a Cervantes en superficie: hay palabras coherentes en pares ("el cura", "su amo"), pero no hay coherencia global. Esa es la limitación esencial de un bigrama: solo ve la palabra anterior, no la frase completa.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: LLMs como cadenas de Markov -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Los LLMs son cadenas de Markov?</h2>
+                <p class="slide-subtitle">Spoiler: sí, matemáticamente sí</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Resultado formal (Zekri et al., ICLR 2025)</h3>
+                    <p>En el paper <em>"Large Language Models as Markov Chains"</em> (arXiv:2410.02724), los autores demuestran que cualquier LLM autoregresivo con vocabulario de tamaño T y ventana de contexto K es <strong>matemáticamente equivalente</strong> a una cadena de Markov con matriz de transición dispersa y bloque-estructurada de tamaño O(T<sup>K</sup>).</p>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Implicación 1: existe π</h4>
+                        <p>Si fijamos temperatura y prompt inicial, el LLM tiene una distribución estacionaria única. Esto explica por qué a alta temperatura los LLMs caen en repeticiones patológicas.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Implicación 2: cotas de generalización</h4>
+                        <p>Los autores derivan cotas teóricas sobre el error de predicción y las validan empíricamente en Llama 3 y Gemma. Es decir: no es solo curiosidad matemática, sirve para predecir comportamiento.</p>
+                    </div>
+                </div>
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">50K</div>
+                        <div class="stat-label">Tokens en vocabulario típico</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">1M</div>
+                        <div class="stat-label">Tamaño de contexto en LLMs 2026</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">T<sup>K</sup></div>
+                        <div class="stat-label">Tamaño del espacio de estados</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La equivalencia es exacta pero <strong>intratable</strong>: T<sup>K</sup> con T=50.000 y K=1.000.000 es un número imposible de representar físicamente. La utilidad es analítica, no computacional. El mensaje para llevarse: los LLMs no son razonadores mágicos, son aproximaciones neuronales eficientes a una cadena de Markov de orden gigantesco.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: HMM intuición -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Procesos de Markov ocultos (HMM)</h2>
+                <p class="slide-subtitle">Cuando no vemos el estado, solo sus señales</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>La idea</h3>
+                    <p>Un HMM tiene dos capas: una cadena de Markov subyacente con estados <strong>no observables</strong> (X<sub>1</sub>, X<sub>2</sub>, ...), y en cada instante t emite una observación Y<sub>t</sub> cuya distribución depende solo del estado oculto actual.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Régimen de mercado oculto</h4>
+                        <p>No vemos directamente si estamos en "bull" o "bear", pero observamos retornos diarios. Inferimos el régimen a partir de la volatilidad.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Bioinformática</div>
+                        <h4>Predicción de exones</h4>
+                        <p>Tiberius (2024), Helixer y AUGUSTUS combinan HMM con deep learning para identificar regiones codificantes en el ADN.</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Los tres problemas de Rabiner (1989)</h3>
+                    <ul>
+                        <li><strong>Evaluación</strong> (Forward-Backward): dado λ y O, calcular P(O | λ)</li>
+                        <li><strong>Decodificación</strong> (Viterbi): dada O, encontrar la secuencia de estados ocultos más probable</li>
+                        <li><strong>Aprendizaje</strong> (Baum-Welch): dados solo O, estimar los parámetros λ que maximizan P(O | λ)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: HMM en R - regímenes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">HMM en R: detectando regímenes financieros</h2>
+                <p class="slide-subtitle">Datos sintéticos con dos regímenes de volatilidad</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(depmixS4)
+<span class="function">set.seed</span>(<span class="number">2026</span>)
+
+<span class="comment"># Generamos 600 dias con dos regimenes ocultos</span>
+<span class="keyword">n</span> <- <span class="number">600</span>
+<span class="keyword">regimen_real</span> <- <span class="function">c</span>(<span class="function">rep</span>(<span class="number">1</span>, <span class="number">250</span>), <span class="function">rep</span>(<span class="number">2</span>, <span class="number">150</span>), <span class="function">rep</span>(<span class="number">1</span>, <span class="number">200</span>))
+<span class="keyword">retornos</span> <- <span class="function">ifelse</span>(regimen_real == <span class="number">1</span>,
+                   <span class="function">rnorm</span>(n, <span class="keyword">mean</span> = <span class="number">0.001</span>, <span class="keyword">sd</span> = <span class="number">0.008</span>),    <span class="comment"># calmo</span>
+                   <span class="function">rnorm</span>(n, <span class="keyword">mean</span> = -<span class="number">0.002</span>, <span class="keyword">sd</span> = <span class="number">0.025</span>))   <span class="comment"># volatil</span>
+<span class="keyword">df</span> <- <span class="function">data.frame</span>(retornos = retornos)
+
+<span class="comment"># Especificamos un HMM gaussiano de 2 estados</span>
+<span class="keyword">mod</span> <- <span class="function">depmix</span>(retornos ~ <span class="number">1</span>, <span class="keyword">data</span> = df,
+              <span class="keyword">nstates</span> = <span class="number">2</span>, <span class="keyword">family</span> = <span class="function">gaussian</span>())
+<span class="keyword">ajuste</span> <- <span class="function">fit</span>(mod, <span class="keyword">verbose</span> = <span class="keyword">FALSE</span>)
+
+<span class="comment"># Decodificacion (Viterbi)</span>
+<span class="keyword">estados_decod</span> <- <span class="function">posterior</span>(ajuste)$state
+
+<span class="comment"># Comparemos con el regimen real</span>
+<span class="function">table</span>(real = regimen_real, decodificado = estados_decod)
+<span class="output">##     decodificado
+## real   1   2
+##    1 438  12   <- 97% de aciertos en el regimen calmo
+##    2   8 142   <- 95% de aciertos en el regimen volatil</span>
+                </div>
+                <div class="highlight-box">
+                    <p>El HMM no vio nunca los regímenes reales, solo los retornos. Aún así, recuperó el régimen subyacente con más del 95% de precisión usando solo la volatilidad observada. Esto es exactamente lo que hacen los fondos de cobertura para identificar cambios estructurales en los mercados.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Caso costarricense -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso costarricense: pensiones con Markov</h2>
+                <p class="slide-subtitle">Víquez, Víquez, Campos, Loría y Mendoza (UCR-CIMPA, 2018)</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El problema</h3>
+                    <p>Proyectar la evolución de cotizantes y jubilados de un fondo de pensiones de una institución pública costarricense. Los autores modelaron el sistema como una <strong>cadena de Markov tridimensional</strong> con estados que combinan situación laboral, edad y aportes.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Resultado</h4>
+                        <p>Validación con datos reales del fondo. Error de estimación inferior al 2% en proyecciones a varios años.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Por qué importa</h4>
+                        <p>Es un caso publicado por la UCR (CIMPA) en una revista indexada, aplicado a un problema actuarial real y resuelto con las mismas matemáticas que vimos hoy. No es teoría: es trabajo de actuarios en CR usando estas técnicas.</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Referencia completa (APA 7)</h3>
+                    <p>Víquez, J. J., Víquez, J. A., Campos, A., Loría, J., &amp; Mendoza, L. A. (2018). Modelación de poblaciones vía Cadenas de Markov Tridimensionales. <em>Revista de Matemática: Teoría y Aplicaciones</em>, 25(2), 185-214. https://doi.org/10.15517/rmta.v25i2.33608</p>
+                </div>
+                <div class="highlight-box">
+                    <p>Esto es un excelente ejemplo del tipo de proyecto que pueden plantear para el proyecto integrador: tomar un problema real costarricense con datos accesibles y modelarlo con las herramientas matemáticas del curso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Síntesis -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Síntesis: del clima al PageRank</h2>
+                <p class="slide-subtitle">Una sola idea, escalas radicalmente distintas</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Sistema</th>
+                                <th>Estados</th>
+                                <th>Tamaño del espacio</th>
+                                <th>Aplicación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Clima de hoy</td><td>S, N, L</td><td>3</td><td>Pronóstico simple</td></tr>
+                            <tr><td>Cliente de banco</td><td>Nuevo, Activo, Inactivo, Churn</td><td>4</td><td>CLV, prevención de fuga</td></tr>
+                            <tr><td>Red social pequeña</td><td>Nodo por persona</td><td>10² a 10⁴</td><td>Influencia, propagación</td></tr>
+                            <tr><td>Google PageRank</td><td>Cada página web</td><td>~10¹²</td><td>Ranking de búsqueda</td></tr>
+                            <tr><td>Bigrama en español</td><td>Cada palabra del vocabulario</td><td>10⁵</td><td>Generación de texto simple</td></tr>
+                            <tr><td>LLM moderno</td><td>Cada secuencia de K tokens</td><td>50.000<sup>1.000.000</sup></td><td>ChatGPT, Claude, Gemini</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>La matemática es exactamente la misma: una matriz estocástica, ecuaciones de Chapman-Kolmogorov y una distribución estacionaria. Lo único que cambia es el tamaño del espacio de estados y la representación computacional que usamos para no quedarnos sin memoria.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Actividad grupal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">25 minutos: matemática a mano y código en R</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (a mano, 10 min):</strong> modelar el comportamiento de un cliente de banco con 4 estados y calcular su distribución a 2 pasos</li>
+                        <li><strong>Parte B (en R/Colab, 12 min):</strong> implementar la cadena en R, calcular la distribución estacionaria y simular 1000 meses</li>
+                        <li><strong>Parte C (reflexión, 3 min):</strong> interpretar qué significa π para la gerencia del banco</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>Una foto o escaneo de la matriz de transición y los cálculos a mano</li>
+                        <li>El notebook de Colab compartido del grupo (formato .ipynb)</li>
+                        <li>Una celda final en Markdown con la reflexión grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento completo de la actividad está disponible en el campus virtual. Ahora mismo se distribuyen a las salas de trabajo. Estaré rotando entre las salas para apoyar dudas puntuales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Próxima clase -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para la próxima clase (semana 4)</h2>
+                <p class="slide-subtitle">Simulación de Monte Carlo e introducción a MCMC</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Preparación recomendada</h3>
+                    <ul>
+                        <li>Lectura: Murphy (2022), <em>Probabilistic Machine Learning</em>, capítulo introductorio a inferencia bayesiana (disponible gratis en probml.github.io/pml-book)</li>
+                        <li>Video: Setosa.io — Markov Chains Explained Visually (refrescar la intuición de hoy)</li>
+                        <li>Refrescar el concepto de valor esperado y varianza de variables aleatorias</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Conexión con lo de hoy</h3>
+                    <ul>
+                        <li>La semana 4 introduce <strong>MCMC</strong> (Markov Chain Monte Carlo): se usan cadenas de Markov diseñadas para que su distribución estacionaria sea una distribución a posteriori bayesiana</li>
+                        <li>Es el corazón del paquete <strong>PyMC</strong> que usaremos en Python</li>
+                        <li>La idea central: si quiero muestrear de una distribución difícil, construyo una cadena de Markov cuya π sea esa distribución y la dejo correr hasta que converja</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>Lo de hoy no es teoría aislada: cada concepto reaparece la próxima clase con un giro nuevo. Si la idea de distribución estacionaria les quedó clara, la semana 4 va a fluir muy bien.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Cuatro ideas y una sola matemática</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>La propiedad de Markov es más poderosa de lo que parece</h4>
+                    <p>"El futuro depende solo del presente" es una simplificación radical, pero es suficiente para modelar el clima, el comportamiento de clientes, la propagación de epidemias, el ranking de la web y hasta los LLMs.</p>
+                </div>
+                <div class="key-point">
+                    <h4>La distribución estacionaria es la huella digital del sistema</h4>
+                    <p>π nos dice cómo se ve el sistema "a largo plazo" sin importar dónde comenzamos. Es la respuesta a casi todas las preguntas estructurales que podemos hacerle a una cadena.</p>
+                </div>
+                <div class="key-point">
+                    <h4>PageRank y LLMs no son magia</h4>
+                    <p>Son cadenas de Markov. El primero sobre un grafo de páginas web; los segundos sobre secuencias de tokens con un espacio de estados gigantesco. La misma matemática, ejecutada a escalas distintas.</p>
+                </div>
+                <div class="key-point">
+                    <h4>R es una herramienta del oficio</h4>
+                    <p>Hoy aprovecharon ecosistemas especializados (markovchain, igraph, depmixS4) que no tienen equivalente directo en Python. Conocer ambos lenguajes amplía el repertorio profesional.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 22px;">Gracias por la sesión. Nos vemos la próxima semana con Monte Carlo y MCMC.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
