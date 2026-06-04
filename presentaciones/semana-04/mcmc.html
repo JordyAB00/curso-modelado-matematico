@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 4: Simulación de Monte Carlo y MCMC - Modelado matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 65px 70px 90px 70px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 22px;
+        }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: calc(100vh - 230px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 20px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .content-box p {
+            font-size: 15px;
+            color: #1d1d1f;
+            line-height: 1.45;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 15px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 6px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .code-box .output {
+            color: #9cdcfe;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 12px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 85px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 60px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .viz-placeholder {
+            background: linear-gradient(135deg, #fafafa, #f0f0f0);
+            border: 2px dashed #FF8C00;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            color: #6e6e73;
+            font-size: 14px;
+            font-style: italic;
+        }
+
+        .viz-svg {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .viz-svg svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pantallas pequeñas (laptops 13-14", viewport bajo ~850px) */
+        @media (max-height: 850px) {
+            .slide {
+                padding: 55px 60px 70px 60px;
+            }
+            .slide-header {
+                margin-bottom: 14px;
+            }
+            .slide-title {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+            .slide-subtitle {
+                font-size: 16px;
+            }
+            .slide-content {
+                gap: 10px;
+                max-height: calc(100vh - 180px);
+            }
+            .content-box {
+                padding: 12px 16px;
+            }
+            .content-box h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            .content-box p, .content-box li {
+                font-size: 14px;
+            }
+            .highlight-box {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .highlight-box p {
+                font-size: 14px;
+            }
+            .key-point {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .key-point h4 {
+                font-size: 16px;
+            }
+            .key-point p {
+                font-size: 13px;
+            }
+            .comparison-table th {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .comparison-table td {
+                padding: 6px 10px;
+                font-size: 12.5px;
+            }
+            .logo-image {
+                max-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">27</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Simulación de Monte Carlo y MCMC</h1>
+            <p class="cover-subtitle">Semana 4: del dado al posterior, con Python</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matemático<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Recap de la pizarra -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que ya tenemos en la pizarra</h2>
+                <p class="slide-subtitle">Recap rápido antes de pasar al código</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Lo que hicimos a mano</h3>
+                        <ul>
+                            <li>Monte Carlo: estimar π tirando puntos al azar</li>
+                            <li>El error baja como 1/√N</li>
+                            <li>Monte Carlo como promedio: esperanzas e integrales</li>
+                            <li>Metropolis-Hastings: proponer y aceptar/rechazar</li>
+                            <li>Bayes: prior × verosimilitud → posterior</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo que vamos a hacer ahora</h3>
+                        <ul>
+                            <li>Correr todo a gran escala con NumPy y SciPy</li>
+                            <li>Graficar la convergencia y los puntos simulados</li>
+                            <li>Estimar el VaR del colón-dólar con datos del BCCR</li>
+                            <li>Inferencia bayesiana real con PyMC y ArviZ</li>
+                            <li>Conocer NUTS, el muestreador que domina en 2026</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>La idea de esta parte: ver con código y gráficos que las cuentas chiquititas que hicimos a mano funcionan, escalan a millones de muestras y resuelven problemas reales de Costa Rica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Volvemos a Python -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Volvemos a Python esta semana</h2>
+                <p class="slide-subtitle">R fue la excepción, Python es la regla del curso</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Por qué Python para Monte Carlo y MCMC</h3>
+                    <p>La semana pasada usamos R porque el paquete markovchain es insuperable para cadenas de Markov. Pero la simulación estocástica moderna y la inferencia bayesiana viven en Python: NumPy para el azar, SciPy para distribuciones y PyMC para lo bayesiano. Es el stack que un científico de datos usa en producción en 2026.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>Sin instalar nada</h4>
+                        <p>Todo corre en Google Colab. NumPy y SciPy vienen preinstalados; PyMC se instala con una línea de <code>pip</code> en segundos.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>La misma matemática</h4>
+                        <p>Las cadenas de Markov de la semana 3 reaparecen hoy: MCMC construye una cadena cuya distribución estacionaria π es la distribución que queremos muestrear.</p>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 10px;">
+                    <p>Markov Chain Monte Carlo = la cadena de la semana pasada, ahora puesta a trabajar como máquina de muestreo. El nombre une los dos mundos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: El stack 2026 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de la semana</h2>
+                <p class="slide-subtitle">Lo vigente en ciencia de datos a junio de 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>NumPy + SciPy</h4>
+                        <p>Monte Carlo clásico. El generador moderno es <code>np.random.default_rng()</code> (PCG64), no el viejo <code>np.random.seed()</code>. SciPy aporta las distribuciones de <code>scipy.stats</code>.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>PyMC 6.0.1</h4>
+                        <p>El caballo de batalla de la inferencia bayesiana en Python. Backend PyTensor 3.0 (por defecto Numba) y nutpie como muestreador NUTS por defecto.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>ArviZ 1.0</h4>
+                        <p>Diagnóstico y visualización del muestreo: R-hat, ESS, trazas y posterior predictive checks. Dependencia natural de PyMC.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Bambi y NumPyro</h4>
+                        <p>Bambi: regresión bayesiana con fórmulas estilo R. NumPyro (sobre JAX): velocidad extrema y GPU cuando los datos crecen.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla mental: NumPy + SciPy para "tirar dados", PyMC + ArviZ para "actualizar creencias". Bambi y NumPyro son las marchas extra para casos especiales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Monte Carlo, la gran idea -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Para qué sirve Monte Carlo hoy?</h2>
+                <p class="slide-subtitle">Cuatro aplicaciones que mueven dinero de verdad</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Value at Risk (VaR)</h4>
+                        <p>Bancos y fondos simulan millones de escenarios de pérdidas para medir su riesgo. El método de Monte Carlo es el único "hacia adelante": combina factores de riesgo simulados.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Gestión de proyectos</div>
+                        <h4>Riesgo de costos y plazos</h4>
+                        <p>Se asignan distribuciones a costos y tiempos inciertos y se simula el resultado global: presupuesto, cronograma. Muy usado en energía y obra civil.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Ciencia e ingeniería</div>
+                        <h4>Integración en alta dimensión</h4>
+                        <p>Para integrales sin fórmula o en muchas variables, Monte Carlo escala mucho mejor que una cuadrícula, que sufre la maldición de la dimensionalidad.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Inteligencia artificial</div>
+                        <h4>Inferencia bayesiana (MCMC)</h4>
+                        <p>El motor para muestrear distribuciones que solo conocemos salvo una constante. Es el corazón de PyMC y de la estadística bayesiana moderna.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Todo se reduce a la misma idea: cuando la fórmula es imposible o intratable, generamos muchísimos números al azar y dejamos que la ley de los grandes números haga el trabajo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Generador aleatorio moderno -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El generador aleatorio moderno</h2>
+                <p class="slide-subtitle">default_rng, no np.random.seed</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Forma moderna y recomendada (BitGenerator PCG64)</span>
+<span class="keyword">rng</span> = np.random.<span class="function">default_rng</span>(<span class="number">2026</span>)
+
+<span class="keyword">rng</span>.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1</span>, size=<span class="number">3</span>)      <span class="comment"># 3 normales estándar</span>
+<span class="output">## array([ 0.197, -0.521,  1.043])</span>
+
+<span class="keyword">rng</span>.<span class="function">integers</span>(<span class="number">1</span>, <span class="number">7</span>, size=<span class="number">5</span>)     <span class="comment"># 5 tiradas de un dado</span>
+<span class="output">## array([3, 6, 1, 4, 2])</span>
+
+<span class="comment"># Forma legada (evitar): semilla global, peor estadísticamente</span>
+<span class="comment"># np.random.seed(2026)  ->  considerada "de conveniencia, legada"</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Por qué importa</h4>
+                        <p>NumPy documenta que <code>default_rng</code> tiene mejores propiedades estadísticas y rendimiento que el algoritmo MT19937 del <code>RandomState</code> legado.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Buena práctica</h4>
+                        <p>Pasar el objeto <code>rng</code> explícitamente a las funciones, en vez de una semilla global. Hace el código reproducible y predecible.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Estimar pi -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Estimar π con Monte Carlo</h2>
+                <p class="slide-subtitle">El "hola mundo": lo de la pizarra, ahora con 100 000 puntos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">rng</span> = np.random.<span class="function">default_rng</span>(<span class="number">42</span>)
+<span class="keyword">N</span> = <span class="number">100_000</span>
+
+<span class="comment"># Puntos al azar en el cuadrado [0,1]x[0,1]</span>
+<span class="keyword">pts</span> = rng.<span class="function">random</span>((N, <span class="number">2</span>))
+
+<span class="comment"># ¿Caen dentro del cuarto de círculo?</span>
+<span class="keyword">dentro</span> = (pts[:,<span class="number">0</span>]**<span class="number">2</span> + pts[:,<span class="number">1</span>]**<span class="number">2</span>) <= <span class="number">1</span>
+
+<span class="keyword">pi_est</span> = <span class="number">4</span> * dentro.<span class="function">mean</span>()
+<span class="function">print</span>(<span class="string">f"π estimado: {pi_est:.5f}"</span>)
+<span class="output">## π estimado: 3.14132   (verdadero: 3.14159)</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+                            <!-- cuadrado -->
+                            <rect x="40" y="20" width="240" height="240" fill="#fafafa" stroke="#2d2d2d" stroke-width="1.5"/>
+                            <!-- cuarto de círculo -->
+                            <path d="M 40,260 A 240,240 0 0,1 280,20" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+                            <!-- puntos dentro (naranja) -->
+                            <circle cx="80" cy="240" r="2.5" fill="#FF8C00"/>
+                            <circle cx="120" cy="220" r="2.5" fill="#FF8C00"/>
+                            <circle cx="90" cy="180" r="2.5" fill="#FF8C00"/>
+                            <circle cx="150" cy="200" r="2.5" fill="#FF8C00"/>
+                            <circle cx="60" cy="120" r="2.5" fill="#FF8C00"/>
+                            <circle cx="110" cy="130" r="2.5" fill="#FF8C00"/>
+                            <circle cx="170" cy="160" r="2.5" fill="#FF8C00"/>
+                            <circle cx="70" cy="80" r="2.5" fill="#FF8C00"/>
+                            <circle cx="130" cy="90" r="2.5" fill="#FF8C00"/>
+                            <circle cx="200" cy="120" r="2.5" fill="#FF8C00"/>
+                            <circle cx="100" cy="60" r="2.5" fill="#FF8C00"/>
+                            <circle cx="160" cy="70" r="2.5" fill="#FF8C00"/>
+                            <circle cx="210" cy="200" r="2.5" fill="#FF8C00"/>
+                            <circle cx="190" cy="170" r="2.5" fill="#FF8C00"/>
+                            <!-- puntos fuera (gris) -->
+                            <circle cx="240" cy="100" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="250" cy="150" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="220" cy="60" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="260" cy="200" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="230" cy="180" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="200" cy="50" r="2.5" fill="#bbbbbb"/>
+                            <text x="160" y="285" text-anchor="middle" font-size="12" fill="#2d2d2d" font-weight="600">naranja = dentro · gris = fuera</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La fracción de puntos naranjas, multiplicada por 4, aproxima π. Con 100 000 puntos ya acertamos cuatro decimales. Es exactamente el cálculo a mano, pero a otra escala.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Convergencia 1/sqrt(N) -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Convergencia: el error baja como 1/√N</h2>
+                <p class="slide-subtitle">Más muestras, estimación más estable</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Estimación acumulada conforme agregamos puntos</span>
+<span class="keyword">acum</span> = <span class="number">4</span> * np.<span class="function">cumsum</span>(dentro) / np.<span class="function">arange</span>(<span class="number">1</span>, N+<span class="number">1</span>)
+
+<span class="keyword">plt</span>.<span class="function">plot</span>(acum, lw=<span class="number">0.8</span>)
+<span class="keyword">plt</span>.<span class="function">axhline</span>(np.pi, color=<span class="string">"tomato"</span>, ls=<span class="string">"--"</span>,
+            label=<span class="string">"π real"</span>)
+<span class="keyword">plt</span>.<span class="function">xlabel</span>(<span class="string">"número de puntos"</span>)
+<span class="keyword">plt</span>.<span class="function">ylabel</span>(<span class="string">"estimación de π"</span>)
+<span class="keyword">plt</span>.<span class="function">legend</span>(); plt.<span class="function">show</span>()
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 360 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ejes -->
+                            <line x1="45" y1="210" x2="345" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="210" x2="45" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- linea pi real -->
+                            <line x1="45" y1="115" x2="345" y2="115" stroke="tomato" stroke-width="1.5" stroke-dasharray="5,3"/>
+                            <text x="348" y="118" font-size="10" fill="tomato">π</text>
+                            <!-- curva convergente (oscila y se estabiliza) -->
+                            <path d="M 45,40 L 60,180 L 75,70 L 90,160 L 105,90 L 120,140 L 140,100 L 160,130 L 185,108 L 210,122 L 240,112 L 270,118 L 300,114 L 345,116"
+                                  fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <!-- etiquetas -->
+                            <text x="195" y="235" text-anchor="middle" font-size="11" fill="#6e6e73">número de puntos (escala 1 → N)</text>
+                            <text x="20" y="120" text-anchor="middle" font-size="11" fill="#6e6e73" transform="rotate(-90 20 120)">π estimado</text>
+                            <text x="195" y="15" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">La estimación se asienta sobre π</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Al principio la estimación salta mucho; conforme crece N se asienta sobre el valor real. Regla práctica: para reducir el error a la mitad hay que cuadruplicar las simulaciones.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Integracion por Monte Carlo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Integración por Monte Carlo</h2>
+                <p class="slide-subtitle">Estimar un área promediando valores de la función</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Estimar ∫₀¹ x² dx  (verdadero = 1/3 ≈ 0.3333)</span>
+<span class="keyword">rng</span> = np.random.<span class="function">default_rng</span>(<span class="number">7</span>)
+<span class="keyword">x</span> = rng.<span class="function">random</span>(<span class="number">100_000</span>)        <span class="comment"># uniformes en [0,1]</span>
+
+<span class="keyword">integral</span> = (x**<span class="number">2</span>).<span class="function">mean</span>()       <span class="comment"># (b-a)=1, así que solo el promedio</span>
+<span class="function">print</span>(<span class="string">f"∫₀¹ x² dx ≈ {integral:.4f}"</span>)
+<span class="output">## ∫₀¹ x² dx ≈ 0.3338</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 300 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ejes -->
+                            <line x1="40" y1="210" x2="280" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- curva x^2 -->
+                            <path d="M 40,210 Q 160,205 200,130 T 280,30" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+                            <text x="262" y="45" font-size="12" fill="#2d2d2d" font-style="italic">x²</text>
+                            <!-- puntos bajo la curva (naranja) -->
+                            <circle cx="80" cy="200" r="2.5" fill="#FF8C00"/>
+                            <circle cx="120" cy="195" r="2.5" fill="#FF8C00"/>
+                            <circle cx="150" cy="185" r="2.5" fill="#FF8C00"/>
+                            <circle cx="200" cy="160" r="2.5" fill="#FF8C00"/>
+                            <circle cx="230" cy="120" r="2.5" fill="#FF8C00"/>
+                            <circle cx="250" cy="90" r="2.5" fill="#FF8C00"/>
+                            <!-- puntos sobre la curva (gris) -->
+                            <circle cx="90" cy="120" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="130" cy="100" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="180" cy="80" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="110" cy="60" r="2.5" fill="#bbbbbb"/>
+                            <circle cx="160" cy="50" r="2.5" fill="#bbbbbb"/>
+                            <text x="160" y="235" text-anchor="middle" font-size="11" fill="#6e6e73">la fracción bajo la curva estima el área</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El promedio de f(x) en puntos aleatorios estima la integral. La gran ventaja: en muchas dimensiones Monte Carlo gana de lejos a cualquier cuadrícula.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: VaR colon-dolar BCCR -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso Costa Rica: VaR del colón-dólar</h2>
+                <p class="slide-subtitle">Riesgo cambiario con datos del BCCR</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Datos reales: Servicio Web del BCCR</span>
+<span class="comment"># indicador 318 = tipo de cambio venta (₡/US$)</span>
+<span class="keyword">tc</span> = <span class="function">descargar_bccr</span>(indicador=<span class="number">318</span>)
+
+<span class="comment"># Retornos logarítmicos diarios</span>
+<span class="keyword">r</span> = np.<span class="function">diff</span>(np.<span class="function">log</span>(tc))
+<span class="keyword">mu</span>, sigma = r.<span class="function">mean</span>(), r.<span class="function">std</span>()
+
+<span class="comment"># Simular 10 000 trayectorias a 30 días</span>
+<span class="keyword">sim</span> = rng.<span class="function">normal</span>(mu, sigma, (<span class="number">10_000</span>, <span class="number">30</span>))
+<span class="keyword">tc30</span> = tc[-<span class="number">1</span>] * np.<span class="function">exp</span>(sim.<span class="function">sum</span>(axis=<span class="number">1</span>))
+
+<span class="keyword">VaR95</span> = np.<span class="function">percentile</span>(tc30, <span class="number">95</span>)
+<span class="function">print</span>(<span class="string">f"VaR 95% del TC a 30 días: ₡{VaR95:.2f}"</span>)
+<span class="output">## VaR 95% del TC a 30 días: ₡527.40</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- ejes -->
+                            <line x1="40" y1="210" x2="320" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- histograma (campana) -->
+                            <rect x="60" y="195" width="14" height="15" fill="#FFD9A0"/>
+                            <rect x="76" y="180" width="14" height="30" fill="#FFD9A0"/>
+                            <rect x="92" y="150" width="14" height="60" fill="#FFD9A0"/>
+                            <rect x="108" y="110" width="14" height="100" fill="#FFD9A0"/>
+                            <rect x="124" y="75" width="14" height="135" fill="#FFC36E"/>
+                            <rect x="140" y="60" width="14" height="150" fill="#FFC36E"/>
+                            <rect x="156" y="70" width="14" height="140" fill="#FFC36E"/>
+                            <rect x="172" y="100" width="14" height="110" fill="#FFD9A0"/>
+                            <rect x="188" y="135" width="14" height="75" fill="#FFD9A0"/>
+                            <rect x="204" y="160" width="14" height="50" fill="#FFD9A0"/>
+                            <rect x="220" y="178" width="14" height="32" fill="#FFD9A0"/>
+                            <rect x="236" y="190" width="14" height="20" fill="#FFD9A0"/>
+                            <rect x="252" y="200" width="14" height="10" fill="#FFD9A0"/>
+                            <!-- linea VaR -->
+                            <line x1="240" y1="40" x2="240" y2="210" stroke="tomato" stroke-width="2"/>
+                            <text x="244" y="50" font-size="11" fill="tomato" font-weight="bold">VaR 95%</text>
+                            <text x="180" y="235" text-anchor="middle" font-size="11" fill="#6e6e73">tipo de cambio simulado a 30 días</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El VaR 95% es el nivel de tipo de cambio que solo se supera el 5% de las veces. Crítico para empresas costarricenses que importan o exportan. Los códigos del BCCR: 317 (compra) y 318 (venta).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Transicion a MCMC -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Y si no sé muestrear?</h2>
+                <p class="slide-subtitle">El problema que MCMC viene a resolver</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>El límite del Monte Carlo simple</h3>
+                    <p>Hasta ahora supusimos que sabemos generar muestras de la distribución (uniformes, normales). Pero en inferencia bayesiana el posterior suele ser una fórmula que conocemos solo "salvo una constante", y de la cual no sabemos muestrear directamente, sobre todo en muchas dimensiones.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>MCMC resuelve exactamente esto: generar muestras de una distribución que solo sabemos evaluar, no dibujar.</p>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>La idea</h4>
+                        <p>Construir una caminata (cadena de Markov) donde cada paso depende solo del actual. Si diseñamos bien las reglas, el caminante pasa más tiempo en las zonas de alta probabilidad, en proporción exacta a la densidad.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El resultado</h4>
+                        <p>Recolectar los lugares visitados equivale a muestrear la distribución. La distribución estacionaria π de la semana 3 es justamente la distribución objetivo.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Metropolis-Hastings -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Metropolis-Hastings en código</h2>
+                <p class="slide-subtitle">Proponer, aceptar o rechazar: lo de la pizarra, automatizado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">def</span> <span class="function">metropolis</span>(log_p, x0, pasos, paso=<span class="number">1.0</span>):
+    <span class="keyword">x</span> = x0; muestras = [x0]
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(pasos):
+        <span class="keyword">xp</span> = x + rng.<span class="function">normal</span>(<span class="number">0</span>, paso)
+        <span class="comment"># razón en log: la constante se cancela</span>
+        <span class="keyword">a</span> = log_p(xp) - log_p(x)
+        <span class="keyword">if</span> np.<span class="function">log</span>(rng.<span class="function">random</span>()) < a:
+            <span class="keyword">x</span> = xp            <span class="comment"># aceptar</span>
+        muestras.<span class="function">append</span>(x)
+    <span class="keyword">return</span> np.<span class="function">array</span>(muestras)
+
+<span class="comment"># Objetivo: normal estándar (sin normalizar)</span>
+<span class="keyword">m</span> = <span class="function">metropolis</span>(<span class="keyword">lambda</span> x: -x**<span class="number">2</span>/<span class="number">2</span>, <span class="number">0.0</span>, <span class="number">5000</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- traza arriba -->
+                            <text x="160" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">traza de la cadena</text>
+                            <line x1="30" y1="70" x2="300" y2="70" stroke="#ddd" stroke-width="1"/>
+                            <path d="M 30,70 L 50,55 L 70,80 L 90,60 L 110,90 L 130,50 L 150,75 L 170,65 L 190,85 L 210,55 L 230,72 L 250,62 L 270,78 L 300,68"
+                                  fill="none" stroke="#FF8C00" stroke-width="1.3"/>
+                            <!-- histograma abajo (campana normal) -->
+                            <text x="160" y="120" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">histograma de las muestras</text>
+                            <line x1="30" y1="235" x2="300" y2="235" stroke="#2d2d2d" stroke-width="1"/>
+                            <rect x="60" y="228" width="16" height="7" fill="#FFD9A0"/>
+                            <rect x="78" y="218" width="16" height="17" fill="#FFD9A0"/>
+                            <rect x="96" y="195" width="16" height="40" fill="#FFD9A0"/>
+                            <rect x="114" y="165" width="16" height="70" fill="#FFC36E"/>
+                            <rect x="132" y="140" width="16" height="95" fill="#FFC36E"/>
+                            <rect x="150" y="135" width="16" height="100" fill="#FFC36E"/>
+                            <rect x="168" y="148" width="16" height="87" fill="#FFC36E"/>
+                            <rect x="186" y="172" width="16" height="63" fill="#FFD9A0"/>
+                            <rect x="204" y="200" width="16" height="35" fill="#FFD9A0"/>
+                            <rect x="222" y="220" width="16" height="15" fill="#FFD9A0"/>
+                            <rect x="240" y="229" width="16" height="6" fill="#FFD9A0"/>
+                            <!-- curva normal superpuesta -->
+                            <path d="M 60,232 Q 130,135 158,133 T 256,232" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El histograma de las muestras recupera la campana normal, aunque nunca normalizamos la densidad. El truco está en la línea <code>a = log_p(xp) - log_p(x)</code>: la constante desconocida desaparece en la resta.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Gibbs y comparacion -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Gibbs: una variable a la vez</h2>
+                <p class="slide-subtitle">El otro clásico, y cuándo usar cada uno</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>La idea de Gibbs</h3>
+                    <p>Cuando el parámetro tiene varias dimensiones, en vez de proponer un salto en todas a la vez, Gibbs actualiza una variable a la vez, fijando las demás y muestreando de su distribución condicional. Es como ajustar una perilla a la vez en una mezcladora de sonido. Es un caso especial de Metropolis-Hastings donde siempre se acepta.</p>
+                </div>
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Método</th>
+                                <th>Cuándo conviene</th>
+                                <th>Debilidad</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Metropolis-Hastings</td><td>Solo se puede evaluar la densidad (no muestrear)</td><td>Hay que afinar el tamaño de paso; explora por caminata aleatoria</td></tr>
+                            <tr><td>Gibbs</td><td>Se conocen las condicionales completas y son fáciles de muestrear</td><td>Requiere condicionales conjugadas; sufre en alta dimensión</td></tr>
+                            <tr><td>HMC / NUTS</td><td>Parámetros continuos con gradiente disponible</td><td>No maneja variables discretas directamente</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Tanto Metropolis-Hastings como Gibbs sufren en alta dimensión porque exploran mediante caminatas aleatorias ineficientes. Esa es justo la puerta de entrada para lo que sigue.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: HMC y NUTS -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que domina en 2026: HMC y NUTS</h2>
+                <p class="slide-subtitle">Fluir en vez de caminar al azar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Hamiltonian Monte Carlo (HMC)</h4>
+                        <p>En vez de caminar al azar, trata el parámetro como una partícula que se desliza por una superficie (el negativo del log-posterior), usando el gradiente para proponer saltos largos con alta probabilidad de aceptación. Suprime la caminata aleatoria ineficiente.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>NUTS (No-U-Turn Sampler)</h4>
+                        <p>Hoffman y Gelman (2014) extienden HMC eliminando el ajuste manual del número de pasos: la trayectoria se detiene sola cuando empieza a "dar una vuelta en U". Por eso es turnkey, sin tuneo.</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Por qué importa pedagógicamente</h3>
+                    <p>El costo de HMC por muestra independiente crece mucho más despacio con la dimensión que el de la caminata aleatoria de Metropolis. Por eso NUTS es el muestreador por defecto en PyMC, Stan, NumPyro y Bambi: el estudiante escribe <code>pm.sample()</code> y obtiene NUTS sin afinar nada.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>El mensaje, parafraseando a McElreath: si todavía afinás un muestreador de Gibbs a mano, estás trabajando de más para obtener de menos. Hoy la herramienta hace ese trabajo por nosotros.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: PyMC caballo de batalla -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">PyMC: el caballo de batalla</h2>
+                <p class="slide-subtitle">Versión 6.0.1 y la sintaxis mínima que hay que conocer</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> pymc <span class="keyword">as</span> pm
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">rng</span> = np.random.<span class="function">default_rng</span>(<span class="number">42</span>)
+<span class="keyword">with</span> pm.<span class="function">Model</span>() <span class="keyword">as</span> modelo:
+    <span class="comment"># priors: lo que creemos antes de ver los datos</span>
+    <span class="keyword">mu</span> = pm.<span class="function">Normal</span>(<span class="string">"mu"</span>, mu=<span class="number">0</span>, sigma=<span class="number">10</span>)
+    <span class="keyword">sigma</span> = pm.<span class="function">HalfNormal</span>(<span class="string">"sigma"</span>, sigma=<span class="number">10</span>)
+    <span class="comment"># verosimilitud: los datos observados</span>
+    <span class="keyword">y</span> = pm.<span class="function">Normal</span>(<span class="string">"y"</span>, mu=mu, sigma=sigma, observed=datos)
+    <span class="comment"># inferencia: NUTS automático</span>
+    <span class="keyword">idata</span> = pm.<span class="function">sample</span>(<span class="number">1000</span>, tune=<span class="number">1000</span>, chains=<span class="number">4</span>)
+                </div>
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">6.0.1</div>
+                        <div class="stat-label">Versión actual (mayo 2026)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">nutpie</div>
+                        <div class="stat-label">Muestreador NUTS por defecto</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">Numba</div>
+                        <div class="stat-label">Backend por defecto (PyTensor 3.0)</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El patrón es siempre el mismo: <code>with pm.Model()</code>, declarar priors, declarar la verosimilitud con <code>observed=</code>, y <code>pm.sample()</code>. PyMC ya se instala seguro con <code>pip install pymc</code>.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Bayes prior x verosimilitud -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Bayes: prior × verosimilitud → posterior</h2>
+                <p class="slide-subtitle">Actualizar creencias con datos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Los tres ingredientes</h3>
+                        <ul>
+                            <li><strong>Prior:</strong> lo que creo del parámetro antes de ver datos</li>
+                            <li><strong>Verosimilitud:</strong> qué tan compatibles son los datos con cada valor</li>
+                            <li><strong>Posterior:</strong> mi creencia actualizada, proporcional a prior × verosimilitud</li>
+                        </ul>
+                        <p style="margin-top:8px;">Con más datos, el posterior se concentra y el prior pesa menos.</p>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="30" y1="200" x2="305" y2="200" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- prior (ancho, gris) -->
+                            <path d="M 30,200 Q 167,120 305,200" fill="none" stroke="#bbbbbb" stroke-width="2.5"/>
+                            <text x="55" y="150" font-size="11" fill="#9a9a9a">prior</text>
+                            <!-- verosimilitud (medio, negro) -->
+                            <path d="M 120,200 Q 200,70 280,200" fill="none" stroke="#2d2d2d" stroke-width="2.5"/>
+                            <text x="255" y="120" font-size="11" fill="#2d2d2d">verosim.</text>
+                            <!-- posterior (estrecho, naranja) -->
+                            <path d="M 150,200 Q 205,30 260,200" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <text x="210" y="45" font-size="11" fill="#FF8C00" font-weight="bold">posterior</text>
+                            <text x="167" y="222" text-anchor="middle" font-size="11" fill="#6e6e73">valor del parámetro →</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El posterior queda entre el prior y la verosimilitud, pero más estrecho que ambos: los datos reducen la incertidumbre. El problema es que casi nunca tiene fórmula cerrada, y ahí entra MCMC.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Ejemplo PyMC posterior -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Inferencia bayesiana con PyMC</h2>
+                <p class="slide-subtitle">Estimar una tasa con su incertidumbre completa</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># 18 de 50 hogares con cierto atributo</span>
+<span class="keyword">n</span>, k = <span class="number">50</span>, <span class="number">18</span>
+<span class="keyword">with</span> pm.<span class="function">Model</span>() <span class="keyword">as</span> modelo:
+    <span class="keyword">theta</span> = pm.<span class="function">Beta</span>(<span class="string">"theta"</span>, <span class="number">1</span>, <span class="number">1</span>)   <span class="comment"># prior uniforme</span>
+    <span class="keyword">y</span> = pm.<span class="function">Binomial</span>(<span class="string">"y"</span>, n=n, p=theta,
+                   observed=k)
+    <span class="keyword">idata</span> = pm.<span class="function">sample</span>(<span class="number">2000</span>, chains=<span class="number">4</span>)
+
+<span class="keyword">az</span>.<span class="function">summary</span>(idata, kind=<span class="string">"stats"</span>)
+<span class="output">##        mean   sd  hdi_5.5%  hdi_94.5%
+## theta  0.365 0.067   0.261     0.470</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="30" y1="195" x2="305" y2="195" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- area HDI sombreada -->
+                            <path d="M 110,195 Q 165,55 215,195 Z" fill="#FFE9CC"/>
+                            <!-- curva posterior -->
+                            <path d="M 50,193 Q 165,40 290,193" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <!-- linea media -->
+                            <line x1="165" y1="55" x2="165" y2="195" stroke="#2d2d2d" stroke-width="1.5" stroke-dasharray="4,2"/>
+                            <text x="165" y="48" text-anchor="middle" font-size="10" fill="#2d2d2d">media 0.365</text>
+                            <!-- limites HDI -->
+                            <text x="105" y="210" font-size="10" fill="#FF8C00">0.261</text>
+                            <text x="200" y="210" font-size="10" fill="#FF8C00">0.470</text>
+                            <text x="167" y="225" text-anchor="middle" font-size="10" fill="#6e6e73">HDI 89% de θ</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El resultado no es un número, es una distribución completa de valores plausibles de θ. De ahí sacamos la media (0.365) y el intervalo de credibilidad (HDI 89%, de 0.261 a 0.470). ArviZ 1.0 usa 0.89 por defecto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: ArviZ diagnostico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Diagnóstico con ArviZ</h2>
+                <p class="slide-subtitle">¿Confiamos en el muestreo? Cuatro cosas que mirar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Qué hay que saber interpretar</h3>
+                        <ul>
+                            <li><strong>R-hat:</strong> debe estar muy cerca de 1 (idealmente ≤ 1.01)</li>
+                            <li><strong>ESS:</strong> tamaño de muestra efectivo; cuanto mayor, mejor (> 400)</li>
+                            <li><strong>Trace plots:</strong> "orugas peludas" estacionarias y bien mezcladas</li>
+                            <li><strong>Posterior predictive checks:</strong> los datos simulados deben parecerse a los reales</li>
+                        </ul>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 230" xmlns="http://www.w3.org/2000/svg">
+                            <!-- buena traza -->
+                            <text x="80" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="darkgreen">buena (mezclada)</text>
+                            <rect x="20" y="22" width="130" height="80" fill="#f5fff5" stroke="#cde8cd"/>
+                            <path d="M 25,62 L 40,45 L 55,75 L 70,50 L 85,80 L 100,48 L 115,72 L 130,55 L 145,68"
+                                  fill="none" stroke="darkgreen" stroke-width="1"/>
+                            <path d="M 25,68 L 40,52 L 55,70 L 70,58 L 85,72 L 100,55 L 115,78 L 130,60 L 145,72"
+                                  fill="none" stroke="#7bc47b" stroke-width="1"/>
+                            <!-- mala traza -->
+                            <text x="240" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="tomato">mala (pegada)</text>
+                            <rect x="175" y="22" width="130" height="80" fill="#fff5f5" stroke="#f0cccc"/>
+                            <path d="M 180,90 L 200,85 L 220,80 L 240,60 L 260,40 L 280,35 L 300,30"
+                                  fill="none" stroke="tomato" stroke-width="1.2"/>
+                            <path d="M 180,60 L 200,62 L 220,58 L 240,70 L 260,75 L 280,85 L 300,88"
+                                  fill="none" stroke="#f0a0a0" stroke-width="1.2"/>
+                            <!-- tabla resumen -->
+                            <text x="160" y="130" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">az.summary(idata)</text>
+                            <rect x="40" y="140" width="240" height="70" fill="#fafafa" stroke="#e5e5e7"/>
+                            <text x="55" y="160" font-size="10" fill="#1d1d1f" font-family="monospace">        mean   r_hat   ess_bulk</text>
+                            <text x="55" y="178" font-size="10" fill="#1d1d1f" font-family="monospace">theta  0.365   1.00     3820</text>
+                            <text x="55" y="196" font-size="10" fill="darkgreen" font-family="monospace">r_hat≈1 y ess alto → todo bien</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La traza buena parece orugas peludas superpuestas; la mala muestra cadenas separadas o con tendencia. Si R-hat se aleja de 1, las cadenas no convergieron y no debemos confiar en el resultado.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Credibilidad vs confianza -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Credibilidad vs. confianza</h2>
+                <p class="slide-subtitle">El punto pedagógico de oro del tema</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Intervalo de credibilidad (bayesiano)</h4>
+                        <p>"Dados los datos y el prior, hay 95% de probabilidad de que el parámetro esté en este rango." Es una afirmación directa sobre el parámetro. En ArviZ se reporta como HDI.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Intervalo de confianza (frecuentista)</h4>
+                        <p>"Si repitiéramos el experimento muchas veces, el 95% de los intervalos así construidos contendrían el valor verdadero." NO es una probabilidad sobre este intervalo en particular.</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>El gancho</h3>
+                    <p>La interpretación intuitiva que casi todo el mundo cree que tiene el intervalo de confianza es, en realidad, la del intervalo de credibilidad. Cuando decimos "hay 95% de probabilidad de que esté aquí", estamos hablando como bayesianos sin saberlo.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>Por eso el enfoque bayesiano se siente tan natural: dice exactamente lo que queremos preguntar. Es un argumento didáctico que conviene remarcar en clase.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Bambi -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Bambi: regresión bayesiana como en R</h2>
+                <p class="slide-subtitle">Cuando una fórmula basta</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> bambi <span class="keyword">as</span> bmb
+
+<span class="comment"># Regresión logística bayesiana: probabilidad de pobreza</span>
+<span class="comment"># del hogar según región, escolaridad y tamaño (datos ENAHO)</span>
+<span class="keyword">modelo</span> = bmb.<span class="function">Model</span>(<span class="string">"pobre ~ escolaridad + tamano_hogar + (1|region)"</span>,
+                   data=enaho, family=<span class="string">"bernoulli"</span>)
+
+<span class="keyword">idata</span> = modelo.<span class="function">fit</span>(draws=<span class="number">2000</span>, chains=<span class="number">4</span>)
+<span class="keyword">az</span>.<span class="function">summary</span>(idata)
+<span class="output">##                  mean    sd   hdi_5.5%  hdi_94.5%  r_hat</span>
+<span class="output">## escolaridad    -0.412  0.05    -0.49     -0.33     1.00</span>
+<span class="output">## tamano_hogar    0.287  0.04     0.22      0.35     1.00</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>La gracia</h4>
+                        <p>Una fórmula estilo R (<code>y ~ x + (1|grupo)</code>) construida sobre PyMC. Ideal para modelos jerárquicos accesibles sin escribir el modelo a mano.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El ejemplo</h4>
+                        <p>Hogares anidados en regiones (efecto aleatorio por región). La escolaridad reduce la probabilidad de pobreza; un hogar más grande la aumenta. Cada coeficiente trae su intervalo de credibilidad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Cuando escalar -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuándo escalar: GPU e inferencia variacional</h2>
+                <p class="slide-subtitle">Umbrales que cambian la herramienta</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Situación</th>
+                                <th>Herramienta recomendada</th>
+                                <th>Por qué</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Corre en segundos con pm.sample()</td><td>PyMC en CPU</td><td>Mejor equilibrio de facilidad, diagnóstico y comunidad</td></tr>
+                            <tr><td>Decenas o cientos de miles de filas</td><td>NumPyro / JAX en GPU</td><td>Punto de cruce GPU > CPU ronda las 50 000 observaciones</td></tr>
+                            <tr><td>Datos masivos, el muestreo tarda demasiado</td><td>Inferencia variacional (ADVI, Pathfinder)</td><td>Aproxima rápido, aceptando que subestima varianzas</td></tr>
+                            <tr><td>Equipo ya en el ecosistema Stan</td><td>CmdStanPy</td><td>PyStan está esencialmente en desuso</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>El número clave</h4>
+                        <p>Según un benchmark de PyMC Labs, PyMC con JAX y GPU puede dar hasta 4 veces más rapidez y unas 11 veces más muestras efectivas por segundo que PyMC y Stan en CPU, en modelos grandes.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>La advertencia</h4>
+                        <p>La inferencia variacional es más rápida pero aproximada: falla con distribuciones multimodales y subestima la incertidumbre. Es complemento, no reemplazo universal de MCMC.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Caso CR dengue -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso Costa Rica: dengue bayesiano</h2>
+                <p class="slide-subtitle">Ministerio de Salud + grupo UCR / CIMPA</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>El estudio real</h3>
+                        <p>Chou-Chen et al. (2023) modelaron casos mensuales de dengue de 2000 a 2021 en 32 cantones de Costa Rica con un modelo bayesiano espacio-temporal, usando datos del Ministerio de Salud más variables climáticas (precipitación, ENSO, NDVI). Un estudio compañero encontró que los índices climáticos anteceden los brotes unos 9 meses.</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Versión simplificada para clase</span>
+<span class="keyword">with</span> pm.<span class="function">Model</span>() <span class="keyword">as</span> dengue:
+    <span class="keyword">a</span> = pm.<span class="function">Normal</span>(<span class="string">"a"</span>, <span class="number">0</span>, <span class="number">5</span>)
+    <span class="keyword">b</span> = pm.<span class="function">Normal</span>(<span class="string">"b_lluvia"</span>, <span class="number">0</span>, <span class="number">1</span>)
+    <span class="keyword">lam</span> = pm.<span class="function">math</span>.<span class="function">exp</span>(a + b*lluvia)
+    <span class="keyword">y</span> = pm.<span class="function">NegativeBinomial</span>(<span class="string">"casos"</span>,
+              mu=lam, alpha=<span class="number">2</span>, observed=casos)
+    <span class="keyword">idata</span> = pm.<span class="function">sample</span>()
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Un modelo de conteo (binomial negativa) bayesiano de casos según lluvia, con incertidumbre del riesgo relativo. Las cifras del Ministerio salen de los boletines epidemiológicos semanales. Es justo el tipo de problema del proyecto integrador.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Sintesis -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Síntesis: del dado al posterior</h2>
+                <p class="slide-subtitle">Una sola familia de ideas, tres escalas</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Técnica</th>
+                                <th>Qué resuelve</th>
+                                <th>Herramienta</th>
+                                <th>Ejemplo de hoy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Monte Carlo clásico</td><td>Estimar probabilidades, integrales, riesgo</td><td>NumPy + SciPy</td><td>π, VaR del colón-dólar</td></tr>
+                            <tr><td>Metropolis-Hastings / Gibbs</td><td>Muestrear lo que solo sabemos evaluar</td><td>NumPy (didáctico)</td><td>Recuperar una normal sin normalizar</td></tr>
+                            <tr><td>HMC / NUTS</td><td>Lo mismo, pero eficiente y automático</td><td>PyMC (pm.sample)</td><td>Posterior de una tasa θ</td></tr>
+                            <tr><td>Inferencia bayesiana</td><td>Actualizar creencias con datos</td><td>PyMC + ArviZ + Bambi</td><td>Pobreza ENAHO, dengue</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Todo arranca en la misma intuición: cuando la fórmula no existe o es intratable, generamos muestras al azar y promediamos. Lo único que cambia es qué tan inteligente es la forma de generar esas muestras.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexión con el proyecto integrador</h2>
+                <p class="slide-subtitle">Carriles donde Monte Carlo y lo bayesiano encajan</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Riesgo financiero</div>
+                        <h4>Cartera con datos del BCCR y la BNV</h4>
+                        <p>VaR por Monte Carlo, simulación de escenarios de mercado. Tipo de cambio colón-dólar como factor de riesgo.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Salud</div>
+                        <h4>Dengue del Ministerio de Salud</h4>
+                        <p>Modelo bayesiano de conteo de casos según clima, con incertidumbre. Datos de boletines epidemiológicos.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Social</div>
+                        <h4>Pobreza por hogar con datos del INEC</h4>
+                        <p>Regresión logística bayesiana jerárquica con Bambi. Hogares anidados en regiones (ENAHO, ENIGH).</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Demanda eléctrica del ICE / CENCE</h4>
+                        <p>Simulación de Monte Carlo de la demanda pico para estimar la probabilidad de exceder un umbral.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Cualquiera de estos carriles puede usar al menos dos métodos del curso. Monte Carlo y la inferencia bayesiana son herramientas naturales para cuantificar incertidumbre en datos reales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Actividad grupal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">25 a 30 minutos: a mano y en Colab</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (a mano, 10 min):</strong> una estimación de Monte Carlo, dos pasos de Metropolis-Hastings y un Bayes discreto</li>
+                        <li><strong>Parte B (en Colab, 12-15 min):</strong> estimar π con gráfico de convergencia, simular un VaR cambiario, y un primer modelo bayesiano con PyMC</li>
+                        <li><strong>Parte C (reflexión, 3 min):</strong> interpretar el VaR y el intervalo de credibilidad, y conectar con el proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>Una foto o escaneo de los cálculos a mano (Parte A)</li>
+                        <li>El notebook de Colab compartido del grupo (formato .ipynb)</li>
+                        <li>Una celda final en Markdown con la reflexión grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento completo de la actividad está en el campus virtual. Ahora mismo los distribuyo a las salas. Estaré rotando entre ellas para apoyar dudas puntuales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Proxima clase -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para la próxima clase (semana 5)</h2>
+                <p class="slide-subtitle">Regresión clásica y regularizada</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Preparación recomendada</h3>
+                    <ul>
+                        <li>Lectura: Murphy (2022), Probabilistic Machine Learning, capítulos de regresión lineal y regularización (gratis en probml.github.io/pml-book)</li>
+                        <li>Refrescar mínimos cuadrados y el concepto de sobreajuste</li>
+                        <li>Repasar la idea de prior: en la semana 5 la regularización Ridge/Lasso tiene una lectura bayesiana directa</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Conexión con lo de hoy</h3>
+                    <ul>
+                        <li>La regresión bayesiana de la semana 5 usa exactamente PyMC y Bambi que vimos hoy</li>
+                        <li>Ridge y Lasso equivalen a poner priors sobre los coeficientes: la regularización es un prior disfrazado</li>
+                        <li>Seguiremos interpretando posteriors e intervalos de credibilidad</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>Si la idea de prior → posterior quedó clara hoy, la semana 5 va a fluir muy bien: la regularización deja de ser un truco y se vuelve una creencia previa sobre los parámetros.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 27: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Cuatro ideas y una sola intuición</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Monte Carlo: el azar resuelve lo difícil</h4>
+                    <p>Cuando la fórmula no existe o es intratable, generamos muchísimos números al azar y promediamos. El error baja como 1/√N. Sirve para π, integrales y, sobre todo, riesgo.</p>
+                </div>
+                <div class="key-point">
+                    <h4>MCMC: muestrear lo que no sabemos dibujar</h4>
+                    <p>Una cadena de Markov diseñada para visitar cada zona en proporción a su probabilidad. Metropolis-Hastings y Gibbs son el fundamento; NUTS es lo que domina hoy.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Bayes: actualizar creencias con datos</h4>
+                    <p>Prior × verosimilitud → posterior. El resultado es una distribución completa, no un número. El intervalo de credibilidad dice lo que de verdad queremos preguntar.</p>
+                </div>
+                <div class="key-point">
+                    <h4>PyMC hace el trabajo pesado</h4>
+                    <p>Con pm.sample() obtenemos NUTS sin afinar nada, y con ArviZ diagnosticamos si confiar. La misma matemática de la pizarra, a escala industrial y con datos de Costa Rica.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 22px;">Gracias por la sesión. Nos vemos la próxima semana con regresión clásica y regularizada.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
