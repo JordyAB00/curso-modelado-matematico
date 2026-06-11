@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 5: Regresión clásica y regularizada - Modelado matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 65px 70px 90px 70px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 22px;
+        }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: calc(100vh - 230px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 20px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .content-box p {
+            font-size: 15px;
+            color: #1d1d1f;
+            line-height: 1.45;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 15px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 6px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .code-box .output {
+            color: #9cdcfe;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 12px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 85px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 60px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .viz-svg {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .viz-svg svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pantallas pequeñas (laptops 13-14", viewport bajo ~850px) */
+        @media (max-height: 850px) {
+            .slide {
+                padding: 55px 60px 70px 60px;
+            }
+            .slide-header {
+                margin-bottom: 14px;
+            }
+            .slide-title {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+            .slide-subtitle {
+                font-size: 16px;
+            }
+            .slide-content {
+                gap: 10px;
+                max-height: calc(100vh - 180px);
+            }
+            .content-box {
+                padding: 12px 16px;
+            }
+            .content-box h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            .content-box p, .content-box li {
+                font-size: 14px;
+            }
+            .highlight-box {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .highlight-box p {
+                font-size: 14px;
+            }
+            .key-point {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .key-point h4 {
+                font-size: 16px;
+            }
+            .key-point p {
+                font-size: 13px;
+            }
+            .comparison-table th {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .comparison-table td {
+                padding: 6px 10px;
+                font-size: 12.5px;
+            }
+            .logo-image {
+                max-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">29</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Regresión clásica y regularizada</h1>
+            <p class="cover-subtitle">Semana 5: de la recta a la creencia previa, con Python</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matemático<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                I Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Recap de la pizarra -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que ya tenemos en la pizarra</h2>
+                <p class="slide-subtitle">Recap rápido antes de pasar al código</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Lo que hicimos a mano</h3>
+                        <ul>
+                            <li>La recta de mínimos cuadrados: 5 hogares, β₁ ≈ 0.80 y β₀ ≈ -1.15</li>
+                            <li>La geometría: OLS es la sombra (proyección) de y sobre el plano de X</li>
+                            <li>El memorizador: sobreajuste y la curva en U</li>
+                            <li>Las dos correas: Ridge (círculo) y Lasso (rombo con esquinas)</li>
+                            <li>El prior disfrazado: Normal = Ridge, Laplace = Lasso</li>
+                            <li>Simulacros de examen: validación cruzada K-fold</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo que vamos a hacer ahora</h3>
+                        <ul>
+                            <li>scikit-learn debe devolver nuestros 0.80 y -1.15 exactos</li>
+                            <li>Ver las rutas de los coeficientes encogiéndose en vivo</li>
+                            <li>Lasso apagando variables en un caso tipo ENAHO</li>
+                            <li>La forma correcta de validar: Pipeline y cero fuga de datos</li>
+                            <li>Regresión bayesiana real con PyMC y Bambi</li>
+                            <li>Comparar modelos como se hace en 2026: LOO con ArviZ</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box" style="margin-top: 15px;">
+                    <p>La idea de esta parte: comprobar que la pizarra y la máquina dicen lo mismo, y luego escalar a problemas donde la pizarra ya no alcanza: cientos de variables, colinealidad y la pregunta de cuánto creerle al modelo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: El stack de la semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de la semana</h2>
+                <p class="slide-subtitle">Lo vigente en ciencia de datos a junio de 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>scikit-learn 1.9.0</h4>
+                        <p>Publicado el 2 de junio de 2026. El estándar para predecir y regularizar: <code>Pipeline</code>, <code>StandardScaler</code>, <code>RidgeCV</code>, <code>LassoCV</code>, <code>ElasticNetCV</code>. El viejo <code>normalize=</code> ya no existe.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>statsmodels 0.14.6</h4>
+                        <p>El estándar para inferir: <code>summary()</code> con p-valores, intervalos de confianza, R² ajustado y diagnósticos (Breusch-Pagan, Durbin-Watson, Jarque-Bera).</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>PyMC 6.0.1 + Bambi 0.18.0</h4>
+                        <p>Los mismos de la semana pasada, ahora para regresión bayesiana. Bambi acepta fórmulas estilo R: <code>"ingreso ~ escolaridad"</code> y construye el modelo PyMC por nosotros.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>ArviZ 1.1</h4>
+                        <p>Diagnóstico y comparación de modelos. La gran noticia de la versión 1.x: WAIC fue eliminado; el estándar es PSIS-LOO-CV vía <code>az.loo</code> y <code>az.compare</code>.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla mental de la semana: statsmodels para explicar e inferir, scikit-learn para predecir y regularizar, Bambi y PyMC cuando necesitamos la incertidumbre completa.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Para qué sirve la regresión hoy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Para qué sirve la regresión en 2026?</h2>
+                <p class="slide-subtitle">El modelo más viejo del curso sigue siendo el más usado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Banca</div>
+                        <h4>Credit scoring</h4>
+                        <p>Modelos lineales regularizados siguen siendo el estándar regulatorio: interpretables, auditables y rápidos. En Costa Rica, el carril de scoring con datos sintéticos tipo SUGEF del proyecto.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Política social</div>
+                        <h4>Proxy-means test</h4>
+                        <p>Predecir el ingreso o la pobreza de un hogar con pocas variables observables. Es literalmente regresión con selección de variables: el trabajo natural del Lasso sobre la ENAHO.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Energía y precios</div>
+                        <h4>Demanda y tarifas</h4>
+                        <p>Demanda eléctrica del ICE según clima y calendario, elasticidades de precios, costos. Regresión múltiple con validación temporal.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Industria de ML</div>
+                        <h4>El baseline obligatorio</h4>
+                        <p>Antes de cualquier red neuronal, el primer modelo en producción es una regresión regularizada. Muchas veces el baseline gana y ahí se queda.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Y un secreto del que hablaremos al final: la capa de salida de casi toda red neuronal es una regresión lineal, y la regularización de hoy es el weight decay con el que se entrenan los LLMs.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Dos culturas -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Dos culturas, dos herramientas</h2>
+                <p class="slide-subtitle">¿Quiero entender o quiero acertar?</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Pregunta</th>
+                                <th>Inferir y explicar</th>
+                                <th>Predecir y regularizar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>¿Qué quiero saber?</td><td>¿La escolaridad afecta el ingreso? ¿Cuánto? ¿Es significativo?</td><td>¿Cuál será el ingreso de un hogar nuevo?</td></tr>
+                            <tr><td>Herramienta</td><td>statsmodels (<code>smf.ols</code>)</td><td>scikit-learn (<code>Pipeline</code> + estimadores)</td></tr>
+                            <tr><td>Salida típica</td><td>Coeficientes con p-valores e intervalos de confianza</td><td>Error de predicción medido con validación cruzada</td></tr>
+                            <tr><td>Métrica reina</td><td>R² ajustado, significancia</td><td>RMSE en datos no vistos</td></tr>
+                            <tr><td>Lo que más le importa</td><td>Supuestos del modelo</td><td>Generalización (no memorizar)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>No son enemigas: son dos preguntas distintas sobre el mismo modelo. Un buen científico de datos sabe cuál pregunta le están haciendo antes de elegir la herramienta. Hoy usaremos ambas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: OLS con scikit-learn -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La pizarra contra la máquina</h2>
+                <p class="slide-subtitle">Los mismos 5 hogares de la parte manual</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LinearRegression
+
+<span class="comment"># Los 5 hogares de la pizarra</span>
+<span class="keyword">X</span> = np.<span class="function">array</span>([[<span class="number">6</span>], [<span class="number">9</span>], [<span class="number">11</span>], [<span class="number">14</span>], [<span class="number">16</span>]])
+<span class="keyword">y</span> = np.<span class="function">array</span>([<span class="number">4</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">10</span>, <span class="number">12</span>])
+
+<span class="keyword">ols</span> = <span class="function">LinearRegression</span>().<span class="function">fit</span>(X, y)
+<span class="function">print</span>(<span class="string">f"pendiente:  {ols.coef_[0]:.4f}"</span>)
+<span class="function">print</span>(<span class="string">f"intercepto: {ols.intercept_:.4f}"</span>)
+<span class="output">## pendiente:  0.7994
+## intercepto: -1.1529</span>
+
+plt.<span class="function">scatter</span>(X, y, s=<span class="number">60</span>)
+plt.<span class="function">plot</span>(X, ols.<span class="function">predict</span>(X), color=<span class="string">"#FF8C00"</span>)
+plt.<span class="function">xlabel</span>(<span class="string">"escolaridad"</span>); plt.<span class="function">ylabel</span>(<span class="string">"ingreso"</span>)
+plt.<span class="function">show</span>()
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 260" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="40" y1="220" x2="300" y2="220" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="220" x2="40" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- recta OLS -->
+                            <line x1="55" y1="195" x2="290" y2="40" stroke="#FF8C00" stroke-width="2.5"/>
+                            <!-- puntos (6,4)(9,6)(11,7)(14,10)(16,12) -->
+                            <circle cx="65" cy="185" r="5" fill="#2d2d2d"/>
+                            <circle cx="130" cy="150" r="5" fill="#2d2d2d"/>
+                            <circle cx="175" cy="130" r="5" fill="#2d2d2d"/>
+                            <circle cx="240" cy="78" r="5" fill="#2d2d2d"/>
+                            <circle cx="285" cy="45" r="5" fill="#2d2d2d"/>
+                            <!-- resortes (residuos) -->
+                            <line x1="65" y1="185" x2="65" y2="189" stroke="#bbbbbb" stroke-width="1.5" stroke-dasharray="2,2"/>
+                            <line x1="130" y1="150" x2="130" y2="146" stroke="#bbbbbb" stroke-width="1.5" stroke-dasharray="2,2"/>
+                            <line x1="175" y1="130" x2="175" y2="118" stroke="#bbbbbb" stroke-width="1.5" stroke-dasharray="2,2"/>
+                            <line x1="240" y1="78" x2="240" y2="74" stroke="#bbbbbb" stroke-width="1.5" stroke-dasharray="2,2"/>
+                            <text x="170" y="245" text-anchor="middle" font-size="11" fill="#6e6e73">escolaridad (años) → ingreso (cientos de miles)</text>
+                            <text x="160" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">ŷ = -1.15 + 0.80 x</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La máquina devuelve 0.7994 y -1.1529: exactamente lo que calculamos a mano con la tabla de desviaciones. Mismos datos, misma matemática; la computadora solo no se equivoca en la aritmética.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6b: datos simulados (setup) -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Los datos de hoy: 300 hogares simulados</h2>
+                <p class="slide-subtitle">Una ENAHO de bolsillo que nos acompaña toda la noche</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+<span class="keyword">rng</span> = np.random.<span class="function">default_rng</span>(<span class="number">2026</span>)
+<span class="keyword">n</span> = <span class="number">300</span>
+<span class="keyword">escolaridad</span>  = rng.<span class="function">normal</span>(<span class="number">11</span>, <span class="number">3.5</span>, n).<span class="function">clip</span>(<span class="number">0</span>, <span class="number">22</span>)
+<span class="keyword">tamano_hogar</span> = rng.<span class="function">integers</span>(<span class="number">1</span>, <span class="number">8</span>, n).<span class="function">astype</span>(<span class="keyword">float</span>)
+<span class="keyword">edad_jefe</span>    = rng.<span class="function">normal</span>(<span class="number">48</span>, <span class="number">13</span>, n).<span class="function">clip</span>(<span class="number">18</span>, <span class="number">90</span>)
+<span class="keyword">esc_pareja</span>   = escolaridad + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1.2</span>, n)   <span class="comment"># colineal a propósito</span>
+<span class="keyword">ruido1</span>, <span class="keyword">ruido2</span>, <span class="keyword">ruido3</span> = rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1</span>, (<span class="number">3</span>, n))    <span class="comment"># NO afectan el ingreso</span>
+
+<span class="keyword">ingreso</span> = (<span class="number">2.0</span> + <span class="number">0.75</span>*escolaridad - <span class="number">0.9</span>*tamano_hogar
+           + <span class="number">0.02</span>*edad_jefe + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1.8</span>, n))
+
+<span class="keyword">df</span> = pd.<span class="function">DataFrame</span>({<span class="string">"ingreso"</span>: ingreso, <span class="string">"escolaridad"</span>: escolaridad,
+                   <span class="string">"tamano_hogar"</span>: tamano_hogar, <span class="string">"edad_jefe"</span>: edad_jefe,
+                   <span class="string">"esc_pareja"</span>: esc_pareja, <span class="string">"ruido1"</span>: ruido1,
+                   <span class="string">"ruido2"</span>: ruido2, <span class="string">"ruido3"</span>: ruido3})
+<span class="keyword">X</span> = df.<span class="function">drop</span>(columns=<span class="string">"ingreso"</span>).values
+<span class="keyword">y</span> = df[<span class="string">"ingreso"</span>].values
+<span class="function">print</span>(df[[<span class="string">"ingreso"</span>, <span class="string">"escolaridad"</span>, <span class="string">"tamano_hogar"</span>, <span class="string">"esc_pareja"</span>]].<span class="function">head</span>().<span class="function">round</span>(<span class="number">2</span>))
+<span class="output">##    ingreso  escolaridad  tamano_hogar  esc_pareja
+## 0     3.68         8.22           6.0        8.45
+## 1    10.09        11.84           4.0       10.67
+## 2     3.87         4.36           4.0        3.40
+## 3    11.69        15.89           1.0       16.37
+## 4    10.90        13.23           1.0       13.60</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Por qué simulados</h4>
+                        <p>Porque conocemos la verdad: el ingreso se construyó con 0.75 por año de escolaridad, -0.9 por miembro del hogar, 0.02 por año de edad, y tres variables de puro ruido. Podemos calificar a cada modelo contra esa verdad.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El mismo df de la actividad</h4>
+                        <p>La Celda 1 del notebook grupal genera exactamente estos datos (semilla 2026). Lo que vean aquí es lo que les saldrá en Colab, número por número.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Todo el código del resto de la presentación corre sobre este df, en orden: si copian las celdas de arriba hacia abajo en un notebook, reproducen cada salida que ven en pantalla.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: statsmodels -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La otra cultura: statsmodels</h2>
+                <p class="slide-subtitle">Cuando la pregunta es inferir, no solo predecir</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> statsmodels.formula.api <span class="keyword">as</span> smf
+
+<span class="comment"># El df de 300 hogares que acabamos de simular</span>
+<span class="keyword">modelo</span> = smf.<span class="function">ols</span>(<span class="string">"ingreso ~ escolaridad + tamano_hogar"</span>, data=df).<span class="function">fit</span>()
+<span class="function">print</span>(modelo.<span class="function">summary</span>())
+<span class="output">##                  coef    std err        t      P>|t|     [0.025    0.975]
+## ---------------------------------------------------------------------------
+## Intercept      3.0330      0.414    7.325      0.000      2.218     3.848
+## escolaridad    0.7350      0.029   25.586      0.000      0.678     0.792
+## tamano_hogar  -0.8726      0.054  -16.164      0.000     -0.979    -0.766
+## ---------------------------------------------------------------------------
+## R-squared: 0.765   Adj. R-squared: 0.763   AIC: 1218.3   BIC: 1229.4</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Cómo se lee</h4>
+                        <p>Cada año de escolaridad suma unos 73 500 colones de ingreso, manteniendo fijo el tamaño del hogar (el ceteris paribus de la pizarra). Y miren: simulamos con 0.75 y el modelo estima 0.735, con el valor verdadero dentro del intervalo de confianza. La maquinaria funciona.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Lo que scikit-learn no da</h4>
+                        <p>Errores estándar, p-valores, intervalos de confianza, R² ajustado, AIC y BIC. Por eso la regla: statsmodels para el informe que explica, scikit-learn para el sistema que predice.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Diagnostico de residuos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El modelo confiesa en sus residuos</h2>
+                <p class="slide-subtitle">Los cuatro mini dibujos de la pizarra, ahora con datos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Residuos vs. valores ajustados: el diagnóstico básico</span>
+<span class="keyword">residuos</span> = modelo.resid
+<span class="keyword">ajustados</span> = modelo.fittedvalues
+
+plt.<span class="function">scatter</span>(ajustados, residuos, alpha=<span class="number">0.5</span>)
+plt.<span class="function">axhline</span>(<span class="number">0</span>, color=<span class="string">"tomato"</span>, ls=<span class="string">"--"</span>)
+plt.<span class="function">xlabel</span>(<span class="string">"valores ajustados"</span>)
+plt.<span class="function">ylabel</span>(<span class="string">"residuos"</span>)
+plt.<span class="function">show</span>()
+
+<span class="comment"># Pruebas formales en una línea</span>
+<span class="keyword">from</span> statsmodels.stats.api <span class="keyword">import</span> het_breuschpagan
+<span class="keyword">bp</span> = <span class="function">het_breuschpagan</span>(residuos, modelo.model.exog)
+<span class="function">print</span>(<span class="string">f"Breusch-Pagan p-valor: {bp[1]:.3f}"</span>)
+<span class="output">## Breusch-Pagan p-valor: 0.017   (p &lt; 0.05: hay heterocedasticidad leve)</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+                            <text x="90" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="darkgreen">sano: nube sin patrón</text>
+                            <rect x="15" y="25" width="150" height="100" fill="#f5fff5" stroke="#cde8cd"/>
+                            <line x1="15" y1="75" x2="165" y2="75" stroke="tomato" stroke-width="1" stroke-dasharray="4,2"/>
+                            <circle cx="30" cy="60" r="2.5" fill="#2d2d2d"/><circle cx="45" cy="90" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="60" cy="55" r="2.5" fill="#2d2d2d"/><circle cx="72" cy="85" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="88" cy="65" r="2.5" fill="#2d2d2d"/><circle cx="100" cy="95" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="115" cy="58" r="2.5" fill="#2d2d2d"/><circle cx="130" cy="88" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="145" cy="68" r="2.5" fill="#2d2d2d"/><circle cx="152" cy="82" r="2.5" fill="#2d2d2d"/>
+                            <text x="250" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="tomato">enfermo: embudo</text>
+                            <rect x="175" y="25" width="150" height="100" fill="#fff5f5" stroke="#f0cccc"/>
+                            <line x1="175" y1="75" x2="325" y2="75" stroke="tomato" stroke-width="1" stroke-dasharray="4,2"/>
+                            <circle cx="190" cy="72" r="2.5" fill="#2d2d2d"/><circle cx="205" cy="79" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="220" cy="68" r="2.5" fill="#2d2d2d"/><circle cx="235" cy="85" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="250" cy="58" r="2.5" fill="#2d2d2d"/><circle cx="263" cy="95" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="278" cy="45" r="2.5" fill="#2d2d2d"/><circle cx="292" cy="105" r="2.5" fill="#2d2d2d"/>
+                            <circle cx="305" cy="35" r="2.5" fill="#2d2d2d"/><circle cx="315" cy="112" r="2.5" fill="#2d2d2d"/>
+                            <text x="170" y="150" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Q-Q plot de los residuos</text>
+                            <rect x="90" y="158" width="160" height="90" fill="#fafafa" stroke="#e5e5e7"/>
+                            <line x1="100" y1="240" x2="240" y2="166" stroke="#bbbbbb" stroke-width="1.2" stroke-dasharray="4,2"/>
+                            <circle cx="108" cy="237" r="2.5" fill="#FF8C00"/><circle cx="125" cy="228" r="2.5" fill="#FF8C00"/>
+                            <circle cx="142" cy="219" r="2.5" fill="#FF8C00"/><circle cx="160" cy="209" r="2.5" fill="#FF8C00"/>
+                            <circle cx="178" cy="200" r="2.5" fill="#FF8C00"/><circle cx="196" cy="190" r="2.5" fill="#FF8C00"/>
+                            <circle cx="214" cy="181" r="2.5" fill="#FF8C00"/><circle cx="230" cy="172" r="2.5" fill="#FF8C00"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Si la nube no tiene patrón y los puntos del Q-Q caen sobre la diagonal, los supuestos LINE de la pizarra están razonablemente bien. El embudo delata varianza creciente. Nuestro df, de hecho, da p = 0.017: una heterocedasticidad leve (los recortes con clip la inducen). El diagnóstico la detecta, y eso es justo lo que queremos ver.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: El enemigo en accion -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El enemigo en acción: coeficientes que gritan</h2>
+                <p class="slide-subtitle">Colinealidad y sobreajuste, vistos en consola</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Una gemela casi exacta de la escolaridad (corr 0.999)</span>
+<span class="comment"># y pocos datos: la receta del desastre</span>
+<span class="keyword">esc_gemela</span> = escolaridad + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">0.1</span>, n)
+<span class="keyword">X2</span> = np.<span class="function">column_stack</span>([escolaridad, esc_gemela])[:<span class="number">25</span>]
+<span class="keyword">y25</span> = y[:<span class="number">25</span>]   <span class="comment"># solo 25 hogares</span>
+
+<span class="keyword">ols2</span> = <span class="function">LinearRegression</span>().<span class="function">fit</span>(X2, y25)
+<span class="function">print</span>(<span class="string">"OLS:  "</span>, ols2.coef_.<span class="function">round</span>(2))
+<span class="output">## OLS:   [ 4.84 -4.05]   ← gigantes y de signos opuestos</span>
+
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> Ridge
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler
+<span class="keyword">Xs2</span> = <span class="function">StandardScaler</span>().<span class="function">fit_transform</span>(X2)
+<span class="keyword">r</span> = <span class="function">Ridge</span>(alpha=<span class="number">10</span>).<span class="function">fit</span>(Xs2, y25)
+<span class="function">print</span>(<span class="string">"Ridge:"</span>, r.coef_.<span class="function">round</span>(2))
+<span class="output">## Ridge: [0.82 0.79]   ← se reparten el efecto, con calma</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="45" y1="210" x2="320" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="210" x2="45" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- curva train -->
+                            <path d="M 60,90 Q 140,150 200,170 T 310,195" fill="none" stroke="#bbbbbb" stroke-width="2.5"/>
+                            <text x="270" y="185" font-size="11" fill="#9a9a9a">entrenamiento</text>
+                            <!-- curva test en U -->
+                            <path d="M 60,100 Q 150,160 195,155 Q 250,150 305,55" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <text x="280" y="48" font-size="11" fill="#FF8C00" font-weight="bold">prueba</text>
+                            <!-- punto dulce -->
+                            <line x1="195" y1="155" x2="195" y2="210" stroke="#2d2d2d" stroke-width="1" stroke-dasharray="4,2"/>
+                            <circle cx="195" cy="155" r="5" fill="#2d2d2d"/>
+                            <text x="195" y="228" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="600">punto dulce</text>
+                            <text x="182" y="243" text-anchor="middle" font-size="11" fill="#6e6e73">complejidad del modelo →</text>
+                            <text x="25" y="115" text-anchor="middle" font-size="11" fill="#6e6e73" transform="rotate(-90 25 115)">error</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Una pendiente de +4.84 y otra de -4.05 para dos variables que miden lo mismo: OLS inventa coeficientes enormes que se cancelan entre sí; ajusta perfecto los datos viejos y delira con los nuevos. Ridge suma λI a la matriz XᵀX y los obliga a hablar en voz baja. Es la correa de la pizarra, en acción.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Pipeline canonico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El patrón canónico: Pipeline</h2>
+                <p class="slide-subtitle">Estandarizar y regularizar, sin hacer trampa</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">from</span> sklearn.pipeline <span class="keyword">import</span> make_pipeline
+<span class="keyword">from</span> sklearn.preprocessing <span class="keyword">import</span> StandardScaler
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> Ridge
+
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split
+<span class="keyword">X_train</span>, <span class="keyword">X_test</span>, <span class="keyword">y_train</span>, <span class="keyword">y_test</span> = <span class="function">train_test_split</span>(
+    X, y, test_size=<span class="number">0.25</span>, random_state=<span class="number">42</span>)
+
+<span class="comment"># TODO junto: escalar + regularizar en un solo objeto</span>
+<span class="keyword">pipe</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(), <span class="function">Ridge</span>(alpha=<span class="number">1.0</span>))
+<span class="keyword">pipe</span>.<span class="function">fit</span>(X_train, y_train)
+<span class="function">print</span>(<span class="string">f"R² en prueba: {pipe.score(X_test, y_test):.3f}"</span>)
+<span class="output">## R² en prueba: 0.845</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Por qué estandarizar es obligatorio</h4>
+                        <p>La correa castiga el tamaño de los coeficientes, y el tamaño depende de las unidades: una variable en colones tendría coeficiente diminuto y la correa casi no la tocaría. Media 0 y varianza 1 para todas: penalización justa.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Por qué dentro del Pipeline</h4>
+                        <p>El scaler aprende su media y varianza solo con los datos de entrenamiento de cada pliegue. Escalar todo el dataset antes de partirlo es fuga de datos: el examen contaminado del que hablamos en la pizarra.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Nota de arqueología: en versiones viejas de scikit-learn existía <code>Ridge(normalize=True)</code>. Fue eliminado hace años; si lo ven en un tutorial, ese tutorial está vencido. La forma idiomática en 2026 es StandardScaler dentro del Pipeline.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Ridge ruta de coeficientes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ridge en vivo: la ruta de los coeficientes</h2>
+                <p class="slide-subtitle">Apretar la correa y ver qué pasa</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">alphas</span> = np.<span class="function">logspace</span>(-<span class="number">2</span>, <span class="number">4</span>, <span class="number">60</span>)
+<span class="keyword">coefs</span> = []
+<span class="keyword">for</span> a <span class="keyword">in</span> alphas:
+    <span class="keyword">m</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(),
+                      <span class="function">Ridge</span>(alpha=a)).<span class="function">fit</span>(X, y)
+    coefs.<span class="function">append</span>(m[-<span class="number">1</span>].coef_)
+
+plt.<span class="function">plot</span>(alphas, coefs)
+plt.<span class="function">xscale</span>(<span class="string">"log"</span>)
+plt.<span class="function">xlabel</span>(<span class="string">"alpha (fuerza de la correa)"</span>)
+plt.<span class="function">ylabel</span>(<span class="string">"coeficiente"</span>)
+plt.<span class="function">title</span>(<span class="string">"Ruta Ridge"</span>); plt.<span class="function">show</span>()
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="40" y1="125" x2="320" y2="125" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <line x1="40" y1="220" x2="320" y2="220" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="220" x2="40" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M 45,45 C 130,50 200,95 315,122" fill="none" stroke="#FF8C00" stroke-width="2.5"/>
+                            <path d="M 45,70 C 130,75 200,105 315,123" fill="none" stroke="#FFC36E" stroke-width="2.5"/>
+                            <path d="M 45,95 C 130,98 200,115 315,124" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+                            <path d="M 45,185 C 130,180 200,150 315,128" fill="none" stroke="#6e6e73" stroke-width="2"/>
+                            <path d="M 45,160 C 130,158 200,140 315,127" fill="none" stroke="#bbbbbb" stroke-width="2"/>
+                            <text x="55" y="38" font-size="10" fill="#FF8C00" font-weight="600">escolaridad</text>
+                            <text x="55" y="200" font-size="10" fill="#6e6e73">tamaño hogar</text>
+                            <text x="180" y="243" text-anchor="middle" font-size="11" fill="#6e6e73">alpha (escala log) →</text>
+                            <text x="170" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">Todos se acercan a cero, ninguno llega</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Es el mini cálculo de la pizarra (0.80 → 0.61 → 0.31) generalizado: con alpha pequeño recuperamos OLS, con alpha grande todo tiende a cero, pero suavemente y sin tocarlo nunca. El círculo no tiene esquinas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Lasso esparsidad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lasso en vivo: variables que se apagan</h2>
+                <p class="slide-subtitle">El rombo cumple su promesa</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> LassoCV
+
+<span class="keyword">lasso</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(),
+        <span class="function">LassoCV</span>(cv=<span class="number">10</span>, random_state=<span class="number">0</span>)).<span class="function">fit</span>(X, y)
+
+<span class="keyword">l</span> = lasso[-<span class="number">1</span>]
+<span class="function">print</span>(<span class="string">f"alpha elegido por CV: {l.alpha_:.3f}"</span>)
+<span class="keyword">apagadas</span> = (l.coef_ == <span class="number">0</span>).<span class="function">sum</span>()
+<span class="function">print</span>(<span class="string">f"{apagadas} de {len(l.coef_)} coeficientes en CERO exacto"</span>)
+<span class="output">## alpha elegido por CV: 0.056
+## 3 de 7 coeficientes en CERO exacto</span>
+
+<span class="keyword">for</span> nombre, c <span class="keyword">in</span> <span class="function">zip</span>(df.columns[<span class="number">1</span>:], l.coef_):
+    <span class="function">print</span>(<span class="string">f"{nombre:14s} {c:+.3f}"</span>)
+<span class="output">## escolaridad    +2.664
+## tamano_hogar   -1.636
+## edad_jefe      +0.192
+## esc_pareja     +0.000   ← apagada (redundante)
+## ruido1         +0.098   ← sobrevivió por poco
+## ruido2         -0.000   ← apagada
+## ruido3         -0.000   ← apagada</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="40" y1="125" x2="320" y2="125" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <line x1="40" y1="220" x2="320" y2="220" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="220" x2="40" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M 45,45 C 150,55 240,100 315,123" fill="none" stroke="#FF8C00" stroke-width="2.5"/>
+                            <path d="M 45,80 C 120,85 180,118 225,125 L 315,125" fill="none" stroke="#FFC36E" stroke-width="2.5"/>
+                            <path d="M 45,95 C 100,100 145,120 175,125 L 315,125" fill="none" stroke="#2d2d2d" stroke-width="2"/>
+                            <path d="M 45,175 C 100,170 140,132 165,125 L 315,125" fill="none" stroke="#6e6e73" stroke-width="2"/>
+                            <path d="M 45,155 C 85,152 110,128 128,125 L 315,125" fill="none" stroke="#bbbbbb" stroke-width="2"/>
+                            <circle cx="128" cy="125" r="4" fill="tomato"/>
+                            <circle cx="165" cy="125" r="4" fill="tomato"/>
+                            <circle cx="175" cy="125" r="4" fill="tomato"/>
+                            <circle cx="225" cy="125" r="4" fill="tomato"/>
+                            <text x="230" y="112" font-size="10" fill="tomato" font-weight="600">cero exacto</text>
+                            <text x="55" y="38" font-size="10" fill="#FF8C00" font-weight="600">escolaridad (sobrevive)</text>
+                            <text x="180" y="243" text-anchor="middle" font-size="11" fill="#6e6e73">alpha (escala log) →</text>
+                            <text x="170" y="14" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">Las variables van muriendo una a una</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Lasso no solo encoge: selecciona. Apagó la gemela redundante y dos de los tres ruidos. Pero ojo: ruido1 sobrevivió con un coeficiente diminuto. La selección automática es poderosa, no infalible; por eso el coeficiente pequeño también se lee con ojo crítico. (Los valores están en escala estandarizada: efecto por desviación estándar.)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Geometria -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Por qué: el círculo y el rombo</h2>
+                <p class="slide-subtitle">El dibujo de la pizarra, formalizado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">Ridge: restricción circular</text>
+                            <line x1="160" y1="30" x2="160" y2="230" stroke="#bbbbbb" stroke-width="1"/>
+                            <line x1="40" y1="135" x2="290" y2="135" stroke="#bbbbbb" stroke-width="1"/>
+                            <circle cx="160" cy="135" r="55" fill="#FFE9CC" stroke="#FF8C00" stroke-width="2.5"/>
+                            <ellipse cx="245" cy="70" rx="58" ry="30" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 70)"/>
+                            <ellipse cx="245" cy="70" rx="38" ry="19" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 70)"/>
+                            <ellipse cx="245" cy="70" rx="18" ry="9" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 70)"/>
+                            <circle cx="203" cy="100" r="5" fill="#2d2d2d"/>
+                            <text x="222" y="118" font-size="10" fill="#2d2d2d">β₁≠0, β₂≠0</text>
+                        </svg>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">Lasso: restricción romboidal</text>
+                            <line x1="160" y1="30" x2="160" y2="230" stroke="#bbbbbb" stroke-width="1"/>
+                            <line x1="40" y1="135" x2="290" y2="135" stroke="#bbbbbb" stroke-width="1"/>
+                            <polygon points="160,80 215,135 160,190 105,135" fill="#FFE9CC" stroke="#FF8C00" stroke-width="2.5"/>
+                            <ellipse cx="245" cy="68" rx="58" ry="30" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 68)"/>
+                            <ellipse cx="245" cy="68" rx="38" ry="19" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 68)"/>
+                            <ellipse cx="245" cy="68" rx="18" ry="9" fill="none" stroke="#2d2d2d" stroke-width="1.4" transform="rotate(-25 245 68)"/>
+                            <circle cx="160" cy="80" r="5" fill="tomato"/>
+                            <text x="170" y="70" font-size="10" fill="tomato" font-weight="600">esquina: β₁ = 0</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Ridge (norma L2)</h4>
+                        <p>El contorno del error toca el círculo en un punto genérico: ambos coeficientes pequeños, ninguno exactamente cero. Encoge el volumen sin apagar canales.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Lasso (norma L1)</h4>
+                        <p>El rombo tiene esquinas sobre los ejes, y la elipse tiende a engancharse ahí. En una esquina, un coeficiente vale cero exacto: selección automática de variables.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Elastic Net -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Elastic Net: la mezcla de las correas</h2>
+                <p class="slide-subtitle">Cuándo ni Ridge ni Lasso solos bastan</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> ElasticNetCV
+
+<span class="keyword">enet</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(),
+       <span class="function">ElasticNetCV</span>(l1_ratio=[<span class="number">.1</span>, <span class="number">.5</span>, <span class="number">.7</span>, <span class="number">.9</span>, <span class="number">.95</span>, <span class="number">1</span>],
+                    cv=<span class="number">10</span>)).<span class="function">fit</span>(X, y)
+
+<span class="keyword">e</span> = enet[-<span class="number">1</span>]
+<span class="function">print</span>(<span class="string">f"l1_ratio elegido: {e.l1_ratio_}"</span>)
+<span class="function">print</span>(<span class="string">f"alpha elegido:    {e.alpha_:.3f}"</span>)
+<span class="output">## l1_ratio elegido: 1.0
+## alpha elegido:    0.056</span>
+
+<span class="comment"># l1_ratio = 1 → puro Lasso; l1_ratio = 0 → puro Ridge</span>
+                    </div>
+                    <div class="content-box">
+                        <h3>Cuándo conviene</h3>
+                        <ul>
+                            <li>Grupos de variables correlacionadas: Lasso elige una al azar del grupo; Elastic Net las encoge y selecciona juntas (efecto agrupador)</li>
+                            <li>Más variables que observaciones (p mayor que n), donde Lasso se queda corto</li>
+                            <li>Cuando no sabemos cuál correa usar: dejamos que la validación cruzada elija la mezcla</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Cuidado con los nombres en scikit-learn: alpha es la fuerza global de la correa y l1_ratio es la proporción de rombo en la mezcla. En nuestro df la CV eligió l1_ratio = 1: Lasso puro. Tiene lógica: con ruidos genuinamente inútiles, apagar gana. En datos con grupos correlacionados suele ganar una mezcla intermedia.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Validacion cruzada -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Validación cruzada en código</h2>
+                <p class="slide-subtitle">Los simulacros de examen, automatizados</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> cross_val_score, KFold
+
+<span class="keyword">cv</span> = <span class="function">KFold</span>(n_splits=<span class="number">5</span>, shuffle=<span class="keyword">True</span>, random_state=<span class="number">42</span>)
+<span class="keyword">rmse</span> = -<span class="function">cross_val_score</span>(pipe, X, y, cv=cv,
+        scoring=<span class="string">"neg_root_mean_squared_error"</span>)
+
+<span class="keyword">for</span> i, e <span class="keyword">in</span> <span class="function">enumerate</span>(rmse, <span class="number">1</span>):
+    <span class="function">print</span>(<span class="string">f"pliegue {i}: RMSE = {e:.3f}"</span>)
+<span class="function">print</span>(<span class="string">f"promedio:  {rmse.mean():.3f} ± {rmse.std():.3f}"</span>)
+<span class="output">## pliegue 1: RMSE = 1.447
+## pliegue 2: RMSE = 1.837
+## pliegue 3: RMSE = 2.349
+## pliegue 4: RMSE = 1.732
+## pliegue 5: RMSE = 1.736
+## promedio:  1.820 ± 0.295</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">K-fold con K = 5</text>
+                            <!-- 5 filas de 5 bloques -->
+                            <g font-size="9" fill="#6e6e73">
+                            <!-- fila 1 -->
+                            <rect x="60" y="30" width="48" height="28" fill="#FF8C00" stroke="#fff"/><rect x="108" y="30" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="156" y="30" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="204" y="30" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="252" y="30" width="48" height="28" fill="#e5e5e7" stroke="#fff"/>
+                            <text x="40" y="48">it. 1</text>
+                            <!-- fila 2 -->
+                            <rect x="60" y="64" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="108" y="64" width="48" height="28" fill="#FF8C00" stroke="#fff"/><rect x="156" y="64" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="204" y="64" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="252" y="64" width="48" height="28" fill="#e5e5e7" stroke="#fff"/>
+                            <text x="40" y="82">it. 2</text>
+                            <!-- fila 3 -->
+                            <rect x="60" y="98" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="108" y="98" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="156" y="98" width="48" height="28" fill="#FF8C00" stroke="#fff"/><rect x="204" y="98" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="252" y="98" width="48" height="28" fill="#e5e5e7" stroke="#fff"/>
+                            <text x="40" y="116">it. 3</text>
+                            <!-- fila 4 -->
+                            <rect x="60" y="132" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="108" y="132" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="156" y="132" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="204" y="132" width="48" height="28" fill="#FF8C00" stroke="#fff"/><rect x="252" y="132" width="48" height="28" fill="#e5e5e7" stroke="#fff"/>
+                            <text x="40" y="150">it. 4</text>
+                            <!-- fila 5 -->
+                            <rect x="60" y="166" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="108" y="166" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="156" y="166" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="204" y="166" width="48" height="28" fill="#e5e5e7" stroke="#fff"/><rect x="252" y="166" width="48" height="28" fill="#FF8C00" stroke="#fff"/>
+                            <text x="40" y="184">it. 5</text>
+                            </g>
+                            <rect x="60" y="210" width="12" height="12" fill="#FF8C00"/><text x="78" y="220" font-size="10" fill="#6e6e73">prueba</text>
+                            <rect x="140" y="210" width="12" height="12" fill="#e5e5e7"/><text x="158" y="220" font-size="10" fill="#6e6e73">entrenamiento</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Cinco simulacros, cinco notas, un promedio honesto con su desviación. Y como el Pipeline va completo dentro de cross_val_score, el escalado se reaprende en cada pliegue: cero fuga de datos sin esfuerzo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: TimeSeriesSplit -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuando los datos tienen reloj: TimeSeriesSplit</h2>
+                <p class="slide-subtitle">Caso BCCR: el K-fold normal haría trampa</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> TimeSeriesSplit
+
+<span class="comment"># Tipo de cambio simulado: caminata aleatoria de 200 días</span>
+<span class="comment"># (en el proyecto: la serie real del BCCR, indicador 318)</span>
+<span class="keyword">serie</span> = <span class="number">520</span> + np.<span class="function">cumsum</span>(rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1.5</span>, <span class="number">200</span>))
+
+<span class="keyword">tss</span> = <span class="function">TimeSeriesSplit</span>(n_splits=<span class="number">4</span>, gap=<span class="number">5</span>)
+
+<span class="keyword">for</span> i, (tr, te) <span class="keyword">in</span> <span class="function">enumerate</span>(tss.<span class="function">split</span>(serie), <span class="number">1</span>):
+    <span class="function">print</span>(<span class="string">f"it. {i}: entreno hasta el día {tr[-1]}, "</span>
+          <span class="string">f"pruebo del {te[0]} al {te[-1]}"</span>)
+<span class="output">## it. 1: entreno hasta el día 34, pruebo del 40 al 79
+## it. 2: entreno hasta el día 74, pruebo del 80 al 119
+## it. 3: entreno hasta el día 114, pruebo del 120 al 159
+## it. 4: entreno hasta el día 154, pruebo del 160 al 199</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">Ventana expansiva: el pasado predice el futuro</text>
+                            <g font-size="9" fill="#6e6e73">
+                            <rect x="60" y="32" width="60" height="26" fill="#e5e5e7"/><rect x="124" y="32" width="50" height="26" fill="#FF8C00"/>
+                            <text x="38" y="49">it. 1</text>
+                            <rect x="60" y="66" width="112" height="26" fill="#e5e5e7"/><rect x="176" y="66" width="50" height="26" fill="#FF8C00"/>
+                            <text x="38" y="83">it. 2</text>
+                            <rect x="60" y="100" width="164" height="26" fill="#e5e5e7"/><rect x="228" y="100" width="50" height="26" fill="#FF8C00"/>
+                            <text x="38" y="117">it. 3</text>
+                            <rect x="60" y="134" width="216" height="26" fill="#e5e5e7"/><rect x="280" y="134" width="40" height="26" fill="#FF8C00"/>
+                            <text x="38" y="151">it. 4</text>
+                            </g>
+                            <line x1="60" y1="180" x2="320" y2="180" stroke="#2d2d2d" stroke-width="1"/>
+                            <text x="190" y="198" text-anchor="middle" font-size="10" fill="#6e6e73">tiempo →</text>
+                            <rect x="80" y="206" width="12" height="12" fill="#e5e5e7"/><text x="98" y="216" font-size="10" fill="#6e6e73">pasado (entreno)</text>
+                            <rect x="210" y="206" width="12" height="12" fill="#FF8C00"/><text x="228" y="216" font-size="10" fill="#6e6e73">futuro (pruebo)</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Barajar días del tipo de cambio mezclaría futuro con pasado: el modelo "vería" mañana para predecir hoy. TimeSeriesSplit entrena siempre hacia atrás y prueba hacia adelante; el parámetro gap deja un colchón entre ambos. Esto reaparece con fuerza en las semanas 6 y 7.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Curva de validacion y 1-SE -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Elegir alpha: la curva de validación</h2>
+                <p class="slide-subtitle">El mínimo, y la regla del error estándar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">from</span> sklearn.linear_model <span class="keyword">import</span> RidgeCV
+
+<span class="keyword">ridge</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(),
+        <span class="function">RidgeCV</span>(alphas=np.<span class="function">logspace</span>(-<span class="number">3</span>, <span class="number">3</span>, <span class="number">50</span>))).<span class="function">fit</span>(X, y)
+
+<span class="function">print</span>(<span class="string">f"alpha óptimo (CV): {ridge[-1].alpha_:.3f}"</span>)
+<span class="output">## alpha óptimo (CV): 0.655</span>
+
+<span class="comment"># RidgeCV usa LOO eficiente (GCV): prueba 50 alphas</span>
+<span class="comment"># casi al precio de un solo ajuste. Por eso se prefiere</span>
+<span class="comment"># a un GridSearchCV genérico para este caso.</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="45" y1="210" x2="320" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="210" x2="45" y2="20" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- curva en U con barras de error -->
+                            <path d="M 60,60 Q 120,140 165,150 Q 215,158 300,70" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <g stroke="#FFC36E" stroke-width="1.5">
+                            <line x1="80" y1="85" x2="80" y2="115"/><line x1="120" y1="125" x2="120" y2="150"/>
+                            <line x1="165" y1="138" x2="165" y2="162"/><line x1="210" y1="142" x2="210" y2="168"/>
+                            <line x1="255" y1="105" x2="255" y2="135"/>
+                            </g>
+                            <!-- minimo -->
+                            <circle cx="165" cy="150" r="5" fill="#2d2d2d"/>
+                            <text x="165" y="180" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="600">mínimo CV</text>
+                            <!-- punto 1-SE -->
+                            <circle cx="210" cy="155" r="5" fill="tomato"/>
+                            <text x="232" y="142" text-anchor="middle" font-size="10" fill="tomato" font-weight="600">regla 1-SE</text>
+                            <text x="182" y="235" text-anchor="middle" font-size="11" fill="#6e6e73">alpha (más regularización →)</text>
+                            <text x="25" y="115" text-anchor="middle" font-size="11" fill="#6e6e73" transform="rotate(-90 25 115)">error CV</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La curva de CV se estima con ruido (las barras). La regla de un error estándar dice: en vez del mínimo exacto, elegir el modelo más simple cuyo error quede a una barra del mínimo. Tiende a dar modelos más esparsos; a veces sacrifica un poco de predicción pura. Es una decisión, no un dogma.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Caso ENAHO -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso Costa Rica: pobreza y la ENAHO</h2>
+                <p class="slide-subtitle">El proxy-means test es un Lasso con apellido social</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>El contexto real</h3>
+                        <p>La ENAHO 2025 del INEC reporta pobreza de 15,2 % (286 365 hogares) y un ingreso promedio de 1 209 825 colones por hogar. La encuesta mide cientos de variables socioeconómicas: el escenario perfecto de alta dimensionalidad y colinealidad.</p>
+                        <p style="margin-top:8px;">El proxy-means test pregunta: ¿con cuáles pocas variables fáciles de observar (materiales de la vivienda, escolaridad, equipamiento) puedo predecir el ingreso para focalizar programas sociales? Eso es exactamente selección de variables.</p>
+                    </div>
+                    <div class="code-box">
+<span class="comment"># Simulación: 64 variables observables; solo las</span>
+<span class="comment"># primeras 8 afectan de verdad el log del ingreso</span>
+<span class="keyword">X_enaho</span> = rng.<span class="function">normal</span>(size=(n, <span class="number">64</span>))
+<span class="keyword">log_ingreso</span> = (<span class="number">1.5</span> + X_enaho[:, :<span class="number">8</span>] @ rng.<span class="function">uniform</span>(<span class="number">0.3</span>, <span class="number">0.8</span>, <span class="number">8</span>)
+               + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">1.0</span>, n))
+
+<span class="keyword">pmt</span> = <span class="function">make_pipeline</span>(<span class="function">StandardScaler</span>(),
+      <span class="function">LassoCV</span>(cv=<span class="number">10</span>, max_iter=<span class="number">20000</span>)).<span class="function">fit</span>(X_enaho, log_ingreso)
+
+<span class="keyword">coef</span> = pmt[-<span class="number">1</span>].coef_
+<span class="function">print</span>(<span class="string">f"disponibles: {len(coef)} | seleccionadas: {(coef != 0).sum()}"</span>)
+<span class="function">print</span>(<span class="string">f"de las 8 con efecto real: {(coef[:8] != 0).sum()} seleccionadas"</span>)
+<span class="output">## disponibles: 64 | seleccionadas: 20
+## de las 8 con efecto real: 8 seleccionadas</span>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>De 64 variables, el Lasso retiene 20: las 8 verdaderas, todas, más 12 colados. Lección doble: garantiza no perder lo importante, pero no garantiza excluir todo lo inútil. Y un detalle crítico del propio INEC: la ENAHO 2025 mostró inconsistencias con la Encuesta Continua de Empleo. Los datos reales vienen con asteriscos, y un modelador serio los lee.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Regularizacion = prior -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La regularización es un prior disfrazado</h2>
+                <p class="slide-subtitle">El puente con la semana 4, formalizado</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 240" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="30" y1="200" x2="315" y2="200" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="172" y1="200" x2="172" y2="30" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <!-- normal: campana suave -->
+                            <path d="M 40,198 C 110,190 140,60 172,55 C 204,60 234,190 305,198" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <!-- laplace: carpa puntiaguda -->
+                            <path d="M 50,199 C 120,196 160,120 172,38 C 184,120 224,196 295,199" fill="none" stroke="#2d2d2d" stroke-width="2.5"/>
+                            <text x="80" y="100" font-size="11" fill="#FF8C00" font-weight="600">Normal → Ridge</text>
+                            <text x="215" y="55" font-size="11" fill="#2d2d2d" font-weight="600">Laplace → Lasso</text>
+                            <text x="172" y="222" text-anchor="middle" font-size="11" fill="#6e6e73">valor del coeficiente (0 al centro)</text>
+                        </svg>
+                    </div>
+                    <div class="content-box">
+                        <h3>La equivalencia exacta</h3>
+                        <ul>
+                            <li>Prior Normal(0, τ²) sobre cada β → el MAP (la moda del posterior) es Ridge, con λ = σ²/τ²</li>
+                            <li>Prior Laplace(0, b) → el MAP es Lasso: el pico en cero concentra creencia en "este coeficiente es exactamente cero"</li>
+                            <li>Prior más concentrado (τ pequeño) = correa más corta = más regularización</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>La precisión que importa</h4>
+                        <p>La equivalencia es con el MAP, un solo punto. El bayesiano completo entrega toda la distribución: media, intervalos de credibilidad, incertidumbre. Bayesiano no es "lo mismo que Ridge": es Ridge más toda la honestidad sobre lo que no sabemos.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Por qué este puente importa</h4>
+                        <p>Une las semanas 4 y 5 en una sola idea: penalizar es creer. Y dentro de unas diapositivas une también con el deep learning: el weight decay de los LLMs es este mismo prior gaussiano.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: PyMC regresion bayesiana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Regresión bayesiana con PyMC</h2>
+                <p class="slide-subtitle">El mismo patrón de la semana 4, ahora con coeficientes</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="keyword">import</span> pymc <span class="keyword">as</span> pm
+<span class="keyword">import</span> arviz <span class="keyword">as</span> az
+
+<span class="comment"># Tres predictores del df, estandarizados</span>
+<span class="keyword">X3</span> = df[[<span class="string">"escolaridad"</span>, <span class="string">"tamano_hogar"</span>, <span class="string">"edad_jefe"</span>]].values
+<span class="keyword">X_std</span> = <span class="function">StandardScaler</span>().<span class="function">fit_transform</span>(X3)
+
+<span class="keyword">with</span> pm.<span class="function">Model</span>() <span class="keyword">as</span> modelo:
+    <span class="keyword">b0</span> = pm.<span class="function">Normal</span>(<span class="string">"intercepto"</span>, mu=<span class="number">0</span>, sigma=<span class="number">10</span>)
+    <span class="keyword">betas</span> = pm.<span class="function">Normal</span>(<span class="string">"betas"</span>, mu=<span class="number">0</span>, sigma=<span class="number">1</span>, shape=<span class="number">3</span>)   <span class="comment"># prior Normal = sabor Ridge</span>
+    <span class="keyword">sigma</span> = pm.<span class="function">HalfNormal</span>(<span class="string">"sigma"</span>, sigma=<span class="number">5</span>)
+    <span class="keyword">mu</span> = b0 + pm.math.<span class="function">dot</span>(X_std, betas)
+    <span class="keyword">y_obs</span> = pm.<span class="function">Normal</span>(<span class="string">"y_obs"</span>, mu=mu, sigma=sigma, observed=y)
+    <span class="keyword">idata</span> = pm.<span class="function">sample</span>()    <span class="comment"># NUTS vía nutpie, como la semana pasada</span>
+
+<span class="function">print</span>(az.<span class="function">summary</span>(idata, var_names=[<span class="string">"betas"</span>], kind=<span class="string">"stats"</span>))
+<span class="output">##            mean     sd   eti_5.5%   eti_94.5%
+## betas[0]  2.714  0.105     2.545       2.884    ← escolaridad
+## betas[1] -1.693  0.106    -1.864      -1.523    ← tamaño hogar
+## betas[2]  0.244  0.105     0.074       0.415    ← edad jefe (roza el cero)</span>
+                </div>
+                <div class="highlight-box">
+                    <p>Cada coeficiente llega con su distribución completa, en escala estandarizada. El de edad es pequeño y su intervalo apenas se separa del cero: el efecto existe, pero es débil; con la mitad de los datos, el cero quedaría adentro. Para un sabor Lasso bayesiano, basta cambiar el prior a pm.Laplace(...). Una línea: esa es toda la diferencia entre las dos correas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Bambi -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Bambi: la fórmula hace el trabajo</h2>
+                <p class="slide-subtitle">Regresión bayesiana en dos líneas</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> bambi <span class="keyword">as</span> bmb
+
+<span class="keyword">m</span> = bmb.<span class="function">Model</span>(<span class="string">"ingreso ~ escolaridad + tamano_hogar"</span>,
+              data=df)
+<span class="keyword">idata</span> = m.<span class="function">fit</span>(draws=<span class="number">2000</span>, chains=<span class="number">4</span>)
+
+<span class="function">print</span>(m)   <span class="comment"># muestra los priors auto-generados</span>
+<span class="output">## Intercept     ~ Normal(mu: 7.8, sigma: 9.4)
+## escolaridad   ~ Normal(mu: 0.0, sigma: 2.5)
+## tamano_hogar  ~ Normal(mu: 0.0, sigma: 4.8)</span>
+
+<span class="keyword">az</span>.<span class="function">plot_posterior</span>(idata); plt.<span class="function">show</span>()
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="600" fill="#2d2d2d">az.plot_posterior: escolaridad</text>
+                            <line x1="30" y1="200" x2="300" y2="200" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M 110,198 Q 165,38 220,198 Z" fill="#FFE9CC"/>
+                            <path d="M 45,197 Q 165,25 290,197" fill="none" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="165" y1="40" x2="165" y2="200" stroke="#2d2d2d" stroke-width="1.5" stroke-dasharray="4,2"/>
+                            <text x="165" y="34" text-anchor="middle" font-size="10" fill="#2d2d2d">media 0.73</text>
+                            <text x="105" y="215" font-size="10" fill="#FF8C00">0.69</text>
+                            <text x="208" y="215" font-size="10" fill="#FF8C00">0.78</text>
+                            <text x="160" y="232" text-anchor="middle" font-size="10" fill="#6e6e73">ETI 89 % del coeficiente de escolaridad</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Bambi genera por defecto priors débilmente informativos escalados a los datos (por eso el print los muestra: siempre hay que leerlos). La fórmula es la misma sintaxis que statsmodels, pero la salida es bayesiana completa. Con family="bernoulli" se vuelve regresión logística, como la de pobreza de la semana pasada.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Comparacion de modelos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Cuál modelo gana? az.compare</h2>
+                <p class="slide-subtitle">Selección de modelos bayesiana, estándar 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># Dos modelos sobre el mismo df: ¿aporta el tamaño del hogar?</span>
+<span class="keyword">m1</span> = bmb.<span class="function">Model</span>(<span class="string">"ingreso ~ escolaridad"</span>, df)
+<span class="keyword">m2</span> = bmb.<span class="function">Model</span>(<span class="string">"ingreso ~ escolaridad + tamano_hogar"</span>, df)
+
+<span class="comment"># log_likelihood=True es el requisito para poder comparar</span>
+<span class="keyword">idata_1</span> = m1.<span class="function">fit</span>(idata_kwargs={<span class="string">"log_likelihood"</span>: <span class="keyword">True</span>})
+<span class="keyword">idata_2</span> = m2.<span class="function">fit</span>(idata_kwargs={<span class="string">"log_likelihood"</span>: <span class="keyword">True</span>})
+
+<span class="keyword">comp</span> = az.<span class="function">compare</span>({<span class="string">"simple"</span>: idata_1, <span class="string">"completo"</span>: idata_2})
+<span class="function">print</span>(comp[[<span class="string">"rank"</span>, <span class="string">"elpd_loo"</span>, <span class="string">"elpd_diff"</span>, <span class="string">"weight"</span>, <span class="string">"se"</span>]])
+<span class="output">##           rank   elpd_loo   elpd_diff   weight     se
+## completo     0    -607.8         0.0      1.00   13.5
+## simple       1    -702.4        94.6      0.00   15.8</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Cómo se lee</h4>
+                        <p>elpd_loo estima la capacidad predictiva fuera de muestra vía PSIS-LOO-CV (la validación cruzada dejar-uno-fuera, calculada de forma inteligente sin reajustar n veces). El modelo completo arrasa: la diferencia de 94.6 es seis veces su error estándar y se lleva todo el peso. Lógico: simulamos el ingreso usando el tamaño del hogar.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El cambio de 2026</h4>
+                        <p>ArviZ 1.x eliminó WAIC: la recomendación oficial es usar solo LOO, que además trae diagnósticos propios (k̂ de Pareto). Si un material del curso pasado usaba az.waic, ya es legacy. También cambió el intervalo por defecto: 0.89 y tipo ETI.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Puente a deep learning -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El puente: de Ridge a los LLMs</h2>
+                <p class="slide-subtitle">Por qué esta semana reaparece en toda la carrera</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">L2</div>
+                        <div class="stat-label">Ridge: penalizar el cuadrado de los coeficientes (1970)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">decay</div>
+                        <div class="stat-label">Weight decay: la misma penalización sobre los pesos de una red neuronal</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">AdamW</div>
+                        <div class="stat-label">El optimizador estándar de los LLMs: Adam con el decay desacoplado (2019)</div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>La historia en tres pasos</h3>
+                    <ul>
+                        <li>El weight decay de las redes neuronales es exactamente la penalización L2 de Ridge, aplicada a millones de pesos en vez de a 8 coeficientes</li>
+                        <li>Loshchilov y Hutter (2019) descubrieron que en optimizadores adaptativos como Adam, L2 y weight decay dejan de ser equivalentes, y propusieron AdamW, que los desacopla</li>
+                        <li>AdamW es hoy el optimizador con el que se entrenan los modelos de lenguaje y de visión; lo estudiaremos en detalle en la semana 11 con PyTorch y JAX</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El estudiante que hoy entiende por qué Ridge encoge coeficientes ya entiende la mitad de cómo se regulariza un LLM. La distancia entre la pizarra de hoy y el entrenamiento de un modelo de lenguaje es más corta de lo que parece.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Sintesis -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Síntesis: una recta, tres preguntas</h2>
+                <p class="slide-subtitle">Todo lo de hoy en una tabla</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Técnica</th>
+                                <th>Qué resuelve</th>
+                                <th>Herramienta</th>
+                                <th>Ejemplo de hoy</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>OLS</td><td>La mejor recta; inferencia sobre efectos</td><td>statsmodels / LinearRegression</td><td>Los 5 hogares de la pizarra (0.80, -1.15)</td></tr>
+                            <tr><td>Ridge (L2)</td><td>Colinealidad y coeficientes que gritan</td><td>Pipeline + RidgeCV</td><td>Escolaridad del jefe y de la pareja</td></tr>
+                            <tr><td>Lasso (L1)</td><td>Selección automática de variables</td><td>Pipeline + LassoCV</td><td>Proxy-means test: 64 → 11 variables</td></tr>
+                            <tr><td>Elastic Net</td><td>Grupos correlacionados, p mayor que n</td><td>ElasticNetCV</td><td>Mezcla elegida por CV (l1_ratio 0.7)</td></tr>
+                            <tr><td>Validación cruzada</td><td>Estimar el error en datos no vistos; elegir alpha</td><td>KFold / TimeSeriesSplit</td><td>5 simulacros; ventana expansiva BCCR</td></tr>
+                            <tr><td>Regresión bayesiana</td><td>Coeficientes con incertidumbre completa</td><td>PyMC / Bambi + ArviZ</td><td>Priors = correas; az.compare con LOO</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Tres preguntas detrás de todo: ¿cuál es la mejor recta? (OLS), ¿cuánto debo desconfiar de ella? (regularización y CV), ¿qué creo de sus parámetros? (bayesiano). Las mismas tres preguntas reaparecen en cada modelo del resto del curso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexión con el proyecto integrador</h2>
+                <p class="slide-subtitle">Carriles donde la regresión regularizada encaja</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Social</div>
+                        <h4>Pobreza por hogar (INEC)</h4>
+                        <p>Lasso o Elastic Net sobre la ENAHO para un proxy-means test, más una versión bayesiana con Bambi para los intervalos. Dos métodos del curso en un solo carril.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Banca</div>
+                        <h4>Credit scoring (SUGEF sintético)</h4>
+                        <p>Regresión logística regularizada como modelo base interpretable y auditable, comparada con un modelo bayesiano.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Tipo de cambio (BCCR)</h4>
+                        <p>Regresión con rezagos y variables macro, validada con TimeSeriesSplit. El Monte Carlo de la semana 4 más la regresión de hoy: combinación natural.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Demanda eléctrica (ICE / CENCE)</h4>
+                        <p>Regresión múltiple con clima y calendario como baseline obligatorio antes de los modelos de series temporales de las semanas 6 y 7.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Recordatorio de calendario: el avance del proyecto se entrega en la semana 8 e incluye un primer modelo aplicado. Una regresión bien validada como la de hoy ya cumple ese requisito.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Actividad grupal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">25 a 30 minutos: a mano y en Colab</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (a mano, 10 min):</strong> una recta de mínimos cuadrados con 4 hogares, el encogimiento de Ridge variando lambda, y un emparejamiento prior-correa</li>
+                        <li><strong>Parte B (en Colab, 12-15 min):</strong> verificar la recta con scikit-learn y graficarla, rutas de coeficientes Ridge y Lasso, y comparación honesta con validación cruzada</li>
+                        <li><strong>Parte C (reflexión, 3-5 min):</strong> interpretar coeficientes, explicar la fuga de datos con sus palabras y conectar con el proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>Una foto o escaneo de los cálculos a mano (Parte A)</li>
+                        <li>El notebook de Colab compartido del grupo (formato .ipynb)</li>
+                        <li>Una celda final en Markdown con la reflexión grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento completo de la actividad está en el campus virtual. Ahora mismo los distribuyo a las salas. Estaré rotando entre ellas para apoyar dudas puntuales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 27: Proxima clase -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para la próxima clase (semana 6)</h2>
+                <p class="slide-subtitle">Series temporales clásicas: ARIMA y compañía</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Preparación recomendada</h3>
+                    <ul>
+                        <li>Lectura: Hyndman y Athanasopoulos, Forecasting: Principles and Practice (3.ª edición), capítulos 1 a 3 (gratis en otexts.com/fpp3)</li>
+                        <li>Volvemos a R: refrescar lo visto en la semana 3, porque usaremos el ecosistema fpp3 (tsibble, fable) en Colab con kernel R</li>
+                        <li>Repasar la advertencia de hoy sobre validación temporal: en series de tiempo es la regla, no la excepción</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Conexión con lo de hoy</h3>
+                    <ul>
+                        <li>Un modelo ARIMA es, en el fondo, una regresión de la serie contra su propio pasado: los coeficientes de hoy reaparecen como rezagos</li>
+                        <li>TimeSeriesSplit y la fuga temporal que vimos hoy son el corazón metodológico de las semanas 6 y 7</li>
+                        <li>La descomposición tendencia + estacionalidad + ruido es el nuevo "modelo + error" de la regresión</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>Si hoy quedó claro que validar es entrenar en el pasado y probar en el futuro, la mitad conceptual de las series temporales ya está ganada.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 28: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Cuatro ideas y una sola intuición</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>OLS: la mejor recta es una proyección</h4>
+                    <p>Minimizar resortes al cuadrado equivale a proyectar y sobre el espacio de las variables. Lo calculamos a mano (0.80, -1.15) y la máquina nos dio la razón.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Regularizar: ponerle correa al modelo</h4>
+                    <p>Ridge encoge (círculo), Lasso apaga (rombo con esquinas), Elastic Net mezcla. Siempre con StandardScaler dentro de un Pipeline: penalización justa y sin fuga de datos.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Validar: examinar con datos no vistos</h4>
+                    <p>K-fold para datos sin reloj, TimeSeriesSplit cuando lo tienen. El error de CV elige alpha; la regla 1-SE recuerda que la curva tiene ruido.</p>
+                </div>
+                <div class="key-point">
+                    <h4>El prior disfrazado</h4>
+                    <p>Normal = Ridge, Laplace = Lasso (en el MAP). El bayesiano completo con PyMC y Bambi da además la incertidumbre, y az.compare con LOO decide entre modelos. Y esa misma L2 es el weight decay con que se entrenan los LLMs.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 22px;">Gracias por la sesión. Nos vemos la próxima semana con series temporales clásicas.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
