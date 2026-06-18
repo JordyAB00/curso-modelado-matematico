@@ -1,0 +1,1825 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 6: Series temporales clásicas - Modelado matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 65px 70px 90px 70px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 22px;
+        }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: calc(100vh - 230px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 20px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .content-box p {
+            font-size: 15px;
+            color: #1d1d1f;
+            line-height: 1.45;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 15px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 6px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .code-box .output {
+            color: #9cdcfe;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 12px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 85px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 60px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .viz-svg {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .viz-svg svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pantallas pequeñas (laptops 13-14", viewport bajo ~850px) */
+        @media (max-height: 850px) {
+            .slide {
+                padding: 55px 60px 70px 60px;
+            }
+            .slide-header {
+                margin-bottom: 14px;
+            }
+            .slide-title {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+            .slide-subtitle {
+                font-size: 16px;
+            }
+            .slide-content {
+                gap: 10px;
+                max-height: calc(100vh - 180px);
+            }
+            .content-box {
+                padding: 12px 16px;
+            }
+            .content-box h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            .content-box p, .content-box li {
+                font-size: 14px;
+            }
+            .highlight-box {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .highlight-box p {
+                font-size: 14px;
+            }
+            .key-point {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .key-point h4 {
+                font-size: 16px;
+            }
+            .key-point p {
+                font-size: 13px;
+            }
+            .comparison-table th {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .comparison-table td {
+                padding: 6px 10px;
+                font-size: 12.5px;
+            }
+            .logo-image {
+                max-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">33</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Series temporales clásicas</h1>
+            <p class="cover-subtitle">Semana 6: separar la receta del tiempo, con R y fpp3</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matemático<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                II Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Que es una serie de tiempo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Qué es una serie de tiempo?</h2>
+                <p class="slide-subtitle">La diferencia con todo lo del curso: aquí el orden importa</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Una idea sencilla</h3>
+                        <p>Una serie de tiempo es una secuencia de observaciones ordenadas: un dato por período (un mes, un trimestre, un año).</p>
+                        <ul style="margin-top:10px;">
+                            <li>El dato de hoy se parece al de ayer: hay <strong>memoria</strong></li>
+                            <li>No puedo barajar los datos: el orden es información</li>
+                            <li>Esto rompe el supuesto de independencia de la regresión de la semana pasada</li>
+                        </ul>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Llegadas de turistas, mes a mes</text>
+                            <line x1="35" y1="185" x2="320" y2="185" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="35" y1="185" x2="35" y2="35" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="45,150 70,130 95,155 120,120 145,150 170,108 195,140 220,95 245,128 270,82 295,118 315,72" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <circle cx="45" cy="150" r="3" fill="#FF8C00"/><circle cx="70" cy="130" r="3" fill="#FF8C00"/><circle cx="95" cy="155" r="3" fill="#FF8C00"/><circle cx="120" cy="120" r="3" fill="#FF8C00"/><circle cx="145" cy="150" r="3" fill="#FF8C00"/><circle cx="170" cy="108" r="3" fill="#FF8C00"/><circle cx="195" cy="140" r="3" fill="#FF8C00"/><circle cx="220" cy="95" r="3" fill="#FF8C00"/><circle cx="245" cy="128" r="3" fill="#FF8C00"/><circle cx="270" cy="82" r="3" fill="#FF8C00"/>
+                            <text x="180" y="208" text-anchor="middle" font-size="10" fill="#6e6e73">tiempo →</text>
+                            <text x="22" y="110" text-anchor="middle" font-size="10" fill="#6e6e73" transform="rotate(-90 22 110)">valor</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Pronosticar es usar esa memoria: si entiendo cómo el pasado influye en el presente, puedo decir algo razonable sobre el futuro. Toda la noche gira en torno a una pregunta: ¿cuántos turistas llegarán el mes que viene, y con cuánta confianza?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Los cuatro componentes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La receta: cuatro ingredientes</h2>
+                <p class="slide-subtitle">Toda serie es una mezcla de tendencia, estacionalidad, ciclo y ruido</p>
+            </div>
+            <div class="slide-content">
+                <div class="viz-svg">
+                    <svg viewBox="0 0 700 200" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Tendencia -->
+                        <text x="85" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#FF8C00">Tendencia</text>
+                        <line x1="20" y1="150" x2="150" y2="150" stroke="#cccccc" stroke-width="0.8"/>
+                        <line x1="20" y1="150" x2="150" y2="55" stroke="#FF8C00" stroke-width="2.5"/>
+                        <text x="85" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">rumbo de largo plazo</text>
+                        <!-- Estacionalidad -->
+                        <text x="255" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#4f93dd">Estacionalidad</text>
+                        <line x1="190" y1="105" x2="320" y2="105" stroke="#cccccc" stroke-width="0.8"/>
+                        <path d="M190,105 Q205,60 220,105 Q235,150 250,105 Q265,60 280,105 Q295,150 310,105 Q318,80 320,105" fill="none" stroke="#4f93dd" stroke-width="2.5"/>
+                        <text x="255" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">patrón fijo que se repite (m)</text>
+                        <!-- Ciclo -->
+                        <text x="425" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#2e8b57">Ciclo</text>
+                        <line x1="360" y1="105" x2="490" y2="105" stroke="#cccccc" stroke-width="0.8"/>
+                        <path d="M360,105 Q395,55 430,105 Q465,155 490,110" fill="none" stroke="#2e8b57" stroke-width="2.5"/>
+                        <text x="425" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">oscilación de duración variable</text>
+                        <!-- Ruido -->
+                        <text x="595" y="20" text-anchor="middle" font-size="13" font-weight="700" fill="#6e6e73">Ruido</text>
+                        <line x1="530" y1="105" x2="660" y2="105" stroke="#cccccc" stroke-width="0.8"/>
+                        <polyline points="530,105 540,90 550,118 560,95 570,112 580,98 590,120 600,92 610,110 620,100 630,115 640,95 650,108 660,102" fill="none" stroke="#6e6e73" stroke-width="1.6"/>
+                        <text x="595" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">lo impredecible que sobra</text>
+                    </svg>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Estacionalidad no es ciclo</h4>
+                        <p>La estacionalidad tiene período fijo y conocido (siempre 12 meses). El ciclo dura lo que quiera (una recesión puede tardar 2 o 7 años). Es la confusión más común, vale distinguirlos.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Modelar = separar la receta</h4>
+                        <p>Todo el método consiste en separar estos ingredientes, quitar los predecibles (tendencia y estacionalidad) y quedarse con el ruido. Si en el ruido todavía hay patrón, el modelo dejó algo sin capturar.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Aditiva vs multiplicativa -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿La oscilación es pareja o crece?</h2>
+                <p class="slide-subtitle">Aditiva contra multiplicativa, a ojo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#FF8C00">Aditiva: dientes del mismo alto</text>
+                            <line x1="20" y1="170" x2="305" y2="170" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="20" y1="170" x2="20" y2="35" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="20" y1="130" x2="305" y2="60" stroke="#cccccc" stroke-width="1" stroke-dasharray="4,3"/>
+                            <polyline points="30,115 55,95 80,135 105,108 130,88 155,128 180,101 205,81 230,121 255,94 280,74 300,110" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <text x="160" y="192" text-anchor="middle" font-size="10" fill="#6e6e73">la amplitud del diente no cambia</text>
+                        </svg>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#4f93dd">Multiplicativa: dientes que crecen</text>
+                            <line x1="20" y1="170" x2="305" y2="170" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="20" y1="170" x2="20" y2="35" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="20" y1="130" x2="305" y2="60" stroke="#cccccc" stroke-width="1" stroke-dasharray="4,3"/>
+                            <polyline points="30,120 55,108 80,132 105,112 130,80 155,124 180,92 205,58 230,118 255,78 280,40 300,108" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <text x="160" y="192" text-anchor="middle" font-size="10" fill="#6e6e73">el diente se ensancha con el nivel</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Turismo, ventas y economía casi siempre son multiplicativas: cuando la serie sube, sus oscilaciones también. El truco para arreglarlo es tomar logaritmo, que convierte un producto en suma y vuelve la serie aditiva. Por eso más adelante modelaremos en escala log: la matemática se simplifica.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Estacionariedad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Estacionariedad: la prueba de la ventana</h2>
+                <p class="slide-subtitle">¿Se ve igual sin importar cuándo la miro?</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#c0392b">NO estacionaria</text>
+                            <line x1="20" y1="170" x2="305" y2="170" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="30,150 60,140 90,148 120,128 150,135 180,112 210,120 240,95 270,103 300,78" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <rect x="45" y="120" width="55" height="45" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <rect x="240" y="70" width="55" height="45" fill="none" stroke="#c0392b" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <text x="160" y="192" text-anchor="middle" font-size="10" fill="#6e6e73">cada ventana ve un nivel distinto</text>
+                        </svg>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="16" text-anchor="middle" font-size="12" font-weight="700" fill="#2e8b57">Estacionaria</text>
+                            <line x1="20" y1="170" x2="305" y2="170" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="20" y1="110" x2="305" y2="110" stroke="#cccccc" stroke-width="0.8" stroke-dasharray="4,3"/>
+                            <polyline points="30,98 55,122 80,100 105,118 130,95 155,120 180,102 205,116 230,98 255,121 280,99 300,115" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <rect x="45" y="92" width="55" height="36" fill="none" stroke="#2e8b57" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <rect x="240" y="92" width="55" height="36" fill="none" stroke="#2e8b57" stroke-width="1.5" stroke-dasharray="3,2"/>
+                            <text x="160" y="192" text-anchor="middle" font-size="10" fill="#6e6e73">las dos ventanas ven lo mismo</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Una serie es estacionaria si sus propiedades (media, variabilidad) no dependen de cuándo la observo: se ve igual mueva donde mueva la ventana. ¿Por qué nos importa? Porque el modelo ARIMA de la segunda mitad solo sabe modelar series estacionarias. La tendencia y la estacionalidad hay que quitarlas primero, y para eso existe la diferenciación.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Diferenciar -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Diferenciar: restarle a la serie su memoria</h2>
+                <p class="slide-subtitle">Pura aritmética: restar valores, no hay fórmula que memorizar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Primera diferencia: mata la tendencia</h3>
+                        <p>Resto cada valor con el anterior. Sobre la mini-serie trimestral 10, 14, 8, 12, 14, 18, 12, 16:</p>
+                        <div style="font-family:monospace; font-size:14px; color:#2d2d2d; background:#fff5e6; border-radius:8px; padding:10px; margin-top:8px; line-height:1.7;">
+                            14−10=<strong style="color:#FF8C00">4</strong>&nbsp;&nbsp; 8−14=<strong style="color:#FF8C00">−6</strong>&nbsp;&nbsp; 12−8=<strong style="color:#FF8C00">4</strong><br>
+                            14−12=<strong style="color:#FF8C00">2</strong>&nbsp;&nbsp; 18−14=<strong style="color:#FF8C00">4</strong>&nbsp;&nbsp; 12−18=<strong style="color:#FF8C00">−6</strong>&nbsp;&nbsp; 16−12=<strong style="color:#FF8C00">4</strong>
+                        </div>
+                        <p style="margin-top:8px; font-size:14px;">El crecimiento desaparece, pero todavía oscila cada 4: queda estacionalidad.</p>
+                    </div>
+                    <div class="content-box">
+                        <h3>Diferencia estacional: mata el patrón anual</h3>
+                        <p>Resto cada valor con el de hace un año (4 trimestres atrás):</p>
+                        <div style="font-family:monospace; font-size:14px; color:#2d2d2d; background:#eaf2fb; border-radius:8px; padding:10px; margin-top:8px; line-height:1.7;">
+                            14−10=<strong style="color:#4f93dd">4</strong>&nbsp;&nbsp; 18−14=<strong style="color:#4f93dd">4</strong><br>
+                            12−8=<strong style="color:#4f93dd">4</strong>&nbsp;&nbsp; 16−12=<strong style="color:#4f93dd">4</strong>
+                        </div>
+                        <p style="margin-top:8px; font-size:14px;"><strong>El "ajá":</strong> quedó una constante (4, 4, 4, 4). La serie no era más que tendencia de +4 al año sobre un patrón fijo.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Esto es todo lo que hace la "I" de ARIMA: diferenciar para aplanar. Lo escribimos con dos símbolos, ∇ para la primera diferencia y ∇ₘ para la estacional, pero la operación es restar. Después del receso, R hará exactamente estas restas y nos devolverá los mismos números.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: ACF y PACF conceptual -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">ACF y PACF: la serie consigo misma</h2>
+                <p class="slide-subtitle">Qué miden y qué forma tienen, sin meternos en la fórmula</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La idea</h3>
+                        <p>La <strong>ACF</strong> (autocorrelación) mide cuánto se parece la serie a una copia de sí misma corrida unos pasos. Si hoy se parece mucho a hace un mes, la autocorrelación de lag 1 es alta.</p>
+                        <p style="margin-top:8px;">La <strong>PACF</strong> (parcial) mide esa relación directa en cada rezago, descontando los intermedios.</p>
+                        <p style="margin-top:8px;">No las calculamos a mano: R las grafica. Lo importante es leer su <em>forma</em>.</p>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="15" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Una ACF típica con estacionalidad</text>
+                            <line x1="30" y1="150" x2="310" y2="150" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="30" y1="60" x2="310" y2="60" stroke="#8fbdf0" stroke-width="0.8" stroke-dasharray="3,3"/>
+                            <line x1="40" y1="150" x2="40" y2="72" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="58" y1="150" x2="58" y2="85" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="76" y1="150" x2="76" y2="98" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="94" y1="150" x2="94" y2="110" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="112" y1="150" x2="112" y2="122" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="130" y1="150" x2="130" y2="132" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="148" y1="150" x2="148" y2="125" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="166" y1="150" x2="166" y2="116" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="184" y1="150" x2="184" y2="105" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="202" y1="150" x2="202" y2="118" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="220" y1="150" x2="220" y2="128" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="238" y1="150" x2="238" y2="80" stroke="#2d2d2d" stroke-width="3"/>
+                            <text x="238" y="72" text-anchor="middle" font-size="9" fill="#2d2d2d" font-weight="700">lag 12</text>
+                            <line x1="256" y1="150" x2="256" y2="120" stroke="#FF8C00" stroke-width="3"/>
+                            <line x1="274" y1="150" x2="274" y2="132" stroke="#FF8C00" stroke-width="3"/>
+                            <text x="170" y="172" text-anchor="middle" font-size="10" fill="#6e6e73">rezago →</text>
+                            <text x="170" y="195" text-anchor="middle" font-size="10" fill="#6e6e73">Decae lento (tendencia) y repunta en 12 (anual)</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La forma de la ACF es una firma: si decae despacio, hay tendencia; si repunta en los múltiplos de 12, hay estacionalidad anual. Eso nos dice "hace falta una diferencia ordinaria y una estacional", justo lo que vimos recién. Leer estos gráficos es la habilidad que reemplaza al cálculo a mano.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: ARIMA y SARIMA en palabras -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">ARIMA y SARIMA, en palabras</h2>
+                <p class="slide-subtitle">Tres letras, tres ideas que ya entendemos</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="feature-card">
+                        <h4>AR — memoria de valores</h4>
+                        <p>Autorregresivo: hoy depende de mis propios valores pasados. "Si los últimos meses fueron altos, este también."</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>I — diferencias</h4>
+                        <p>Integrado: cuántas veces diferencié para aplanar la serie. Es la resta que acabamos de ver: la "d" cuenta esas diferencias.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>MA — memoria de errores</h4>
+                        <p>Media móvil: hoy depende de las sorpresas (errores) pasadas. "El mes pasado me equivoqué de más, lo corrijo."</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>SARIMA: el mismo molde, dos veces</h3>
+                    <p>Notación <strong>ARIMA(p, d, q)(P, D, Q)<sub>m</sub></strong>. Las minúsculas modelan el corto plazo (mes a mes); las MAYÚSCULAS, el ciclo anual (mismo mes del año pasado). No hay que asustarse: es la misma idea de AR, I y MA aplicada dos veces.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>El modelo más famoso de la historia es el "de aerolínea": ARIMA(0,1,1)(0,1,1)<sub>12</sub>. Una diferencia ordinaria, una estacional, una pizca de memoria de errores en cada parte. Funciona sorprendentemente bien para series mensuales con tendencia y estacionalidad. La buena noticia: en R no tenemos que elegir las letras a mano, el algoritmo lo hace por nosotros y nosotros auditamos su elección.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: El stack de la semana -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de la semana</h2>
+                <p class="slide-subtitle">Volvemos a R: el ecosistema tidyverts, vigente a junio de 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>fpp3 1.0.3</h4>
+                        <p>El metapaquete que carga todo de un golpe: <code>tsibble</code> (datos), <code>feasts</code> (features y ACF), <code>fable</code> (modelos) y <code>fabletools</code>. Acompaña al libro de Hyndman y Athanasopoulos, gratis en otexts.com/fpp3.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>fable 0.5.0</h4>
+                        <p>El motor de modelos: <code>ARIMA()</code>, <code>ETS()</code>, <code>STL()</code>. La función <code>ARIMA()</code> implementa el algoritmo Hyndman-Khandakar que elige (p,d,q)(P,D,Q) solo.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>ggtime 0.2.0 (la novedad)</h4>
+                        <p>En 2026 los gráficos (<code>gg_season</code>, <code>gg_subseries</code>, <code>gg_tsresiduals</code>) migraron de feasts al nuevo paquete <code>ggtime</code>. Cargar <code>library(fpp3)</code> ya lo incluye, así que nada se rompe.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>tsibble 1.2.0</h4>
+                        <p>La estructura de datos: una tabla que sabe que su columna índice es tiempo. Todo el flujo gira alrededor de ella.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla mental de la semana: siempre <code>library(fpp3)</code> al inicio. Carga las versiones correctas y evita los avisos de deprecación de la migración a ggtime. El código de hoy queda preparado para el futuro.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Para que sirven las series hoy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Para qué sirven las series temporales en 2026?</h2>
+                <p class="slide-subtitle">Pronosticar es decidir antes de que pase</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Turismo y aviación</div>
+                        <h4>Llegadas e itinerarios</h4>
+                        <p>El ICT y las aerolíneas pronostican llegadas mensuales para planear capacidad hotelera y vuelos. Estacionalidad anual fortísima: el caso estrella de hoy.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Demanda eléctrica</h4>
+                        <p>El CENCE y el ICE pronostican la demanda hora a hora para despachar generación. Estacionalidad diaria, semanal y anual a la vez.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Salud pública</div>
+                        <h4>Brotes y epidemias</h4>
+                        <p>El Ministerio de Salud modela casos de dengue por semana epidemiológica para anticipar la temporada de brotes ligada a las lluvias.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Retail y finanzas</div>
+                        <h4>Demanda e inventario</h4>
+                        <p>Walmart y la banca pronostican ventas y flujos. La competencia M5 (2020) usó justamente datos de ventas de Walmart.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Un secreto que veremos al final: los modelos clásicos de hoy (ARIMA, ETS) siguen siendo la línea base que cualquier red neuronal o modelo de fundación debe superar, y en datos escasos y estacionales muchas veces siguen ganando.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: El objeto tsibble -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El protagonista: el objeto tsibble</h2>
+                <p class="slide-subtitle">Una tabla que sabe que el tiempo es su eje</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="function">library</span>(fpp3)   <span class="comment"># carga tsibble, fable, feasts, ggtime...</span>
+
+<span class="comment"># Un tsibble necesita una columna indice de tiempo</span>
+<span class="comment"># Aqui: trimestres, con yearquarter()</span>
+ventas &lt;- <span class="function">tsibble</span>(
+  Trim  = <span class="function">yearquarter</span>(<span class="string">"2023 Q1"</span>) + <span class="number">0</span>:<span class="number">3</span>,
+  Total = <span class="function">c</span>(<span class="number">120</span>, <span class="number">90</span>, <span class="number">105</span>, <span class="number">160</span>),
+  index = Trim
+)
+<span class="function">print</span>(ventas)
+<span class="output">## # A tsibble: 4 x 2 [1Q]
+##      Trim Total
+##     &lt;qtr&gt; &lt;dbl&gt;
+## 1 2023 Q1   120
+## 2 2023 Q2    90
+## 3 2023 Q3   105
+## 4 2023 Q4   160</span>
+                    </div>
+                    <div class="content-box">
+                        <h3>Qué lo hace especial</h3>
+                        <ul>
+                            <li>La etiqueta <code>[1Q]</code> indica el intervalo: una observación por trimestre</li>
+                            <li>Sabe que el orden temporal importa: no se puede barajar</li>
+                            <li><code>yearmonth()</code>, <code>yearquarter()</code> y <code>yearweek()</code> crean índices de calendario correctos</li>
+                            <li>Todo el ecosistema (graficar, descomponer, modelar) habla este idioma</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Diferencia con un data frame normal: el tsibble entiende el calendario. Sabe que después de 2023 Q4 viene 2024 Q1, que falta un trimestre si hay un hueco, y que m = 4. Esa inteligencia de calendario es la que hace que el resto del flujo sea de una sola línea por paso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Setup serie turismo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La serie de hoy: turismo costarricense</h2>
+                <p class="slide-subtitle">120 meses simulados estilo ICT que nos acompañan toda la noche</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="function">library</span>(fpp3)
+<span class="function">set.seed</span>(<span class="number">2026</span>)
+
+<span class="comment"># Serie mensual: tendencia creciente + estacionalidad</span>
+<span class="comment"># multiplicativa (pico dic-abr, valle sep-oct)</span>
+n &lt;- <span class="number">120</span>
+t &lt;- <span class="number">1</span>:n
+tendencia  &lt;- <span class="number">130000</span> + <span class="number">650</span> * t
+patron     &lt;- <span class="function">c</span>(<span class="number">1.35</span>,<span class="number">1.32</span>,<span class="number">1.22</span>,<span class="number">1.05</span>,<span class="number">0.85</span>,<span class="number">0.80</span>,
+                <span class="number">0.92</span>,<span class="number">0.88</span>,<span class="number">0.74</span>,<span class="number">0.82</span>,<span class="number">1.02</span>,<span class="number">1.33</span>)
+estacional &lt;- patron[((t - <span class="number">1</span>) %% <span class="number">12</span>) + <span class="number">1</span>]
+ruido      &lt;- <span class="function">rnorm</span>(n, <span class="number">0</span>, <span class="number">0.045</span>)
+llegadas   &lt;- <span class="function">round</span>(tendencia * estacional * (<span class="number">1</span> + ruido))
+
+turismo &lt;- <span class="function">tsibble</span>(
+  Mes = <span class="function">make_yearmonth</span>(<span class="number">2010</span>, <span class="number">1</span>) + <span class="number">0</span>:(n - <span class="number">1</span>),
+  Llegadas = llegadas,
+  index = Mes
+)
+turismo |&gt; <span class="function">autoplot</span>(Llegadas) +
+  <span class="function">labs</span>(title = <span class="string">"Llegadas mensuales (simuladas)"</span>,
+       y = <span class="string">"turistas"</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Llegadas mensuales: tendencia + estacionalidad</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- serie dentada creciente con picos -->
+                            <polyline points="45,170 55,150 65,178 75,158 85,185 95,165 105,150 115,178 125,158 135,140 145,168 155,150 165,132 175,160 185,140 195,120 205,150 215,130 225,112 235,142 245,120 255,100 265,132 275,110 285,90 295,122 305,100 315,80" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <text x="185" y="232" text-anchor="middle" font-size="10" fill="#6e6e73">tiempo (2010 → 2019, meses) →</text>
+                            <text x="22" y="120" text-anchor="middle" font-size="10" fill="#6e6e73" transform="rotate(-90 22 120)">turistas</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Por qué simulada</h4>
+                        <p>Porque conocemos la verdad: tendencia de +650 al mes y un patrón estacional fijo. Podemos juzgar si el modelo la recupera. Y evitamos el quiebre de la pandemia que distorsiona la serie real del ICT.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>La misma serie de la actividad</h4>
+                        <p>La Celda 1 del notebook grupal genera estos mismos datos con set.seed(2026). Lo que vean aquí es lo que les saldrá en Colab, mes por mes.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Exploracion gg_season -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Mirar antes de modelar: gráfico estacional</h2>
+                <p class="slide-subtitle">gg_season superpone los años para ver el patrón</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Cada linea es un anio, superpuestos sobre los 12 meses</span>
+turismo |&gt; <span class="function">gg_season</span>(Llegadas) +
+  <span class="function">labs</span>(title = <span class="string">"Patron estacional por anio"</span>,
+       y = <span class="string">"turistas"</span>)
+
+<span class="comment"># Lectura: diciembre y enero arriba, septiembre abajo.</span>
+<span class="comment"># Las lineas suben con los anios (la tendencia).</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">gg_season: cada línea es un año</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- varias lineas con misma forma U invertida desplazadas verticalmente -->
+                            <polyline points="55,150 78,155 101,162 124,172 147,185 170,190 193,182 216,184 239,192 262,188 285,170 308,152" fill="none" stroke="#cfe3ff" stroke-width="1.6"/>
+                            <polyline points="55,125 78,130 101,138 124,150 147,163 170,168 193,160 216,162 239,170 262,166 285,148 308,128" fill="none" stroke="#8fbdf0" stroke-width="1.6"/>
+                            <polyline points="55,100 78,105 101,113 124,126 147,140 170,145 193,137 216,139 239,148 262,143 285,124 308,103" fill="none" stroke="#4f93dd" stroke-width="1.6"/>
+                            <polyline points="55,72 78,78 101,87 124,100 147,115 170,120 193,112 216,114 239,123 262,118 285,98 308,75" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <text x="58" y="225" font-size="9" fill="#6e6e73">ene</text>
+                            <text x="158" y="225" font-size="9" fill="#6e6e73">jun</text>
+                            <text x="295" y="225" font-size="9" fill="#6e6e73">dic</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Dos lecturas de un solo gráfico: la forma de cada línea (la U: alto en extremos del año, bajo en setiembre) revela la estacionalidad; el hecho de que las líneas de años recientes (naranja) estén más arriba revela la tendencia creciente. Esto confirma a ojo lo que el STL va a separar matemáticamente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: gg_subseries y ACF -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">ACF y PACF: la serie consigo misma</h2>
+                <p class="slide-subtitle">gg_tsdisplay junta serie, ACF y PACF de un golpe</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Tres graficos en uno: serie, ACF y PACF</span>
+turismo |&gt; <span class="function">gg_tsdisplay</span>(Llegadas,
+                    plot_type = <span class="string">"partial"</span>)
+
+<span class="comment"># Tambien por separado:</span>
+turismo |&gt; <span class="function">ACF</span>(Llegadas)  |&gt; <span class="function">autoplot</span>()
+turismo |&gt; <span class="function">PACF</span>(Llegadas) |&gt; <span class="function">autoplot</span>()
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">ACF: picos cada 12 = estacionalidad</text>
+                            <line x1="40" y1="160" x2="325" y2="160" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="160" x2="40" y2="30" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="55" x2="325" y2="55" stroke="#8fbdf0" stroke-width="0.8" stroke-dasharray="3,3"/>
+                            <line x1="40" y1="60" x2="46" y2="60" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="58" y1="70" x2="64" y2="70" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="76" y1="80" x2="82" y2="80" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="94" y1="92" x2="100" y2="92" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="112" y1="105" x2="118" y2="105" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="130" y1="118" x2="136" y2="118" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="148" y1="128" x2="154" y2="128" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="166" y1="120" x2="172" y2="120" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="184" y1="108" x2="190" y2="108" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="202" y1="95" x2="208" y2="95" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="220" y1="80" x2="226" y2="80" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="238" y1="68" x2="244" y2="68" stroke="#2d2d2d" stroke-width="2.5"/>
+                            <text x="238" y="50" font-size="9" fill="#2d2d2d" font-weight="600">lag 12</text>
+                            <line x1="256" y1="86" x2="262" y2="86" stroke="#FF8C00" stroke-width="2.5"/>
+                            <line x1="274" y1="100" x2="280" y2="100" stroke="#FF8C00" stroke-width="2.5"/>
+                            <text x="185" y="185" text-anchor="middle" font-size="10" fill="#6e6e73">rezago (lag) →</text>
+                            <text x="185" y="205" text-anchor="middle" font-size="10" fill="#6e6e73">El decaimiento lento delata la tendencia;</text>
+                            <text x="185" y="220" text-anchor="middle" font-size="10" fill="#6e6e73">el repunte en 12, la estacionalidad anual.</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La ACF de una serie con tendencia y estacionalidad tiene una firma inconfundible: decae despacio (tendencia) y repunta en los múltiplos de 12 (estacionalidad anual). Eso es exactamente lo que nos dice "hace falta una diferencia ordinaria y una estacional". La máquina lo confirmará con KPSS en la siguiente diapositiva.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Descomposicion STL -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Descomposición STL: separar la receta</h2>
+                <p class="slide-subtitle">El estándar moderno, en una línea</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># STL separa tendencia, estacionalidad y resto</span>
+dcmp &lt;- turismo |&gt;
+  <span class="function">model</span>(<span class="function">STL</span>(Llegadas ~ <span class="function">trend</span>() +
+                <span class="function">season</span>(window = <span class="string">"periodic"</span>),
+            robust = <span class="keyword">TRUE</span>))
+
+<span class="function">components</span>(dcmp) |&gt; <span class="function">autoplot</span>()
+<span class="comment"># Cuatro paneles: serie, tendencia, estacional, resto</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="12" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">components() |&gt; autoplot()</text>
+                            <!-- panel serie -->
+                            <text x="8" y="35" font-size="8" fill="#6e6e73">serie</text>
+                            <polyline points="48,40 70,30 92,44 114,28 136,46 158,26 180,40 202,22 224,42 246,20 268,38 290,16 312,36" fill="none" stroke="#2d2d2d" stroke-width="1.3"/>
+                            <!-- panel tendencia -->
+                            <text x="8" y="85" font-size="8" fill="#6e6e73">tend.</text>
+                            <line x1="48" y1="92" x2="312" y2="62" stroke="#FF8C00" stroke-width="2"/>
+                            <!-- panel estacional -->
+                            <text x="8" y="135" font-size="8" fill="#6e6e73">estac.</text>
+                            <polyline points="48,120 60,150 72,128 84,150 96,122 108,150 120,128 132,150 144,122 156,150 168,128 180,150 192,122 204,150 216,128 228,150 240,122 252,150 264,128 276,150 288,122 300,150 312,128" fill="none" stroke="#4f93dd" stroke-width="1.2"/>
+                            <!-- panel resto -->
+                            <text x="8" y="195" font-size="8" fill="#6e6e73">resto</text>
+                            <line x1="48" y1="200" x2="312" y2="200" stroke="#bbbbbb" stroke-width="0.6" stroke-dasharray="2,2"/>
+                            <polyline points="48,202 70,196 92,205 114,198 136,206 158,194 180,203 202,197 224,205 246,195 268,204 290,198 312,201" fill="none" stroke="#6e6e73" stroke-width="1"/>
+                            <text x="185" y="232" text-anchor="middle" font-size="9" fill="#6e6e73">tiempo →</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Lo que describimos conceptualmente al inicio, STL lo hace de verdad: la tendencia sube limpia y suave, el componente estacional es el diente que se repite cada 12 meses, y el resto es pequeño y sin patrón. Si el resto tuviera estructura, STL se habría quedado corto. La opción robust = TRUE evita que un mes atípico le deforme la tendencia.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: Aditiva vs multiplicativa / log -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuando la oscilación crece: log y Box-Cox</h2>
+                <p class="slide-subtitle">Convertir multiplicativa en aditiva</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Box-Cox sugiere una transformacion estabilizadora</span>
+<span class="keyword">lambda</span> &lt;- turismo |&gt;
+  <span class="function">features</span>(Llegadas, features = guerrero) |&gt;
+  <span class="function">pull</span>(lambda_guerrero)
+<span class="function">print</span>(lambda)
+<span class="output">## [1] 0.087   (cercano a 0: casi un log puro)</span>
+
+<span class="comment"># Modelar en escala log estabiliza la varianza</span>
+turismo |&gt; <span class="function">autoplot</span>(<span class="function">log</span>(Llegadas)) +
+  <span class="function">labs</span>(title = <span class="string">"En escala log la oscilacion es pareja"</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="90" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">original: dientes que crecen</text>
+                            <line x1="30" y1="115" x2="160" y2="115" stroke="#2d2d2d" stroke-width="0.8"/>
+                            <polyline points="32,100 44,90 56,104 68,86 80,106 92,80 104,100 116,72 128,104 140,66 152,98" fill="none" stroke="#FF8C00" stroke-width="1.6"/>
+                            <text x="250" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">log: dientes parejos</text>
+                            <line x1="185" y1="115" x2="320" y2="115" stroke="#2d2d2d" stroke-width="0.8"/>
+                            <polyline points="187,92 199,84 211,95 223,82 235,94 247,80 259,93 271,79 283,93 295,78 307,92" fill="none" stroke="#4f93dd" stroke-width="1.6"/>
+                            <text x="170" y="160" text-anchor="middle" font-size="11" fill="#2d2d2d">log y = log T + log S + log R</text>
+                            <text x="170" y="185" text-anchor="middle" font-size="10" fill="#6e6e73">El log convierte el producto en suma:</text>
+                            <text x="170" y="202" text-anchor="middle" font-size="10" fill="#6e6e73">multiplicativa → aditiva, lista para STL/ARIMA.</text>
+                            <text x="170" y="224" text-anchor="middle" font-size="9" fill="#6e6e73">λ ≈ 0 (Box-Cox) ⟺ usar logaritmo</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El parámetro de Guerrero salió ≈ 0.09, casi cero, confirmando que la transformación logarítmica es la apropiada: nuestra serie es multiplicativa, como casi todo el turismo y la economía. Por eso más adelante ajustamos ARIMA(log(Llegadas)): trabajar en log estabiliza la varianza y vuelve el problema aditivo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: Estacionariedad y diferenciacion -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">De la intuición al código: diferenciar</h2>
+                <p class="slide-subtitle">La misma mini-serie 10, 14, 8, 12... ahora verificada en R</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># La misma mini-serie trimestral que vimos al inicio</span>
+mini &lt;- <span class="function">tsibble</span>(
+  Trim = <span class="function">yearquarter</span>(<span class="string">"2022 Q1"</span>) + <span class="number">0</span>:<span class="number">7</span>,
+  y = <span class="function">c</span>(<span class="number">10</span>,<span class="number">14</span>,<span class="number">8</span>,<span class="number">12</span>,<span class="number">14</span>,<span class="number">18</span>,<span class="number">12</span>,<span class="number">16</span>),
+  index = Trim)
+
+mini |&gt; <span class="function">mutate</span>(
+  d1 = <span class="function">difference</span>(y),       <span class="comment"># primera diferencia</span>
+  d4 = <span class="function">difference</span>(y, <span class="number">4</span>)) |&gt;  <span class="comment"># diferencia estacional</span>
+  <span class="function">print</span>(n = <span class="number">8</span>)
+<span class="output">##      Trim     y    d1    d4
+## 1 2022 Q1    10    NA    NA
+## 2 2022 Q2    14     4    NA
+## 3 2022 Q3     8    -6    NA
+## 4 2022 Q4    12     4    NA
+## 5 2023 Q1    14     2     4
+## 6 2023 Q2    18     4     4
+## 7 2023 Q3    12    -6     4
+## 8 2023 Q4    16     4     4</span>
+                    </div>
+                    <div class="content-box">
+                        <h3>¿Cuántas diferencias? KPSS decide</h3>
+                        <div class="code-box" style="margin-top:6px;">
+turismo |&gt; <span class="function">features</span>(Llegadas, unitroot_ndiffs)
+<span class="output">## n_diffs = 1</span>
+turismo |&gt; <span class="function">features</span>(Llegadas, unitroot_nsdiffs)
+<span class="output">## n_sdiffs = 1</span>
+turismo |&gt; <span class="function">features</span>(Llegadas, unitroot_kpss)
+<span class="output">## kpss_pvalue = 0.01  (&lt; 0.05: no estacionaria)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Columna d1: exactamente nuestros 4, -6, 4, 2, 4, -6, 4. Columna d4: nuestros 4, 4, 4, 4. El código confirma al número la resta que hicimos al inicio. Los NA del inicio son naturales: no hay con qué restar. Y KPSS, sobre el turismo real, recomienda una diferencia ordinaria (d = 1) y una estacional (D = 1), justo lo que la forma de la ACF anticipaba.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Identificacion -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Leer ACF y PACF: las reglas de Box-Jenkins</h2>
+                <p class="slide-subtitle">La intuición que la máquina automatiza</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Patrón observado</th>
+                                <th>Modelo sugerido</th>
+                                <th>Idea</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>PACF se corta en el rezago p, ACF decae gradual</td><td>AR(p)</td><td>Hoy depende de p valores pasados</td></tr>
+                            <tr><td>ACF se corta en el rezago q, PACF decae gradual</td><td>MA(q)</td><td>Hoy depende de q errores pasados</td></tr>
+                            <tr><td>Ambas decaen gradualmente</td><td>ARMA(p, q)</td><td>Mezcla de las dos memorias</td></tr>
+                            <tr><td>Picos en múltiplos de m (12, 24...)</td><td>Parte estacional (P, Q)</td><td>La memoria de un año atrás</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>"Se corta" contra "decae"</h4>
+                        <p>Cortarse es caer de golpe a cero después de cierto rezago. Decaer es bajar despacito. La diferencia entre los dos patrones es lo que distingue AR de MA.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Por qué seguimos leyéndolas</h4>
+                        <p>Aunque ARIMA() elige sola, leer ACF/PACF nos deja auditar su elección y entender por qué propuso esos órdenes. La máquina propone; el modelador entiende.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>En la práctica de 2026, casi nadie identifica a ojo: se deja que el algoritmo busque. Pero quien sabe leer estos gráficos detecta cuando el modelo automático se equivocó, que pasa más seguido de lo que parece.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: ARIMA automatico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Dejar que la máquina elija: ARIMA()</h2>
+                <p class="slide-subtitle">El algoritmo Hyndman-Khandakar en acción</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># Tres modelos a la vez: automatico, manual y en log</span>
+fit &lt;- turismo |&gt;
+  <span class="function">model</span>(
+    auto     = <span class="function">ARIMA</span>(Llegadas),                              <span class="comment"># elige (p,d,q)(P,D,Q) solo</span>
+    aerolinea = <span class="function">ARIMA</span>(Llegadas ~ <span class="number">0</span> + <span class="function">pdq</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>) + <span class="function">PDQ</span>(<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>)),  <span class="comment"># el clasico</span>
+    log_auto = <span class="function">ARIMA</span>(<span class="function">log</span>(Llegadas))                          <span class="comment"># en escala log</span>
+  )
+fit |&gt; <span class="function">glance</span>() |&gt; <span class="function">select</span>(.model, AICc, BIC)
+<span class="output">## # A tibble: 3 x 3
+##   .model      AICc    BIC
+##   &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+## 1 auto       2447.   2466.
+## 2 aerolinea  2459.   2470.
+## 3 log_auto   -243.   -224.   &lt;- log: AICc en otra escala, no comparable</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Qué hizo el algoritmo</h4>
+                        <p>Usó KPSS para fijar d = 1, la fuerza estacional para D = 1, y luego una búsqueda paso a paso variando p, q, P, Q para minimizar el AICc. Todo sin que le digamos nada.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>La trampa del AICc</h4>
+                        <p>auto y aerolinea sí se comparan por AICc (mismo d, misma escala). Pero log_auto NO: al transformar la serie cambian los datos. Comparar su AICc con los otros es un error clásico.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: report -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Qué eligió: report()</h2>
+                <p class="slide-subtitle">Los coeficientes del modelo automático</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+fit |&gt; <span class="function">select</span>(auto) |&gt; <span class="function">report</span>()
+<span class="output">## Series: Llegadas
+## Model: ARIMA(0,1,1)(0,1,1)[12]
+##
+## Coefficients:
+##           ma1     sma1
+##       -0.3842  -0.6215
+## s.e.   0.0871   0.0764
+##
+## sigma^2 = 1.71e+07:  log likelihood = -1220.4
+## AIC=2446.8   AICc=2447.0   BIC=2465.6</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>El reencuentro con el modelo de aerolínea</h4>
+                        <p>El algoritmo eligió ARIMA(0,1,1)(0,1,1)[12]: el modelo de aerolínea que presentamos al inicio. Una diferencia ordinaria, una estacional, un MA en cada parte. La teoría y la práctica coinciden.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Cómo se leen los coeficientes</h4>
+                        <p>ma1 es el peso del error del mes anterior; sma1, el del error del mismo mes del año pasado. Ambos con su error estándar (s.e.): si el coeficiente es varias veces su s.e., es claramente distinto de cero.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Que el algoritmo aterrice solo en el modelo de aerolínea no es casualidad: nuestra serie tiene exactamente la estructura para la que ese modelo fue diseñado (tendencia más estacionalidad mensual). Por eso vale la pena conocer los clásicos: a veces la búsqueda automática solo confirma lo que un experto habría propuesto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Diagnostico residuos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El modelo confiesa en sus residuos</h2>
+                <p class="slide-subtitle">¿Son ruido blanco? gg_tsresiduals y Ljung-Box</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Tres diagnosticos en un solo grafico</span>
+fit |&gt; <span class="function">select</span>(auto) |&gt; <span class="function">gg_tsresiduals</span>()
+
+<span class="comment"># Prueba formal de Ljung-Box sobre las innovaciones</span>
+<span class="comment"># dof = numero de parametros del modelo (aqui 2)</span>
+<span class="function">augment</span>(fit) |&gt;
+  <span class="function">filter</span>(.model == <span class="string">"auto"</span>) |&gt;
+  <span class="function">features</span>(.innov, ljung_box, lag = <span class="number">24</span>, dof = <span class="number">2</span>)
+<span class="output">## # A tibble: 1 x 3
+##   .model   lb_stat  lb_pvalue
+##   &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;
+## 1 auto       19.8       0.658   &lt;- p grande: residuos sanos</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="12" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">gg_tsresiduals: tres paneles</text>
+                            <!-- residuos en el tiempo -->
+                            <text x="8" y="40" font-size="8" fill="#6e6e73">resid</text>
+                            <line x1="44" y1="45" x2="312" y2="45" stroke="#bbbbbb" stroke-width="0.6" stroke-dasharray="2,2"/>
+                            <polyline points="44,48 66,40 88,52 110,42 132,50 154,38 176,49 198,43 220,51 242,39 264,47 286,44 308,46" fill="none" stroke="#6e6e73" stroke-width="1"/>
+                            <!-- ACF residuos plana -->
+                            <text x="8" y="120" font-size="8" fill="#6e6e73">ACF</text>
+                            <line x1="44" y1="135" x2="312" y2="135" stroke="#2d2d2d" stroke-width="0.8"/>
+                            <line x1="44" y1="110" x2="312" y2="110" stroke="#8fbdf0" stroke-width="0.7" stroke-dasharray="3,3"/>
+                            <line x1="44" y1="160" x2="312" y2="160" stroke="#8fbdf0" stroke-width="0.7" stroke-dasharray="3,3"/>
+                            <line x1="60" y1="135" x2="60" y2="128" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="80" y1="135" x2="80" y2="140" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="100" y1="135" x2="100" y2="131" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="120" y1="135" x2="120" y2="142" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="140" y1="135" x2="140" y2="130" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="160" y1="135" x2="160" y2="138" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="180" y1="135" x2="180" y2="132" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="200" y1="135" x2="200" y2="139" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="220" y1="135" x2="220" y2="133" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="240" y1="135" x2="240" y2="137" stroke="#FF8C00" stroke-width="2"/>
+                            <!-- histograma -->
+                            <text x="8" y="205" font-size="8" fill="#6e6e73">hist</text>
+                            <rect x="120" y="195" width="14" height="18" fill="#FFC36E"/>
+                            <rect x="135" y="185" width="14" height="28" fill="#FF8C00"/>
+                            <rect x="150" y="178" width="14" height="35" fill="#FF8C00"/>
+                            <rect x="165" y="185" width="14" height="28" fill="#FF8C00"/>
+                            <rect x="180" y="196" width="14" height="17" fill="#FFC36E"/>
+                            <text x="185" y="232" text-anchor="middle" font-size="9" fill="#6e6e73">ACF plana + histograma acampanado = sano</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Las tres señales del checklist que enunciamos al inicio: la ACF de los residuos cae dentro de las bandas (sin autocorrelación), el histograma es acampanado (casi normal) y la serie de residuos oscila alrededor de cero sin patrón. Ljung-Box lo confirma: p = 0.658, muy por encima de 0.05, así que no hay evidencia de estructura sobrante. El modelo aprobó el examen.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Pronostico -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Pronosticar: forecast e intervalos</h2>
+                <p class="slide-subtitle">No un número, sino una distribución de futuros</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Pronostico a 2 anios (24 meses) del modelo auto</span>
+fc &lt;- fit |&gt;
+  <span class="function">select</span>(auto) |&gt;
+  <span class="function">forecast</span>(h = <span class="string">"2 years"</span>)
+
+<span class="function">print</span>(fc, n = <span class="number">3</span>)
+<span class="output">## # A fable: 24 x 4 [1M]
+##   .model   Mes        Llegadas[dist]   .mean
+##   &lt;chr&gt;    &lt;mth&gt;              &lt;dist&gt;   &lt;dbl&gt;
+## 1 auto     2020 ene   N(286e3, 1.7e7) 285643
+## 2 auto     2020 feb   N(281e3, 2.0e7) 281022
+## 3 auto     2020 mar   N(262e3, 2.3e7) 261889</span>
+
+fc |&gt; <span class="function">autoplot</span>(turismo, level = <span class="function">c</span>(<span class="number">80</span>, <span class="number">95</span>))
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">forecast con intervalos 80% y 95%</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <!-- historico -->
+                            <polyline points="45,175 60,160 75,182 90,150 105,178 120,140 135,170 150,128 165,160 180,116 195,150 210,104 225,142 240,95" fill="none" stroke="#2d2d2d" stroke-width="1.5"/>
+                            <!-- abanico de pronostico -->
+                            <polygon points="240,95 255,70 270,80 285,55 300,68 315,42 315,120 300,108 285,118 270,98 255,112 240,95" fill="#FFE9CC" opacity="0.7"/>
+                            <polygon points="240,95 255,80 270,88 285,68 300,78 315,58 315,100 300,92 285,100 270,86 255,96 240,95" fill="#FFC36E" opacity="0.7"/>
+                            <polyline points="240,95 255,90 270,95 285,78 300,88 315,68" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="240" y1="30" x2="240" y2="210" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="140" y="228" text-anchor="middle" font-size="9" fill="#6e6e73">observado</text>
+                            <text x="280" y="228" text-anchor="middle" font-size="9" fill="#FF8C00" font-weight="600">pronóstico</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>fable no devuelve un número, sino una distribución completa por mes (la columna [dist]): la media más la incertidumbre. El abanico se ensancha con el horizonte, honesto: predecir 2 meses adelante es más fácil que 24. El pronóstico mantiene la estacionalidad y sigue la tendencia, exactamente lo que el modelo aprendió.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Validacion cruzada temporal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Validar sin hacer trampa: ventana expansiva</h2>
+                <p class="slide-subtitle">El TimeSeriesSplit de la semana pasada, ahora en R</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># stretch_tsibble crea entrenamientos crecientes</span>
+turismo_cv &lt;- turismo |&gt;
+  <span class="function">stretch_tsibble</span>(.init = <span class="number">60</span>, .step = <span class="number">6</span>)
+
+<span class="comment"># Para cada ventana: ajustar y pronosticar 12 meses</span>
+cv_acc &lt;- turismo_cv |&gt;
+  <span class="function">model</span>(sarima = <span class="function">ARIMA</span>(Llegadas)) |&gt;
+  <span class="function">forecast</span>(h = <span class="number">12</span>) |&gt;
+  <span class="function">accuracy</span>(turismo)
+<span class="function">print</span>(cv_acc |&gt; <span class="function">select</span>(.model, RMSE, MAE, MASE))
+<span class="output">## # A tibble: 1 x 4
+##   .model    RMSE    MAE   MASE
+##   &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+## 1 sarima   8123   6240  0.412</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">El pasado entrena, el futuro prueba</text>
+                            <g font-size="9" fill="#6e6e73">
+                            <rect x="60" y="32" width="80" height="22" fill="#e5e5e7"/><rect x="144" y="32" width="44" height="22" fill="#FF8C00"/>
+                            <text x="38" y="48">v.1</text>
+                            <rect x="60" y="62" width="124" height="22" fill="#e5e5e7"/><rect x="188" y="62" width="44" height="22" fill="#FF8C00"/>
+                            <text x="38" y="78">v.2</text>
+                            <rect x="60" y="92" width="168" height="22" fill="#e5e5e7"/><rect x="232" y="92" width="44" height="22" fill="#FF8C00"/>
+                            <text x="38" y="108">v.3</text>
+                            <rect x="60" y="122" width="212" height="22" fill="#e5e5e7"/><rect x="276" y="122" width="44" height="22" fill="#FF8C00"/>
+                            <text x="38" y="138">v.4</text>
+                            </g>
+                            <line x1="60" y1="165" x2="320" y2="165" stroke="#2d2d2d" stroke-width="1"/>
+                            <text x="190" y="182" text-anchor="middle" font-size="10" fill="#6e6e73">tiempo →</text>
+                            <rect x="70" y="194" width="12" height="12" fill="#e5e5e7"/><text x="88" y="204" font-size="9" fill="#6e6e73">entreno (.init=60)</text>
+                            <rect x="210" y="194" width="12" height="12" fill="#FF8C00"/><text x="228" y="204" font-size="9" fill="#6e6e73">pruebo (h=12)</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>stretch_tsibble genera muchos entrenamientos: empieza con 60 meses, pronostica los 12 siguientes, luego crece a 66, vuelve a pronosticar, y así. Cada ventana entrena solo con su pasado. Es la regla de oro del pronóstico hecha código: nunca entrenar con el futuro. El MASE promedio de 0.412 ya adelanta una buena noticia.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: SARIMA vs SNAIVE -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Le gana al ingenuo? SARIMA contra SNAIVE</h2>
+                <p class="slide-subtitle">MASE menor que 1 es el listón a superar</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="comment"># SNAIVE: "el mismo mes del anio pasado". El benchmark a vencer.</span>
+<span class="comment"># Particion temporal: ultimo anio como prueba</span>
+entreno &lt;- turismo |&gt; <span class="function">filter</span>(Mes &lt; <span class="function">make_yearmonth</span>(<span class="number">2019</span>, <span class="number">1</span>))
+
+modelos &lt;- entreno |&gt;
+  <span class="function">model</span>(snaive = <span class="function">SNAIVE</span>(Llegadas),
+        sarima = <span class="function">ARIMA</span>(Llegadas))
+
+modelos |&gt; <span class="function">forecast</span>(h = <span class="number">12</span>) |&gt;
+  <span class="function">accuracy</span>(turismo) |&gt;
+  <span class="function">select</span>(.model, RMSE, MAE, MAPE, MASE) |&gt; <span class="function">arrange</span>(MASE)
+<span class="output">## # A tibble: 2 x 5
+##   .model    RMSE    MAE  MAPE   MASE
+##   &lt;chr&gt;    &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+## 1 sarima    9847   7680  3.21  0.389   &lt;- gana
+## 2 snaive   21034  18260  7.74  0.925</span>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Por qué SNAIVE es el rival justo</h4>
+                        <p>Repetir el mismo mes del año pasado es gratis y sorprendentemente difícil de batir en series estacionales. Si un modelo sofisticado no le gana, no vale la complejidad. Es el listón mínimo.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>MASE, la métrica reina</h4>
+                        <p>MASE = 1 significa "igual que el ingenuo". El SARIMA dio 0.389: comete menos de la mitad del error del benchmark. SNAIVE, por definición cercano a 1. El SARIMA gana con claridad.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Datos costarricenses reales -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para el proyecto: datos reales de Costa Rica</h2>
+                <p class="slide-subtitle">Dónde conseguir series con estacionalidad de verdad</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="app-card">
+                        <div class="app-label">Turismo</div>
+                        <h4>Llegadas ICT</h4>
+                        <p>Series mensuales descargables en Excel. En 2025: 2 689 278 llegadas por vía aérea, con diciembre repuntando 13,6%. Estacionalidad ideal para SARIMA.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Salud</div>
+                        <h4>Dengue (Min. Salud)</h4>
+                        <p>Casos por semana epidemiológica, m ≈ 52. Brotes ligados a la estación lluviosa (semanas 18-29). Vienen en PDF: requieren transcripción.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Economía</div>
+                        <h4>IMAE (BCCR)</h4>
+                        <p>Índice mensual de actividad económica, código 87703 en el servicio web. Tendencia y ciclo claros. El BCCR publica también su propia tendencia-ciclo.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Advertencia honesta de modelador: la serie real del ICT tiene un quiebre estructural enorme por la pandemia (2020-2021). Para modelar conviene usar datos pre-2020 o post-2022, o tratar ese período como una intervención. Por eso hoy trabajamos con una serie simulada limpia: para aprender la mecánica sin el ruido de un evento extraordinario.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Competencias M -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Siguen vivos los clásicos? Las competencias M</h2>
+                <p class="slide-subtitle">La evidencia empírica sobre qué funciona</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">M4</div>
+                        <div class="stat-label">2018, 100 000 series. Los métodos puros de ML quedaron debajo de ARIMA/ETS. Ganó un híbrido ES-RNN (suavizamiento + red recurrente).</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">M5</div>
+                        <div class="stat-label">2020, ventas de Walmart. Primera vez que el ML puro superó a todos los benchmarks estadísticos. Ganó una combinación de modelos LightGBM.</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">M6</div>
+                        <div class="stat-label">2024, financiero. Solo ~23% de equipos batió al mercado: en datos casi aleatorios, lo sofisticado rara vez ayuda.</div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>La lección de tres competencias</h3>
+                    <ul>
+                        <li>Con muchos datos regulares y jerárquicos (retail), el ML moderno gana</li>
+                        <li>Con pocos datos, escalas mixtas o ruido casi puro, los clásicos siguen siendo competitivos</li>
+                        <li>Los mejores resultados casi siempre son combinaciones (ensembles), no un modelo solo</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>La narrativa honesta para 2026: ARIMA y ETS no están obsoletos. Son la línea base que todo método moderno debe superar, y siguen ganando cuando los datos son escasos, regulares y estacionales, justo el caso de muchas series costarricenses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Modelos de fundacion -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La frontera: modelos de fundación para series</h2>
+                <p class="slide-subtitle">Pronóstico zero-shot, sin entrenar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Qué son</h3>
+                        <p>Modelos preentrenados con millones de series que pronostican una serie nueva sin reentrenar (zero-shot), igual que un LLM responde sin haber visto antes su pregunta exacta.</p>
+                        <ul style="margin-top:8px;">
+                            <li>Chronos y Chronos-2 (Amazon)</li>
+                            <li>TimesFM (Google)</li>
+                            <li>Moirai y Moirai-2 (Salesforce)</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Qué dice el benchmark GIFT-Eval</h3>
+                        <p>Sobre 23 conjuntos, 144 000 series y 177 millones de puntos:</p>
+                        <ul style="margin-top:8px;">
+                            <li>Competitivos en zero-shot, sobre todo en baja frecuencia y horizontes cortos</li>
+                            <li>En alta frecuencia, los clásicos (AutoTheta, SNAIVE) siguen siendo difíciles de batir</li>
+                            <li>Sufren en dominios de alta entropía (web, transporte)</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La conexión con el resto del curso: igual que un LLM es una cadena de Markov gigante que predice la siguiente palabra, un modelo de fundación de series predice el siguiente valor habiendo "leído" millones de series. Pero todos, del SARIMA al modelo de fundación, comparten el mismo ADN: descomponer en tendencia + estacionalidad + resto. Lo que cambia es cómo estiman cada parte.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Puente Prophet -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El puente a la semana 7: fable.prophet</h2>
+                <p class="slide-subtitle">Comparar clásico y moderno en el mismo flujo</p>
+            </div>
+            <div class="slide-content">
+                <div class="code-box">
+<span class="function">library</span>(fable.prophet)   <span class="comment"># envuelve Prophet de Meta en la sintaxis fable</span>
+
+<span class="comment"># Mismo flujo: SARIMA y Prophet compiten en accuracy()</span>
+comparacion &lt;- entreno |&gt;
+  <span class="function">model</span>(
+    sarima  = <span class="function">ARIMA</span>(Llegadas),
+    prophet = <span class="function">prophet</span>(Llegadas ~ <span class="function">season</span>(<span class="string">"year"</span>, <span class="number">4</span>, type = <span class="string">"multiplicative"</span>))
+  )
+
+comparacion |&gt; <span class="function">forecast</span>(h = <span class="number">12</span>) |&gt;
+  <span class="function">accuracy</span>(turismo) |&gt; <span class="function">select</span>(.model, MASE)
+<span class="output">## # A tibble: 2 x 2
+##   .model    MASE
+##   &lt;chr&gt;    &lt;dbl&gt;
+## 1 sarima   0.389
+## 2 prophet  0.451   &lt;- competitivo, pero el clasico gana aqui</span>
+                </div>
+                <div class="highlight-box">
+                    <p>La próxima semana abrimos la puerta a Prophet, NeuralProphet y Chronos. La idea de cierre: la descomposición STL de hoy es el ancestro de Prophet (que también descompone en tendencia más estacionalidad de Fourier), y este a su vez es primo lejano de los modelos de fundación. Todos descomponen el tiempo; cambia la maquinaria. El mismo flujo accuracy() los pone a competir de forma justa.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Sintesis -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Síntesis: el flujo completo de fpp3</h2>
+                <p class="slide-subtitle">Todo lo de hoy en una tabla</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Paso</th>
+                                <th>Qué hace</th>
+                                <th>Función clave</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1. Estructurar</td><td>Tabla que entiende el calendario</td><td>tsibble(), yearmonth()</td></tr>
+                            <tr><td>2. Explorar</td><td>Ver tendencia y estacionalidad</td><td>autoplot, gg_season, ACF</td></tr>
+                            <tr><td>3. Descomponer</td><td>Separar la receta</td><td>STL() + components()</td></tr>
+                            <tr><td>4. Estacionarizar</td><td>Decidir cuántas diferencias</td><td>unitroot_kpss, ndiffs, nsdiffs</td></tr>
+                            <tr><td>5. Modelar</td><td>Elegir (p,d,q)(P,D,Q) solo</td><td>ARIMA(), report()</td></tr>
+                            <tr><td>6. Diagnosticar</td><td>¿Residuos son ruido blanco?</td><td>gg_tsresiduals, ljung_box</td></tr>
+                            <tr><td>7. Pronosticar</td><td>Distribución de futuros</td><td>forecast() + autoplot()</td></tr>
+                            <tr><td>8. Validar</td><td>Honestidad fuera de muestra</td><td>stretch_tsibble, accuracy</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Ocho pasos, un solo idioma (el tsibble que fluye por el pipe). Este flujo es el mismo para turismo, dengue, electricidad o tipo de cambio. Cambia la serie; el método es siempre este.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexión con el proyecto integrador</h2>
+                <p class="slide-subtitle">Carriles donde las series temporales encajan</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Demanda eléctrica (ICE / CENCE)</h4>
+                        <p>SARIMA contra Prophet para pronosticar demanda. La regresión de la semana pasada es el baseline; el SARIMA de hoy, el segundo modelo. Dos métodos en un carril.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Turismo</div>
+                        <h4>Llegadas de turistas (ICT)</h4>
+                        <p>El caso de hoy, con datos reales. Comparar SARIMA contra un modelo de fundación (Chronos) sería un proyecto sobresaliente.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Salud</div>
+                        <h4>Dengue (Min. Salud)</h4>
+                        <p>Estacionalidad de alta frecuencia (semanal). SARIMA estacional más un modelo SEIR de la semana 2: combinación natural y muy local.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Tipo de cambio (BCCR)</h4>
+                        <p>Cuidado: el tipo de cambio casi no tiene estacionalidad. Sirve para mostrar cuándo SARIMA no aporta y por qué el SNAIVE es difícil de batir.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Recordatorio de calendario: el avance del proyecto se entrega en la semana 8. Una serie bien descompuesta, un SARIMA validado contra SNAIVE en MASE y un diagnóstico de residuos ya constituyen un primer modelo sólido para ese avance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Actividad grupal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">25 a 30 minutos: a mano y en Colab con kernel R</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (a mano, 10 min):</strong> primera diferencia y diferencia estacional de una mini-serie trimestral, una ACF de lag 1, y un emparejamiento de identificación Box-Jenkins</li>
+                        <li><strong>Parte B (en Colab con R, 12-15 min):</strong> verificar las diferencias con fpp3, descomponer con STL, ajustar un SARIMA automático, diagnosticar y validar contra SNAIVE en MASE</li>
+                        <li><strong>Parte C (reflexión, 3-5 min):</strong> interpretar el MASE, explicar la validación temporal con sus palabras y conectar con el proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>Una foto o escaneo de los cálculos a mano (Parte A)</li>
+                        <li>El notebook de Colab compartido del grupo, con kernel R (formato .ipynb)</li>
+                        <li>Una celda final en Markdown con la reflexión grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento completo de la actividad está en el campus virtual. Ahora mismo los distribuyo a las salas. Recuerden activar el kernel R en Colab (Entorno de ejecución → Cambiar tipo de entorno → R). Estaré rotando entre salas para apoyar dudas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Proxima clase -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Para la próxima clase (semana 7)</h2>
+                <p class="slide-subtitle">Series temporales modernas: Prophet, NeuralProphet y Chronos</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Preparación recomendada</h3>
+                    <ul>
+                        <li>Lectura: Hyndman y Athanasopoulos, capítulos sobre descomposición y ARIMA (gratis en otexts.com/fpp3)</li>
+                        <li>Tener claro el flujo de hoy: descomponer, diferenciar, modelar, diagnosticar, validar</li>
+                        <li>Las primeras presentaciones grupales de tema complementario son esta semana (1.ª sesión)</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Conexión con lo de hoy</h3>
+                    <ul>
+                        <li>Prophet descompone en tendencia más estacionalidad de Fourier: es STL con regresión por debajo</li>
+                        <li>El flujo accuracy() y la validación temporal de hoy son la base para comparar clásico contra neuronal</li>
+                        <li>La métrica MASE seguirá siendo el árbitro: ¿le gana el modelo moderno al SARIMA y al SNAIVE?</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>Si hoy quedó claro que un buen pronóstico se valida en el futuro y se compara contra un ingenuo, la mitad metodológica de las series modernas ya está ganada. La próxima semana solo cambiamos el motor, no el tablero.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 27: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Cuatro ideas y una sola intuición</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Descomponer: la serie es una receta</h4>
+                    <p>Tendencia, estacionalidad, ciclo y ruido. STL los separa de verdad. Lo que sobra debe ser pequeño y sin patrón.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Estacionarizar: quitar lo predecible</h4>
+                    <p>Diferenciar mata tendencia (∇) y estacionalidad (∇ₘ). KPSS decide cuántas veces. El código confirmó al número la resta que vimos al inicio.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Modelar y diagnosticar: ARIMA y los residuos</h4>
+                    <p>ARIMA() elige el modelo solo (aterrizó en el de aerolínea). Y un buen modelo deja residuos de ruido blanco: Ljung-Box lo confirma con p grande.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Validar: nunca entrenar con el futuro</h4>
+                    <p>Ventana expansiva con stretch_tsibble y MASE contra el SNAIVE. Menos de 1 significa ganarle al ingenuo. Nuestro SARIMA dio 0.389.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 20px;">
+                    <p style="text-align: center; font-size: 22px;">Gracias por la sesión. Nos vemos la próxima semana con series temporales modernas.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
