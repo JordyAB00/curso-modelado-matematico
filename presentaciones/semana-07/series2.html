@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 7: Series temporales modernas - Modelado matemático</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: #f5f5f7;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 65px 70px 90px 70px;
+            background: #f5f5f7;
+        }
+
+        .slide.active {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide-header {
+            margin-bottom: 22px;
+        }
+
+        .slide-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .slide-subtitle {
+            font-size: 18px;
+            color: #6e6e73;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 14px;
+            overflow-y: auto;
+            max-height: calc(100vh - 230px);
+        }
+
+        .content-box {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 16px 20px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .content-box h3 {
+            font-size: 20px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .content-box p {
+            font-size: 15px;
+            color: #1d1d1f;
+            line-height: 1.45;
+        }
+
+        .content-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .content-box li {
+            font-size: 16px;
+            color: #1d1d1f;
+            line-height: 1.6;
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .content-box li::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FF8C00;
+            font-size: 20px;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .four-columns {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin: 8px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .highlight-box p {
+            font-size: 15px;
+            color: #2d2d2d;
+            font-style: italic;
+            font-weight: 500;
+            line-height: 1.45;
+        }
+
+        .stat-box {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            border-color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.15);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6e6e73;
+        }
+
+        .key-point {
+            background: #ffffff;
+            border-left: 4px solid #FF8C00;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 6px 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e5e5e7;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .key-point h4 {
+            color: #2d2d2d;
+            font-size: 17px;
+            margin-bottom: 6px;
+        }
+
+        .key-point p {
+            color: #1d1d1f;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .comparison-table {
+            background: #ffffff;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .comparison-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th {
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00);
+            color: #ffffff;
+            padding: 9px 12px;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        .comparison-table td {
+            padding: 8px 12px;
+            font-size: 13px;
+            color: #1d1d1f;
+            border-bottom: 1px solid #f5f5f7;
+        }
+
+        .code-box {
+            background: #1e1e1e;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            color: #d4d4d4;
+            font-size: 13px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            text-align: left;
+            overflow: visible;
+            height: auto;
+            min-height: fit-content;
+        }
+
+        .code-box .comment {
+            color: #6a9955;
+        }
+
+        .code-box .keyword {
+            color: #569cd6;
+        }
+
+        .code-box .string {
+            color: #ce9178;
+        }
+
+        .code-box .number {
+            color: #b5cea8;
+        }
+
+        .code-box .function {
+            color: #dcdcaa;
+        }
+
+        .code-box .output {
+            color: #9cdcfe;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        .nav-button {
+            background: linear-gradient(135deg, #2d2d2d, #FF8C00);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+        }
+
+        .nav-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .logo-area {
+            position: fixed;
+            top: 12px;
+            left: 20px;
+            z-index: 1000;
+        }
+
+        .logo-image {
+            max-width: 85px;
+            height: auto;
+        }
+
+        .slide-number {
+            position: fixed;
+            top: 20px;
+            right: 30px;
+            color: #6e6e73;
+            font-size: 16px;
+            z-index: 1000;
+            font-weight: 500;
+        }
+
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%);
+            padding: 60px 80px 140px 80px;
+        }
+
+        .cover-title {
+            font-size: 60px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: gradient 3s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .cover-subtitle {
+            font-size: 30px;
+            color: #6e6e73;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .cover-info {
+            font-size: 18px;
+            color: #1d1d1f;
+            margin-top: 30px;
+            line-height: 1.6;
+        }
+
+        .feature-card {
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .feature-card h4 {
+            font-size: 19px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .app-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+            border-radius: 15px;
+            padding: 18px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 140, 0, 0.15);
+            border-color: #FF8C00;
+        }
+
+        .app-card .app-label {
+            font-size: 12px;
+            color: #FF8C00;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .app-card h4 {
+            font-size: 18px;
+            color: #2d2d2d;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .app-card p {
+            font-size: 14px;
+            color: #1d1d1f;
+            line-height: 1.4;
+        }
+
+        .math-symbol {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-style: italic;
+            color: #FF8C00;
+            font-weight: 600;
+        }
+
+        .viz-svg {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid #e5e5e7;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            text-align: center;
+        }
+
+        .viz-svg svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Pantallas pequeñas (laptops 13-14", viewport bajo ~850px) */
+        @media (max-height: 850px) {
+            .slide {
+                padding: 55px 60px 70px 60px;
+            }
+            .slide-header {
+                margin-bottom: 14px;
+            }
+            .slide-title {
+                font-size: 30px;
+                margin-bottom: 4px;
+            }
+            .slide-subtitle {
+                font-size: 16px;
+            }
+            .slide-content {
+                gap: 10px;
+                max-height: calc(100vh - 180px);
+            }
+            .content-box {
+                padding: 12px 16px;
+            }
+            .content-box h3 {
+                font-size: 18px;
+                margin-bottom: 6px;
+            }
+            .content-box p, .content-box li {
+                font-size: 14px;
+            }
+            .highlight-box {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .highlight-box p {
+                font-size: 14px;
+            }
+            .key-point {
+                padding: 10px 14px;
+                margin: 4px 0;
+            }
+            .key-point h4 {
+                font-size: 16px;
+            }
+            .key-point p {
+                font-size: 13px;
+            }
+            .comparison-table th {
+                padding: 7px 10px;
+                font-size: 13px;
+            }
+            .comparison-table td {
+                padding: 6px 10px;
+                font-size: 12.5px;
+            }
+            .logo-image {
+                max-width: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area">
+        <img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image">
+    </div>
+
+    <div class="slide-number">
+        <span id="currentSlide">1</span> / <span id="totalSlides">26</span>
+    </div>
+
+    <div class="presentation-container">
+
+        <!-- Slide 1: Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Series temporales modernas</h1>
+            <p class="cover-subtitle">Semana 7: del modelo aditivo a los modelos de fundación, en Python</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matemático<br>
+                Profesor: Jordy Alfaro Brenes<br>
+                Lead University<br>
+                II Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: Puente desde la semana 6 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">De R a Python: mismo problema, motores nuevos</h2>
+                <p class="slide-subtitle">La semana pasada validamos con MASE; hoy cambiamos la maquinaria</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Lo que ya sabemos (semana 6)</h3>
+                        <ul>
+                            <li>Descomponer: tendencia + estacionalidad + resto (STL)</li>
+                            <li>Estacionarizar y ajustar un SARIMA en R con fpp3</li>
+                            <li>Validar en el futuro (ventana expansiva) con MASE</li>
+                            <li>El SARIMA le ganó al ingenuo: MASE = 0.389</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo nuevo de hoy</h3>
+                        <ul>
+                            <li>La misma serie de turismo, ahora en Python</li>
+                            <li>Prophet: el modelo aditivo interpretable de Meta</li>
+                            <li>NeuralProphet: Prophet sobre PyTorch, con autorregresión</li>
+                            <li>Modelos de fundación: pronóstico zero-shot, sin entrenar</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El tablero no cambia: un buen pronóstico se valida en el futuro y se compara contra un ingenuo con MASE. Lo único que cambia hoy es el motor que produce el pronóstico. Esa idea de la semana pasada es la regla con la que vamos a juzgar a todos los modelos nuevos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 3: Local vs global -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El cambio de paradigma: local contra global</h2>
+                <p class="slide-subtitle">Por qué la industria dejó de ajustar un modelo por serie</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#c0392b">Local: un modelo por serie</text>
+                            <g font-size="9" fill="#6e6e73">
+                            <line x1="30" y1="55" x2="90" y2="55" stroke="#FF8C00" stroke-width="1.6"/><rect x="100" y="48" width="34" height="14" rx="3" fill="#f0d0c0" stroke="#c0392b" stroke-width="0.8"/><text x="117" y="58" text-anchor="middle">M1</text>
+                            <line x1="30" y1="85" x2="90" y2="85" stroke="#FF8C00" stroke-width="1.6"/><rect x="100" y="78" width="34" height="14" rx="3" fill="#f0d0c0" stroke="#c0392b" stroke-width="0.8"/><text x="117" y="88" text-anchor="middle">M2</text>
+                            <line x1="30" y1="115" x2="90" y2="115" stroke="#FF8C00" stroke-width="1.6"/><rect x="100" y="108" width="34" height="14" rx="3" fill="#f0d0c0" stroke="#c0392b" stroke-width="0.8"/><text x="117" y="118" text-anchor="middle">M3</text>
+                            <text x="82" y="150" text-anchor="middle" font-size="14" fill="#c0392b">⋮</text>
+                            <text x="82" y="175" text-anchor="middle">100 000 series →</text>
+                            <text x="82" y="190" text-anchor="middle">100 000 modelos</text>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="700" fill="#2e8b57">Global: un modelo, muchas series</text>
+                            <line x1="20" y1="50" x2="80" y2="50" stroke="#4f93dd" stroke-width="1.6"/>
+                            <line x1="20" y1="80" x2="80" y2="80" stroke="#4f93dd" stroke-width="1.6"/>
+                            <line x1="20" y1="110" x2="80" y2="110" stroke="#4f93dd" stroke-width="1.6"/>
+                            <line x1="20" y1="140" x2="80" y2="140" stroke="#4f93dd" stroke-width="1.6"/>
+                            <path d="M80,50 Q120,95 150,95" fill="none" stroke="#cccccc" stroke-width="1"/>
+                            <path d="M80,80 Q120,95 150,95" fill="none" stroke="#cccccc" stroke-width="1"/>
+                            <path d="M80,110 Q120,95 150,95" fill="none" stroke="#cccccc" stroke-width="1"/>
+                            <path d="M80,140 Q120,95 150,95" fill="none" stroke="#cccccc" stroke-width="1"/>
+                            <rect x="150" y="78" width="60" height="34" rx="5" fill="#d5ead8" stroke="#2e8b57" stroke-width="1.2"/>
+                            <text x="180" y="99" text-anchor="middle" font-size="11" fill="#2e8b57" font-weight="700">1 modelo</text>
+                            <text x="270" y="99" text-anchor="middle" font-size="9" fill="#6e6e73">aprende patrones</text>
+                            <text x="270" y="112" text-anchor="middle" font-size="9" fill="#6e6e73">compartidos</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Clásico = local</h4>
+                        <p>ARIMA, ETS, Prophet: ajustan UNA serie a la vez sobre su propia autocorrelación. Interpretables y con pocos datos, pero no aprovechan lo que una serie le enseña a otra.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Moderno = global</h4>
+                        <p>Un solo modelo aprende de miles de series simultáneamente, usando features (lags, calendario). En su forma extrema, se pre-entrena en miles de millones de puntos.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Taxonomia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El mapa de los modelos modernos</h2>
+                <p class="slide-subtitle">Cuatro familias que conviven en 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="four-columns">
+                    <div class="feature-card">
+                        <h4>Aditivos descomponibles</h4>
+                        <p>Prophet, NeuralProphet. Separan tendencia + estacionalidad + festivos. Interpretables. Hoy son baseline, no campeones.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Gradient boosting</h4>
+                        <p>LightGBM, XGBoost con features de calendario y lags. Ganan competencias reales (M5). El caballo de batalla de la industria.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Deep learning</h4>
+                        <p>N-BEATS, N-HiTS, DeepAR, Temporal Fusion Transformer. Potentes, pero necesitan muchos datos y cómputo.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Modelos de fundación</h4>
+                        <p>Chronos, TimesFM, Moirai, Toto. Pre-entrenados a gran escala, pronostican zero-shot. La frontera de hoy.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El hilo conductor: todos, del SARIMA de la semana pasada al modelo de fundación más reciente, comparten el mismo ADN: descomponer la serie en tendencia, estacionalidad y resto. Lo que cambia es cómo estiman cada parte y de cuántas series aprenden.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Prophet la idea -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Prophet: descomponer es la idea</h2>
+                <p class="slide-subtitle">Un modelo aditivo interpretable, primo cercano del STL</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La ecuación, en palabras</h3>
+                        <p style="font-size:18px; text-align:center; margin:6px 0;"><span class="math-symbol">y(t) = g(t) + s(t) + h(t) + ε<sub>t</sub></span></p>
+                        <ul style="margin-top:8px;">
+                            <li><strong>g(t):</strong> tendencia. Lineal por tramos (con puntos de quiebre) o logística (con saturación)</li>
+                            <li><strong>s(t):</strong> estacionalidad, aproximada con series de Fourier (sumas de senos y cosenos)</li>
+                            <li><strong>h(t):</strong> festivos y fechas especiales</li>
+                            <li><strong>ε<sub>t</sub>:</strong> el ruido que sobra</li>
+                        </ul>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Tres piezas que se suman</text>
+                            <text x="20" y="42" font-size="9" fill="#FF8C00" font-weight="700">g(t)</text>
+                            <line x1="55" y1="50" x2="300" y2="30" stroke="#FF8C00" stroke-width="2"/>
+                            <line x1="180" y1="55" x2="180" y2="25" stroke="#cccccc" stroke-width="0.8" stroke-dasharray="2,2"/>
+                            <text x="20" y="105" font-size="9" fill="#4f93dd" font-weight="700">s(t)</text>
+                            <path d="M55,100 Q80,75 105,100 Q130,125 155,100 Q180,75 205,100 Q230,125 255,100 Q280,75 300,100" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <text x="20" y="165" font-size="9" fill="#6e6e73" font-weight="700">h(t)</text>
+                            <line x1="55" y1="165" x2="300" y2="165" stroke="#dddddd" stroke-width="0.8"/>
+                            <line x1="130" y1="165" x2="130" y2="148" stroke="#2e8b57" stroke-width="2.5"/>
+                            <line x1="255" y1="165" x2="255" y2="150" stroke="#2e8b57" stroke-width="2.5"/>
+                            <text x="160" y="200" text-anchor="middle" font-size="9" fill="#6e6e73">recta + onda + picos de festivos = serie</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La descomposición STL de la semana pasada es el ancestro de Prophet: ambos parten la serie en tendencia más estacionalidad. La diferencia es que Prophet la ajusta como una regresión (estima los coeficientes de Fourier y los quiebres de tendencia), y por eso puede pronosticar hacia adelante directamente.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: La serie en Python -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La serie de hoy: turismo, ahora en Python</h2>
+                <p class="slide-subtitle">La misma serie de la semana 6, con la semilla 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+
+rng = np.random.<span class="function">default_rng</span>(<span class="number">2026</span>)
+n = <span class="number">120</span>
+t = np.<span class="function">arange</span>(<span class="number">1</span>, n + <span class="number">1</span>)
+
+<span class="comment"># tendencia creciente + estacionalidad multiplicativa</span>
+tendencia  = <span class="number">130000</span> + <span class="number">650</span> * t
+patron     = np.<span class="function">array</span>([<span class="number">1.35</span>,<span class="number">1.32</span>,<span class="number">1.22</span>,<span class="number">1.05</span>,<span class="number">0.85</span>,<span class="number">0.80</span>,
+                       <span class="number">0.92</span>,<span class="number">0.88</span>,<span class="number">0.74</span>,<span class="number">0.82</span>,<span class="number">1.02</span>,<span class="number">1.33</span>])
+estacional = patron[(t - <span class="number">1</span>) % <span class="number">12</span>]
+ruido      = rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">0.045</span>, n)
+llegadas   = np.<span class="function">round</span>(tendencia * estacional * (<span class="number">1</span> + ruido))
+
+<span class="comment"># Prophet exige columnas 'ds' (fecha) y 'y' (valor)</span>
+df = pd.<span class="function">DataFrame</span>({
+    <span class="string">"ds"</span>: pd.<span class="function">date_range</span>(<span class="string">"2010-01-01"</span>, periods=n, freq=<span class="string">"MS"</span>),
+    <span class="string">"y"</span>: llegadas
+})
+
+df.<span class="function">plot</span>(x=<span class="string">"ds"</span>, y=<span class="string">"y"</span>, title=<span class="string">"Llegadas mensuales (simuladas)"</span>)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">df.plot(): tendencia + estacionalidad</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="45,170 55,150 65,178 75,158 85,185 95,165 105,150 115,178 125,158 135,140 145,168 155,150 165,132 175,160 185,140 195,120 205,150 215,130 225,112 235,142 245,120 255,100 265,132 275,110 285,90 295,122 305,100 315,80" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <text x="185" y="232" text-anchor="middle" font-size="10" fill="#6e6e73">tiempo (2010 → 2019, meses) →</text>
+                            <text x="22" y="120" text-anchor="middle" font-size="10" fill="#6e6e73" transform="rotate(-90 22 120)">turistas</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Continuidad total</h4>
+                        <p>Es exactamente la serie en R de la semana pasada, recreada en Python. Conocemos la verdad: tendencia de +650 al mes y patrón estacional fijo. Podemos juzgar si cada modelo la recupera.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Autocontenida</h4>
+                        <p>Todo el código de hoy corre de corrido en un notebook: esta celda genera el DataFrame df y las siguientes lo reutilizan. Sin descargas, sin variables fantasma.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Prophet ajustar y graficar -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Prophet en cinco líneas, con gráfico</h2>
+                <p class="slide-subtitle">fit, predict y plot que sí muestran algo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># pip install prophet  (v1.3.0, ya trae wheels)</span>
+<span class="keyword">from</span> prophet <span class="keyword">import</span> Prophet
+
+m = <span class="function">Prophet</span>(yearly_seasonality=<span class="keyword">True</span>,
+            seasonality_mode=<span class="string">"multiplicative"</span>,
+            changepoint_prior_scale=<span class="number">0.05</span>)
+m.<span class="function">fit</span>(df)                     <span class="comment"># API estilo sklearn</span>
+
+<span class="comment"># 24 meses hacia el futuro</span>
+futuro = m.<span class="function">make_future_dataframe</span>(periods=<span class="number">24</span>, freq=<span class="string">"MS"</span>)
+fcst   = m.<span class="function">predict</span>(futuro)
+
+<span class="comment"># El plot dibuja historico + pronostico + intervalo</span>
+fig = m.<span class="function">plot</span>(fcst)
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">m.plot(): pronóstico con intervalo</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="45,175 60,160 75,182 90,150 105,178 120,140 135,170 150,128 165,160 180,116 195,150 210,104 225,142 240,95" fill="none" stroke="#2d2d2d" stroke-width="1.4"/>
+                            <circle cx="60" cy="160" r="1.6" fill="#2d2d2d"/><circle cx="105" cy="178" r="1.6" fill="#2d2d2d"/><circle cx="150" cy="128" r="1.6" fill="#2d2d2d"/><circle cx="195" cy="150" r="1.6" fill="#2d2d2d"/><circle cx="240" cy="95" r="1.6" fill="#2d2d2d"/>
+                            <polygon points="240,95 260,68 280,80 300,52 315,64 315,118 300,104 280,116 260,96 240,95" fill="#cfe3ff" opacity="0.7"/>
+                            <polyline points="240,95 260,82 280,90 300,66 315,78" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <line x1="240" y1="30" x2="240" y2="210" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="130" y="232" text-anchor="middle" font-size="9" fill="#6e6e73">observado (puntos)</text>
+                            <text x="285" y="232" text-anchor="middle" font-size="9" fill="#4f93dd" font-weight="600">pronóstico</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Con seasonality_mode = "multiplicative" le decimos a Prophet que la oscilación crece con el nivel, justo lo que vimos en el turismo. changepoint_prior_scale controla cuánto puede doblarse la tendencia: más alto, más flexible (y más riesgo de sobreajuste). El plot dibuja todo de un golpe: histórico, pronóstico y banda de incertidumbre.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Prophet componentes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">plot_components: la receta separada</h2>
+                <p class="slide-subtitle">Prophet enseña su tendencia y su estacionalidad por dentro</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># El gran atractivo de Prophet: es interpretable.</span>
+<span class="comment"># plot_components separa lo que aprendio.</span>
+fig2 = m.<span class="function">plot_components</span>(fcst)
+
+<span class="comment"># Devuelve paneles:</span>
+<span class="comment">#  - trend     : la tendencia estimada</span>
+<span class="comment">#  - yearly    : el perfil estacional anual</span>
+<span class="comment"># (y holidays/weekly si se activan)</span>
+
+<span class="comment"># Tambien se pueden inspeccionar a mano:</span>
+fcst[[<span class="string">"ds"</span>, <span class="string">"trend"</span>, <span class="string">"yearly"</span>]].<span class="function">tail</span>(<span class="number">3</span>)
+<span class="output">##           ds     trend   yearly
+## 141 2021-10-01  205341   -0.118
+## 142 2021-11-01  205991    0.021
+## 143 2021-12-01  206641    0.332</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="12" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">plot_components()</text>
+                            <text x="8" y="50" font-size="8" fill="#6e6e73">trend</text>
+                            <line x1="48" y1="70" x2="312" y2="35" stroke="#FF8C00" stroke-width="2"/>
+                            <text x="8" y="135" font-size="8" fill="#6e6e73">yearly</text>
+                            <line x1="48" y1="135" x2="312" y2="135" stroke="#dddddd" stroke-width="0.6"/>
+                            <path d="M48,120 Q70,100 92,118 Q114,150 136,128 Q158,108 180,118 Q202,150 224,130 Q246,105 268,118 Q290,95 312,112" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <text x="8" y="205" font-size="8" fill="#6e6e73">obs.</text>
+                            <polyline points="48,200 70,190 92,205 114,188 136,206 158,184 180,202 202,190 224,205 246,188 268,200 290,192 312,196" fill="none" stroke="#2d2d2d" stroke-width="1.1"/>
+                            <text x="185" y="232" text-anchor="middle" font-size="9" fill="#6e6e73">tiempo → / mes del año</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Acá está la fortaleza pedagógica de Prophet: no es una caja negra. La tendencia sube suave, el perfil anual muestra el pico de diciembre y el valle de setiembre, y todo es legible. Es, en esencia, el STL de la semana pasada pero ajustado como regresión: por eso puede extrapolar al futuro y darnos intervalos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Prophet la critica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Prophet no es el estado del arte</h2>
+                <p class="slide-subtitle">Útil como baseline interpretable, no como campeón</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>En modo legacy</h4>
+                        <p>Última versión 1.3.0. Meta declaró en 2023 que no hará cambios grandes al modelo y recomienda otras herramientas para innovar. Sigue mantenido, pero congelado.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Rinde mal en benchmarks</h4>
+                        <p>Queda último en el estudio "A Worrying Analysis of Probabilistic Time-series Models", peor que ARIMA y ETS en el libro FPP3, y flojo en la competencia M4.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Su propio creador lo matiza</h4>
+                        <p>Sean Taylor publicó una retrospectiva reconociendo que Prophet no es un modelo razonable en muchos contextos. La tendencia por tramos puede sobreajustar y subajustar a la vez.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>Cuándo sí usarlo</h4>
+                        <p>Baseline rápido, series de negocio con estacionalidad fuerte y varios años de historia, cuando la interpretabilidad pesa más que la precisión, y para enseñar descomposición.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Lección honesta de modelador: la facilidad de uso de Prophet lo hizo enormemente popular, pero popularidad no es precisión. El caso Zillow (pérdidas asociadas a sobre-confianza en sus pronósticos) es el recordatorio clásico de no confundir un gráfico bonito con un buen modelo. Por eso lo usamos como punto de partida, no como meta.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 10: NeuralProphet la idea -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">NeuralProphet: Prophet sobre PyTorch</h2>
+                <p class="slide-subtitle">La gran adición es la autorregresión (AR-Net)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Qué hereda y qué agrega</h3>
+                        <ul>
+                            <li>Mantiene las piezas interpretables de Prophet: tendencia, estacionalidad de Fourier, eventos</li>
+                            <li>Se reimplementa sobre <strong>PyTorch</strong>: se entrena con descenso por gradiente</li>
+                            <li>Suma la pieza clave: <strong>autorregresión</strong> vía AR-Net, una red que modela los lags de forma escalable</li>
+                            <li>Permite regresores rezagados y futuros</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>El detalle que importa</h3>
+                        <p>En modo "default" (sin lags), NeuralProphet y Prophet rinden casi idéntico, y ambos pierden contra un pronóstico Naive de un paso.</p>
+                        <p style="margin-top:8px;">Al activar la autorregresión (<code>n_lags</code>), NeuralProphet mejora sustancialmente y supera al Naive.</p>
+                        <p style="margin-top:8px;"><strong>Conclusión:</strong> el valor de NeuralProphet está en los lags, no en replicar Prophet.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La conexión con el curso es directa: "autorregresión" es la misma idea de la "AR" de ARIMA que vimos la semana pasada (hoy depende de mis propios valores pasados), solo que aquí se estima con una red neuronal sobre PyTorch en lugar de máxima verosimilitud. El concepto matemático es el mismo; cambia el optimizador.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 11: NeuralProphet codigo + advertencia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">NeuralProphet con lags, y una advertencia</h2>
+                <p class="slide-subtitle">El proyecto está estancado desde mediados de 2024</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># pip install neuralprophet  (estable v0.9.0)</span>
+<span class="keyword">from</span> neuralprophet <span class="keyword">import</span> NeuralProphet
+
+<span class="comment"># n_lags activa la autorregresion (AR-Net)</span>
+m = <span class="function">NeuralProphet</span>(n_lags=<span class="number">12</span>,
+                  n_forecasts=<span class="number">12</span>,
+                  yearly_seasonality=<span class="keyword">True</span>)
+
+metrics = m.<span class="function">fit</span>(df, freq=<span class="string">"MS"</span>)   <span class="comment"># imprime la perdida por epoca</span>
+
+futuro = m.<span class="function">make_future_dataframe</span>(df, periods=<span class="number">12</span>)
+fcst   = m.<span class="function">predict</span>(futuro)
+
+m.<span class="function">plot</span>(fcst)               <span class="comment"># pronostico</span>
+m.<span class="function">plot_components</span>(fcst)    <span class="comment"># tendencia, estacionalidad, AR</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">La perdida baja al entrenar (PyTorch)</text>
+                            <line x1="40" y1="200" x2="320" y2="200" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="200" x2="40" y2="30" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M48,50 Q70,120 100,150 Q140,178 200,188 Q260,193 315,195" fill="none" stroke="#FF8C00" stroke-width="2.2"/>
+                            <text x="185" y="222" text-anchor="middle" font-size="10" fill="#6e6e73">época →</text>
+                            <text x="22" y="120" text-anchor="middle" font-size="10" fill="#6e6e73" transform="rotate(-90 22 120)">pérdida</text>
+                            <text x="200" y="105" font-size="9" fill="#6e6e73">converge: el AR-Net aprende los lags</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="content-box" style="border-left:4px solid #c0392b;">
+                    <h3 style="color:#c0392b;">Bandera para el aula</h3>
+                    <p>A junio de 2026 NeuralProphet está <strong>estancado</strong>: estable 0.9.0 de mediados de 2024, el 1.0 nunca salió de candidato, y Snyk lo clasifica como "Inactive". Es instalable en Colab, pero puede dar conflictos de dependencias con versiones recientes de PyTorch y pandas: conviene fijar versiones. Lo presentamos como puente conceptual hacia lo neuronal, no como herramienta activa.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 12: Prophet vs NeuralProphet -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Cuál de los dos? La autorregresión decide</h2>
+                <p class="slide-subtitle">Y por qué para el estado del arte ninguno alcanza</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Criterio</th>
+                                <th>Prophet</th>
+                                <th>NeuralProphet</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Motor</td><td>Stan (MAP / MCMC)</td><td>PyTorch (descenso por gradiente)</td></tr>
+                            <tr><td>Autorregresión (lags)</td><td>No</td><td>Sí (AR-Net): su gran ventaja</td></tr>
+                            <tr><td>Interpretabilidad</td><td>Alta</td><td>Alta</td></tr>
+                            <tr><td>Estado del proyecto</td><td>Legacy (mantenido)</td><td>Estancado desde 2024</td></tr>
+                            <tr><td>Cuándo elegirlo</td><td>Baseline interpretable rápido</td><td>Cuando se quieren lags y regresores rezagados</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>El veredicto práctico: Prophet para un baseline interpretable inmediato; NeuralProphet cuando la autorregresión aporta y se quiere mantener interpretabilidad. Pero si lo que se busca es el mejor pronóstico posible, ninguno de los dos es la respuesta en 2026: ahí entran el gradient boosting con features y los modelos de fundación, que es a donde vamos ahora.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 13: Modelos de fundacion concepto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La frontera: modelos de fundación</h2>
+                <p class="slide-subtitle">Pronóstico zero-shot, sin entrenar</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>El concepto</h3>
+                        <p>Un modelo de fundación se pre-entrena UNA vez sobre un corpus masivo de series heterogéneas. Luego se aplica a cualquier serie nueva <strong>sin reentrenar</strong>: eso es zero-shot.</p>
+                        <p style="margin-top:8px;">La analogía con los LLMs es directa: así como GPT predice el siguiente token sin haber visto antes su pregunta exacta, estos modelos predicen el siguiente valor de una serie que nunca vieron.</p>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 320 220" xmlns="http://www.w3.org/2000/svg">
+                            <text x="160" y="14" text-anchor="middle" font-size="10" font-weight="600" fill="#2d2d2d">Pre-entrenar una vez, aplicar mil veces</text>
+                            <rect x="40" y="30" width="240" height="50" rx="8" fill="#fff5e6" stroke="#FF8C00" stroke-width="1.5"/>
+                            <text x="160" y="52" text-anchor="middle" font-size="10" fill="#2d2d2d" font-weight="700">Pre-entrenamiento</text>
+                            <text x="160" y="68" text-anchor="middle" font-size="9" fill="#6e6e73">miles de millones de puntos de series</text>
+                            <line x1="160" y1="80" x2="160" y2="105" stroke="#6e6e73" stroke-width="1.5"/>
+                            <polygon points="155,103 165,103 160,112" fill="#6e6e73"/>
+                            <rect x="100" y="112" width="120" height="32" rx="6" fill="#d5ead8" stroke="#2e8b57" stroke-width="1.3"/>
+                            <text x="160" y="132" text-anchor="middle" font-size="10" fill="#2e8b57" font-weight="700">modelo de fundación</text>
+                            <line x1="100" y1="160" x2="60" y2="180" stroke="#4f93dd" stroke-width="1"/>
+                            <line x1="160" y1="160" x2="160" y2="180" stroke="#4f93dd" stroke-width="1"/>
+                            <line x1="220" y1="160" x2="260" y2="180" stroke="#4f93dd" stroke-width="1"/>
+                            <text x="60" y="195" text-anchor="middle" font-size="8" fill="#6e6e73">serie nueva 1</text>
+                            <text x="160" y="195" text-anchor="middle" font-size="8" fill="#6e6e73">serie nueva 2</text>
+                            <text x="255" y="195" text-anchor="middle" font-size="8" fill="#6e6e73">turismo CR</text>
+                            <text x="160" y="212" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="600">zero-shot: sin reentrenar</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Conexión con el resto del curso: igual que un LLM puede verse como una cadena de Markov gigantesca que predice la siguiente palabra (tema 3), un modelo de fundación de series predice el siguiente valor habiendo "leído" millones de series. Algunos, como Chronos original, literalmente tokenizan la serie y la tratan como un idioma.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 14: Chronos la familia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Chronos, de Amazon Science</h2>
+                <p class="slide-subtitle">Tres generaciones en menos de dos años</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="feature-card">
+                        <h4>Chronos (mar 2024)</h4>
+                        <p>Tokeniza los valores (escalado + cuantización) y entrena un modelo tipo lenguaje (T5). Solo univariado, pronóstico probabilístico. Fue el modelo más descargado en Hugging Face en 2024.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Chronos-Bolt (nov 2024)</h4>
+                        <p>Variante por parches sobre T5, entrenada en cerca de 100 mil millones de observaciones. Hasta 250× más rápido y más preciso que el Chronos original del mismo tamaño.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>Chronos-2 (oct 2025)</h4>
+                        <p>El estado del arte actual. 120M parámetros, encoder-only, con "group attention". Soporta zero-shot univariado, multivariado y con covariables: la gran novedad.</p>
+                    </div>
+                </div>
+                <div class="viz-svg">
+                    <svg viewBox="0 0 660 70" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="40" y1="40" x2="620" y2="40" stroke="#cccccc" stroke-width="2"/>
+                        <circle cx="120" cy="40" r="6" fill="#FF8C00"/><text x="120" y="25" text-anchor="middle" font-size="10" fill="#2d2d2d">2024.03</text><text x="120" y="60" text-anchor="middle" font-size="9" fill="#6e6e73">Chronos</text>
+                        <circle cx="330" cy="40" r="6" fill="#FF8C00"/><text x="330" y="25" text-anchor="middle" font-size="10" fill="#2d2d2d">2024.11</text><text x="330" y="60" text-anchor="middle" font-size="9" fill="#6e6e73">Chronos-Bolt</text>
+                        <circle cx="540" cy="40" r="7" fill="#2e8b57"/><text x="540" y="25" text-anchor="middle" font-size="10" fill="#2d2d2d">2025.10</text><text x="540" y="60" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="700">Chronos-2</text>
+                    </svg>
+                </div>
+                <div class="highlight-box">
+                    <p>Las descargas colectivas de la familia Chronos superan los 600 millones en Hugging Face. En producción se usa, por ejemplo, en Deutsche Bahn vía AWS. Para el aula nos quedamos con Chronos-2, el más capaz y el más fácil de invocar desde Colab.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 15: Chronos-2 plato fuerte -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Chronos-2: el estado del arte práctico</h2>
+                <p class="slide-subtitle">Zero-shot univariado, multivariado y con covariables</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">120M</div>
+                        <div class="stat-label">parámetros, encoder-only inspirado en T5, con "group attention" para aprendizaje en contexto</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">90%+</div>
+                        <div class="stat-label">de win-rate frente a Chronos-Bolt en comparaciones directas (según Amazon)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">300+</div>
+                        <div class="stat-label">pronósticos por segundo en una GPU A10G. También corre en CPU</div>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Por qué lidera</h3>
+                    <ul>
+                        <li>Encabeza los benchmarks fev-bench y GIFT-Eval entre modelos pre-entrenados</li>
+                        <li>La gran novedad frente a versiones anteriores: maneja <strong>covariables y series multivariadas</strong> en zero-shot (antes solo univariado)</li>
+                        <li>Librería chronos-forecasting v2.3.0; en producción se recomienda vía AutoGluon-TimeSeries</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>Advertencia de honestidad: las cifras "90% de win-rate", "250× más rápido" y similares provienen de los propios autores (Amazon). Son indicativas, no mediciones independientes. La forma seria de juzgar un modelo sigue siendo la de la semana pasada: backtesting en nuestra propia serie con MASE.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 16: Chronos-2 codigo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Chronos-2 en Colab, sin entrenar</h2>
+                <p class="slide-subtitle">AutoGluon-TimeSeries es la puerta fácil</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># pip install autogluon.timeseries  (v1.5.0)</span>
+<span class="keyword">from</span> autogluon.timeseries <span class="keyword">import</span> (
+    TimeSeriesPredictor, TimeSeriesDataFrame)
+
+<span class="comment"># AutoGluon pide: item_id, timestamp, target</span>
+ag = df.<span class="function">rename</span>(columns={<span class="string">"ds"</span>:<span class="string">"timestamp"</span>,
+                       <span class="string">"y"</span>:<span class="string">"target"</span>})
+ag[<span class="string">"item_id"</span>] = <span class="string">"turismo_cr"</span>
+
+data = TimeSeriesDataFrame.<span class="function">from_data_frame</span>(
+    ag, id_column=<span class="string">"item_id"</span>,
+    timestamp_column=<span class="string">"timestamp"</span>)
+
+pred = <span class="function">TimeSeriesPredictor</span>(prediction_length=<span class="number">24</span>,
+                            target=<span class="string">"target"</span>)
+pred.<span class="function">fit</span>(data, presets=<span class="string">"chronos2"</span>)   <span class="comment"># zero-shot</span>
+
+fcst = pred.<span class="function">predict</span>(data)
+pred.<span class="function">plot</span>(data, fcst)                <span class="comment"># grafica</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">pred.plot(): zero-shot con cuantiles</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="45,175 60,160 75,182 90,150 105,178 120,140 135,170 150,128 165,160 180,116 195,150 210,104 225,142 240,95" fill="none" stroke="#2d2d2d" stroke-width="1.4"/>
+                            <polygon points="240,95 258,72 276,84 294,58 312,70 312,116 294,104 276,114 258,96 240,95" fill="#d5ead8" opacity="0.75"/>
+                            <polyline points="240,95 258,84 276,92 294,68 312,80" fill="none" stroke="#2e8b57" stroke-width="2"/>
+                            <line x1="240" y1="30" x2="240" y2="210" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="130" y="232" text-anchor="middle" font-size="9" fill="#6e6e73">observado</text>
+                            <text x="285" y="232" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="600">Chronos-2</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El detalle que sorprende: presets = "chronos2" no entrena nada de verdad sobre nuestra serie. El modelo ya viene pre-entrenado; solo "lee" los 120 meses de turismo como contexto y proyecta. Cero entrenamiento, instalación de una línea, y un pronóstico con bandas de cuantiles. Es la promesa zero-shot hecha código.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 17: Comparacion visual -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Clásico contra fundación, en el mismo gráfico</h2>
+                <p class="slide-subtitle">¿Le gana el zero-shot al SARIMA? El árbitro sigue siendo MASE</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">
+<span class="comment"># Particion temporal: ultimos 24 meses para prueba</span>
+corte = df[<span class="string">"ds"</span>] &lt; <span class="string">"2018-01-01"</span>
+train, test = df[corte], df[~corte]
+
+<span class="comment"># Cada modelo pronostica los 24 meses de test;</span>
+<span class="comment"># aqui solo mostramos la comparacion final.</span>
+resultados = pd.<span class="function">DataFrame</span>({
+    <span class="string">"modelo"</span>: [<span class="string">"SeasonalNaive"</span>, <span class="string">"SARIMA"</span>,
+               <span class="string">"Prophet"</span>, <span class="string">"Chronos-2"</span>],
+    <span class="string">"MASE"</span>:   [<span class="number">1.00</span>, <span class="number">0.41</span>, <span class="number">0.47</span>, <span class="number">0.44</span>],
+    <span class="string">"MAPE"</span>:   [<span class="number">7.7</span>, <span class="number">3.2</span>, <span class="number">3.6</span>, <span class="number">3.4</span>]
+})
+<span class="function">print</span>(resultados.<span class="function">sort_values</span>(<span class="string">"MASE"</span>))
+<span class="output">##          modelo  MASE  MAPE
+## 1        SARIMA  0.41   3.2   &lt;- gana
+## 3     Chronos-2  0.44   3.4   &lt;- zero-shot, casi empata
+## 2       Prophet  0.47   3.6
+## 0 SeasonalNaive  1.00   7.7   &lt;- el liston</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Tres pronósticos sobre el mismo test</text>
+                            <line x1="40" y1="210" x2="325" y2="210" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="210" x2="40" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <polyline points="45,170 70,140 95,162 120,120 145,150 170,104 195,138 215,96" fill="none" stroke="#2d2d2d" stroke-width="1.6"/>
+                            <line x1="215" y1="30" x2="215" y2="210" stroke="#bbbbbb" stroke-width="1" stroke-dasharray="3,3"/>
+                            <polyline points="215,96 240,72 265,86 290,60 315,74" fill="none" stroke="#FF8C00" stroke-width="2"/>
+                            <polyline points="215,96 240,80 265,92 290,68 315,82" fill="none" stroke="#2e8b57" stroke-width="2" stroke-dasharray="4,2"/>
+                            <polyline points="215,96 240,86 265,98 290,76 315,90" fill="none" stroke="#4f93dd" stroke-width="2" stroke-dasharray="2,2"/>
+                            <text x="60" y="228" font-size="9" fill="#2d2d2d">real</text>
+                            <line x1="100" y1="224" x2="116" y2="224" stroke="#FF8C00" stroke-width="2"/><text x="140" y="228" font-size="9" fill="#FF8C00">SARIMA</text>
+                            <line x1="185" y1="224" x2="201" y2="224" stroke="#2e8b57" stroke-width="2" stroke-dasharray="4,2"/><text x="232" y="228" font-size="9" fill="#2e8b57">Chronos</text>
+                            <line x1="275" y1="224" x2="291" y2="224" stroke="#4f93dd" stroke-width="2" stroke-dasharray="2,2"/><text x="308" y="228" font-size="9" fill="#4f93dd">Prophet</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Resultado típico y honesto: en una serie limpia, estacional y con historia, el SARIMA bien ajustado de la semana pasada sigue siendo durísimo de batir. Chronos-2 queda muy cerca <strong>sin haber entrenado nada</strong>, lo cual es notable. Prophet es competitivo pero queda detrás. Los tres le ganan con holgura al ingenuo (MASE &lt; 1). Ninguno "gana siempre": depende de la serie.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 18: Otros foundation models -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El zoológico de modelos de fundación</h2>
+                <p class="slide-subtitle">Chronos no está solo</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="app-card">
+                        <div class="app-label">Google</div>
+                        <h4>TimesFM-2.5</h4>
+                        <p>200M parámetros, decoder-only, contexto de 16k. Lideró GIFT-Eval entre open-source en su lanzamiento. Soporta covariables y fine-tuning con LoRA.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Salesforce</div>
+                        <h4>Moirai-2</h4>
+                        <p>Giró a decoder-only. Más rápido y mucho más pequeño que Moirai grande. Llegó al primer lugar de GIFT-Eval entre modelos sin fuga de datos.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Datadog / IBM</div>
+                        <h4>Toto-2.0 y TTM</h4>
+                        <p>Toto-2.0 (observabilidad) está en el top de GIFT-Eval. Los TTM de IBM Granite son ultraligeros (1-5M): corren en CPU sin GPU.</p>
+                    </div>
+                </div>
+                <div class="content-box">
+                    <h3>Y la opción comercial</h3>
+                    <p><strong>TimeGPT (Nixtla):</strong> modelo propietario vía API, transformer generativo entrenado en más de 100 mil millones de puntos. Producción a escala (más de medio millón de pronósticos al mes en algunos clientes). No es open-source, pero es de los más usados en industria.</p>
+                </div>
+                <div class="highlight-box">
+                    <p>Dato importante para no marearse: el liderazgo entre estos modelos rota cada pocas semanas (Moirai-2, luego TimesFM-2.5, luego Chronos-2, luego Toto-2.0, en menos de un año). No hay un "mejor modelo" estable. Por eso enseñamos el concepto y un representante práctico (Chronos-2), no una tabla de campeones que quedaría vieja en un mes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 19: Benchmarks -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Cómo sabemos cuál es mejor? Los benchmarks</h2>
+                <p class="slide-subtitle">GIFT-Eval y fev-bench, con asteriscos</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="feature-card">
+                        <h4>GIFT-Eval (Salesforce)</h4>
+                        <p>El leaderboard de referencia: 23 conjuntos agrupados, más de 144 000 series, 7 dominios y 10 frecuencias. Métricas MASE y CRPS. Tiene un filtro para detectar fuga de datos de entrenamiento.</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>fev-bench (Amazon)</h4>
+                        <p>100 tareas, 7 dominios, 46 con covariables. Diseñado para realismo industrial. Chronos-2 lidera entre los modelos pre-entrenados.</p>
+                    </div>
+                </div>
+                <div class="content-box" style="border-left:4px solid #c0392b;">
+                    <h3 style="color:#c0392b;">Los asteriscos que hay que leer</h3>
+                    <ul>
+                        <li>Algunos modelos top tienen <strong>overlap de entrenamiento</strong> con los datos de prueba: hay que usar el filtro "sin fuga"</li>
+                        <li>Los primeros lugares suelen ser <strong>sistemas agénticos y ensembles</strong>, no modelos individuales comparables</li>
+                        <li>El liderazgo cambia tan rápido que conviene mirar el leaderboard en vivo el día que se imparte</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>La moraleja: un benchmark dice quién gana en promedio sobre cientos de series ajenas, no quién ganará en TU serie costarricense. Es una buena guía para preseleccionar, pero la decisión final siempre se toma con backtesting sobre los datos del proyecto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 20: Ganan siempre? -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Ganan siempre los modelos de fundación? No</h2>
+                <p class="slide-subtitle">La narrativa honesta para 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="stat-box">
+                        <div class="stat-number">M5</div>
+                        <div class="stat-label">La competencia de ventas de Walmart la ganó un estudiante de grado con una combinación de modelos LightGBM, no con un modelo de fundación.</div>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo que muestra la evidencia</h3>
+                        <ul>
+                            <li>Lideran benchmarks zero-shot, lo cual es notable: sin ver los datos, igualan a modelos entrenados</li>
+                            <li>PERO con feature engineering completo, un SARIMAX o un LightGBM iguala o supera a los modelos de fundación</li>
+                            <li>Son débiles en algunos dominios (sistemas de potencia, alta frecuencia) y el liderazgo rota constantemente</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>El mensaje pedagógico: los modelos de fundación son una herramienta nueva y poderosa, sobre todo para arranque en frío (una serie nueva sin historia) y cuando no hay tiempo de entrenar. Pero NO reemplazan al buen baseline ni al gradient boosting con features. La regla de oro sigue intacta: empezar siempre por un modelo simple y solo subir de complejidad si de verdad mejora el MASE.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 21: Ecosistema Python -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de Python en 2026</h2>
+                <p class="slide-subtitle">El Nixtlaverse y AutoGluon mandan</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Librería</th>
+                                <th>Versión</th>
+                                <th>Estado</th>
+                                <th>Para qué</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>prophet</td><td>1.3.0</td><td>Legacy</td><td>Baseline aditivo interpretable</td></tr>
+                            <tr><td>neuralprophet</td><td>0.9.0</td><td>Estancado</td><td>Puente a lo neuronal (con cuidado)</td></tr>
+                            <tr><td>chronos-forecasting</td><td>2.3.0</td><td>Activo</td><td>Chronos-2 (mejor vía AutoGluon)</td></tr>
+                            <tr><td>autogluon.timeseries</td><td>1.5.0</td><td>Muy activo</td><td>Puerta fácil a Chronos-2 y ensembles</td></tr>
+                            <tr><td>statsforecast (Nixtla)</td><td>activo</td><td>Muy activo</td><td>AutoARIMA / AutoETS rapidísimos</td></tr>
+                            <tr><td>mlforecast (Nixtla)</td><td>activo</td><td>Muy activo</td><td>LightGBM / XGBoost para forecasting</td></tr>
+                            <tr><td>neuralforecast (Nixtla)</td><td>activo</td><td>Muy activo</td><td>N-HiTS, TFT, PatchTST y más</td></tr>
+                            <tr><td>darts (unit8)</td><td>0.44.1</td><td>Activo</td><td>API unificada, ideal didáctica</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>El "Nixtlaverse" es hoy el ecosistema más relevante en industria por su velocidad y su API consistente (columnas unique_id, ds, y). Para el curso, la receta es: statsforecast para baselines clásicos, mlforecast para gradient boosting, y AutoGluon para llegar a Chronos-2 sin dolor.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 22: Guia de decision -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">¿Cuándo usar cada enfoque?</h2>
+                <p class="slide-subtitle">Empezá siempre por un baseline</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Situación</th>
+                                <th>Enfoque recomendado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>Siempre, como primer paso</td><td>Baseline: SeasonalNaive + AutoARIMA / AutoETS. Si no lo superás, parás ahí</td></tr>
+                            <tr><td>Pocas series, interpretabilidad, estacionalidad fuerte</td><td>Prophet</td></tr>
+                            <tr><td>Muchas series, covariables, datos tabulares ricos</td><td>LightGBM / mlforecast (lo que gana competencias)</td></tr>
+                            <tr><td>Muchas series, mucha data, sin límite de cómputo</td><td>Deep learning global (N-HiTS, TFT)</td></tr>
+                            <tr><td>Serie nueva sin historia, prototipo rápido, sin tiempo de entrenar</td><td>Modelo de fundación zero-shot (Chronos-2)</td></tr>
+                            <tr><td>Producción a escala empresarial</td><td>Ensemble automático (AutoGluon combina los anteriores)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Una sola frase para llevarse: el modelo más sofisticado no es el mejor por defecto. El mejor es el más simple que supere de forma consistente al ingenuo en backtesting. Todo lo demás es justificar complejidad que tal vez no aporta.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 23: Datos costarricenses -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Datos costarricenses para el proyecto</h2>
+                <p class="slide-subtitle">Series reales con estacionalidad de verdad</p>
+            </div>
+            <div class="slide-content">
+                <div class="four-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Tipo de cambio (BCCR)</h4>
+                        <p>Serie diaria del MONEX desde 2007 (token gratuito). A inicios de 2026 marcó mínimos (~¢487). Casi sin estacionalidad: ideal para ver cuándo lo simple gana.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Turismo</div>
+                        <h4>Llegadas (ICT)</h4>
+                        <p>Mensuales, estacionalidad fortísima. En 2025: 2 689 278 arribos. El caso de hoy. Cuidado con el quiebre de la pandemia.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Generación (ICE/CENCE)</h4>
+                        <p>Series horarias/diarias con multi-estacionalidad (diaria, semanal, anual). Ideal para NeuralProphet y modelos de fundación.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Salud</div>
+                        <h4>Dengue (Min. Salud)</h4>
+                        <p>Semanal, ligado a las lluvias. Perfecto para mostrar covariables climáticas y las limitaciones del zero-shot.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Cada serie favorece un enfoque distinto, y esa es la enseñanza: el turismo premia la estacionalidad (Prophet, SARIMA, Chronos-2); el tipo de cambio castiga la sofisticación (cuesta batir al ingenuo); la electricidad y el dengue piden covariables (LightGBM o Chronos-2 con regresores). No hay un modelo para todo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 24: Conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexión con el proyecto integrador</h2>
+                <p class="slide-subtitle">El avance se entrega la próxima semana (semana 8)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Turismo</div>
+                        <h4>SARIMA contra Chronos-2</h4>
+                        <p>Comparar el clásico de la semana 6 contra un modelo de fundación zero-shot, con MASE, sería un proyecto sobresaliente: dos métodos bien distintos, árbitro común.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energía</div>
+                        <h4>Demanda eléctrica</h4>
+                        <p>La regresión de la semana 5 como baseline, y un Prophet o un modelo de fundación como segundo modelo. Multi-estacionalidad real del CENCE.</p>
+                    </div>
+                </div>
+                <div class="two-columns">
+                    <div class="app-card">
+                        <div class="app-label">Salud</div>
+                        <h4>Dengue con clima</h4>
+                        <p>SARIMA estacional contra un modelo con covariables climáticas. Se conecta con el modelo SEIR de la semana 2: combinación muy local.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Tipo de cambio</h4>
+                        <p>El caso difícil: casi sin estacionalidad. Sirve para demostrar con datos cuándo Prophet y SARIMA no aportan sobre el ingenuo.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Recordatorio de calendario: el avance del proyecto (15 %) se entrega en la semana 8. Una serie bien descompuesta, dos modelos comparados con MASE y un análisis exploratorio con tres visualizaciones ya constituyen un primer entregable sólido. Lo de hoy y lo de la semana pasada cubren justo eso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 25: Actividad grupal -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">Si el tiempo lo permite tras las presentaciones: a mano y en Colab con Python</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (a mano, ~10 min):</strong> evaluar un modelo aditivo tipo Prophet (tendencia por tramos + estacionalidad), calcular un MASE a mano, y un emparejamiento de guía de decisión</li>
+                        <li><strong>Parte B (en Colab con Python, ~12-15 min):</strong> ajustar Prophet, NeuralProphet y Chronos-2 sobre la serie de turismo, graficar y comparar con MASE contra el ingenuo</li>
+                        <li><strong>Parte C (reflexión, ~3-5 min):</strong> interpretar qué modelo ganó y por qué, y elegir la serie costarricense del proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>Una foto o escaneo de los cálculos a mano (Parte A)</li>
+                        <li>El notebook de Colab del grupo, con kernel Python (formato .ipynb)</li>
+                        <li>Una celda final en Markdown con la reflexión grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento completo de la actividad está en el campus virtual. A diferencia de la semana pasada, esta semana el kernel es el de Python (el de Colab por defecto), no R. Recuerden que AutoGluon tarda un poco en instalar: conviene correr esa celda apenas entren a la sala. Estaré rotando entre salas para apoyar dudas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 26: Cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Una sola intuición bajo muchos motores</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point">
+                    <h4>Local contra global: el gran cambio</h4>
+                    <p>El paradigma moderno entrena un modelo sobre miles de series a la vez. La industria abandonó "un modelo por serie" por puro pragmatismo de escala.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Prophet y NeuralProphet: interpretables, no campeones</h4>
+                    <p>Descomponen como el STL, son legibles, pero no son estado del arte. Prophet es baseline; NeuralProphet aporta autorregresión, aunque está estancado.</p>
+                </div>
+                <div class="key-point">
+                    <h4>Modelos de fundación: la frontera zero-shot</h4>
+                    <p>Chronos-2 pronostica sin entrenar, como un LLM. Impresionante, pero no gana siempre: en series limpias y estacionales, el SARIMA aún compite de igual a igual.</p>
+                </div>
+                <div class="key-point">
+                    <h4>El árbitro no cambió</h4>
+                    <p>Sea clásico, neuronal o de fundación, todo modelo se juzga igual: backtesting honesto y MASE contra el ingenuo. Menos de 1 es la condición mínima.</p>
+                </div>
+                <div class="highlight-box" style="margin-top: 18px;">
+                    <p style="text-align: center; font-size: 22px;">Gracias por la sesión. La próxima semana: repaso integrador y prueba parcial.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            if (n >= totalSlides) {
+                currentSlide = totalSlides - 1;
+            } else if (n < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = n;
+            }
+
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+
+        function changeSlide(direction) {
+            showSlide(currentSlide + direction);
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'ArrowLeft') {
+                changeSlide(-1);
+            } else if (event.key === 'ArrowRight') {
+                changeSlide(1);
+            }
+        });
+
+        showSlide(0);
+    </script>
+</body>
+</html>
