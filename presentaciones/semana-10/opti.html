@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 9 y 10: Optimizacion, Lagrange, KKT y sensibilidad - Modelado matematico</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; background: #f5f5f7; }
+        .presentation-container { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.6s ease-in-out; display: flex; flex-direction: column; padding: 65px 70px 90px 70px; background: #f5f5f7; }
+        .slide.active { opacity: 1; z-index: 1; }
+        .slide-header { margin-bottom: 22px; }
+        .slide-title { font-size: 36px; font-weight: 700; color: #2d2d2d; margin-bottom: 8px; }
+        .slide-subtitle { font-size: 18px; color: #6e6e73; font-weight: 300; }
+        .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 14px; overflow-y: auto; max-height: calc(100vh - 230px); }
+        .content-box { background: #ffffff; border-radius: 20px; padding: 16px 20px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .content-box h3 { font-size: 20px; color: #2d2d2d; margin-bottom: 8px; }
+        .content-box p { font-size: 15px; color: #1d1d1f; line-height: 1.45; }
+        .content-box ul { list-style: none; padding-left: 0; }
+        .content-box li { font-size: 16px; color: #1d1d1f; line-height: 1.6; padding-left: 25px; position: relative; margin-bottom: 8px; }
+        .content-box li::before { content: "▸"; position: absolute; left: 0; color: #FF8C00; font-size: 20px; }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .three-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .four-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .highlight-box { background: linear-gradient(135deg, #fff5e6, #ffffff); border-left: 4px solid #FF8C00; padding: 12px 16px; border-radius: 10px; margin: 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .highlight-box p { font-size: 15px; color: #2d2d2d; font-style: italic; font-weight: 500; line-height: 1.45; }
+        .key-point { background: #ffffff; padding: 12px 16px; border-radius: 8px; margin: 6px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e5e7; border-left: 4px solid #FF8C00; }
+        .key-point h4 { color: #2d2d2d; font-size: 17px; margin-bottom: 6px; }
+        .key-point p { color: #1d1d1f; font-size: 14px; line-height: 1.45; }
+        .comparison-table { background: #ffffff; border-radius: 15px; overflow: hidden; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: linear-gradient(90deg, #2d2d2d, #FF8C00); color: #ffffff; padding: 9px 12px; font-size: 14px; text-align: left; }
+        .comparison-table td { padding: 8px 12px; font-size: 13px; color: #1d1d1f; border-bottom: 1px solid #f5f5f7; }
+        .code-box { background: #1e1e1e; border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; color: #d4d4d4; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; text-align: left; }
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string { color: #ce9178; }
+        .code-box .number { color: #b5cea8; }
+        .code-box .function { color: #dcdcaa; }
+        .code-box .output { color: #9cdcfe; }
+        .navigation { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 1000; }
+        .nav-button { background: linear-gradient(135deg, #2d2d2d, #FF8C00); border: none; color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 15px rgba(255,140,0,0.3); }
+        .nav-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,140,0,0.4); }
+        .nav-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .logo-area { position: fixed; top: 12px; left: 20px; z-index: 1000; }
+        .logo-image { max-width: 85px; height: auto; }
+        .slide-number { position: fixed; top: 20px; right: 30px; color: #6e6e73; font-size: 16px; z-index: 1000; font-weight: 500; }
+        .cover-slide { justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%); padding: 60px 80px 140px 80px; }
+        .cover-title { font-size: 56px; font-weight: 800; background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px; animation: gradient 3s ease infinite; background-size: 200% 200%; }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .cover-subtitle { font-size: 26px; color: #6e6e73; margin-bottom: 30px; font-weight: 300; }
+        .cover-info { font-size: 18px; color: #1d1d1f; margin-top: 30px; line-height: 1.6; }
+        .feature-card { background: #ffffff; border-radius: 15px; padding: 18px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,140,0,0.15); border-color: #FF8C00; }
+        .feature-card h4 { font-size: 18px; color: #2d2d2d; margin-bottom: 8px; }
+        .feature-card p { font-size: 14px; color: #1d1d1f; line-height: 1.4; }
+        .app-card { background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%); border-radius: 15px; padding: 18px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+        .app-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,140,0,0.15); border-color: #FF8C00; }
+        .app-card .app-label { font-size: 12px; color: #FF8C00; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .app-card h4 { font-size: 18px; color: #2d2d2d; margin-bottom: 8px; font-weight: 700; }
+        .app-card p { font-size: 14px; color: #1d1d1f; line-height: 1.4; }
+        .math-symbol { font-family: 'Cambria Math', 'Times New Roman', serif; font-style: italic; color: #FF8C00; font-weight: 600; }
+        .viz-svg { background: #ffffff; border-radius: 12px; padding: 15px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .viz-svg svg { max-width: 100%; height: auto; }
+        .widget { background: #ffffff; border-radius: 14px; padding: 14px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .widget-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: #2d2d2d; }
+        .widget-controls label { font-weight: 600; }
+        .widget-controls input[type=range] { flex: 1; min-width: 130px; accent-color: #FF8C00; }
+        .widget-controls button { background: #2d2d2d; color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; }
+        .widget-controls button:hover { background: #FF8C00; }
+        .widget-readout { width: 100%; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; color: #2e8b57; font-weight: 700; }
+        .interactive-badge { display: inline-block; background: #FF8C00; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 12px; margin-bottom: 6px; }
+        @media (max-height: 850px) {
+            .slide { padding: 55px 60px 70px 60px; }
+            .slide-header { margin-bottom: 14px; }
+            .slide-title { font-size: 30px; margin-bottom: 4px; }
+            .slide-subtitle { font-size: 16px; }
+            .slide-content { gap: 10px; max-height: calc(100vh - 180px); }
+            .content-box { padding: 12px 16px; }
+            .content-box h3 { font-size: 18px; }
+            .content-box p, .content-box li { font-size: 14px; }
+            .highlight-box p { font-size: 14px; }
+            .key-point h4 { font-size: 16px; }
+            .key-point p { font-size: 13px; }
+            .comparison-table th { padding: 7px 10px; font-size: 13px; }
+            .comparison-table td { padding: 6px 10px; font-size: 12.5px; }
+            .logo-image { max-width: 70px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area"><img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image"></div>
+    <div class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">23</span></div>
+    <div class="presentation-container">
+
+        <!-- 1 Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Optimizacion: del valle a la cerca</h1>
+            <p class="cover-subtitle">Semanas 9 y 10: la idea intuitiva, y como el computador la resuelve</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matematico<br>Profesor: Jordy Alfaro Brenes<br>Lead University · II Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- 2 Puente -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Que juntamos hoy</h2>
+                <p class="slide-subtitle">Dos semanas en una sesion, un solo hilo: encontrar el fondo del tazon</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La intuicion (semanas 9 y 10)</h3>
+                        <ul>
+                            <li>Optimizar es buscar el punto mas bajo de un terreno</li>
+                            <li>Convexidad: un solo valle, sin sorpresas</li>
+                            <li>Bajar a pasos: el descenso de gradiente</li>
+                            <li>La cerca: con restricciones el optimo se pega a la frontera</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo que hace el computador</h3>
+                        <ul>
+                            <li>scipy.optimize baja hasta el fondo por nosotros</li>
+                            <li>cvxpy resuelve con restricciones y da el precio sombra</li>
+                            <li>Todo anclado en datos de Costa Rica: tipo de cambio y cartera</li>
+                            <li>Nosotros entendemos que significa cada resultado</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla unica del curso: siempre minimizamos. Maximizar f es minimizar -f. Hoy no hacemos cuentas a mano; la matematica pesada la hace la maquina y nosotros nos quedamos con la intuicion.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 Paisaje: tazon / domo / silla -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El paisaje: tazon, domo o silla</h2>
+                <p class="slide-subtitle">Donde el terreno esta plano, la curvatura decide que es</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La brujula y la curvatura</h3>
+                        <p>El gradiente es una brujula que apunta hacia donde el terreno sube mas. Donde el terreno esta plano, la brujula no apunta a ningun lado: es un candidato.</p>
+                        <ul style="margin-top:8px;">
+                            <li>Se curva hacia arriba en todo lado: tazon (minimo)</li>
+                            <li>Se curva hacia abajo: domo (maximo)</li>
+                            <li>Se curva distinto segun la direccion: silla</li>
+                        </ul>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="60" y="20" text-anchor="middle" font-size="11" fill="#2e8b57" font-weight="700">tazon</text>
+                            <path d="M25,35 Q60,105 95,35" fill="none" stroke="#2e8b57" stroke-width="2.2"/>
+                            <circle cx="60" cy="70" r="4" fill="#2e8b57"/>
+                            <text x="60" y="125" text-anchor="middle" font-size="9" fill="#6e6e73">minimo</text>
+                            <text x="170" y="20" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">domo</text>
+                            <path d="M135,95 Q170,25 205,95" fill="none" stroke="#c0392b" stroke-width="2.2"/>
+                            <circle cx="170" cy="60" r="4" fill="#c0392b"/>
+                            <text x="170" y="125" text-anchor="middle" font-size="9" fill="#6e6e73">maximo</text>
+                            <text x="280" y="20" text-anchor="middle" font-size="11" fill="#FF8C00" font-weight="700">silla</text>
+                            <path d="M245,35 Q280,90 315,35" fill="none" stroke="#FF8C00" stroke-width="1.8"/>
+                            <path d="M245,90 Q280,35 315,90" fill="none" stroke="#FF8C00" stroke-width="1.8" opacity="0.45"/>
+                            <circle cx="280" cy="62" r="4" fill="#FF8C00"/>
+                            <text x="280" y="125" text-anchor="middle" font-size="9" fill="#6e6e73">punto silla</text>
+                            <text x="170" y="160" text-anchor="middle" font-size="12" fill="#2d2d2d">z = x&#178; - y&#178; tiene terreno plano en el origen...</text>
+                            <text x="170" y="182" text-anchor="middle" font-size="12" fill="#2d2d2d">...pero es una silla, no un minimo.</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Error que hay que matar hoy: terreno plano no garantiza minimo. En la silla z = x&#178; - y&#178; el suelo esta horizontal en el origen y aun asi es minimo en una direccion y maximo en la otra. Por eso siempre miramos la curvatura.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 Convexidad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Convexidad: un solo valle</h2>
+                <p class="slide-subtitle">La propiedad que nos quita el miedo a quedar atrapados</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="90" y="18" text-anchor="middle" font-size="11" fill="#2e8b57" font-weight="700">convexa: un valle</text>
+                            <path d="M30,45 Q90,140 150,45" fill="none" stroke="#2e8b57" stroke-width="2.2"/>
+                            <line x1="54" y1="75" x2="126" y2="75" stroke="#4f93dd" stroke-width="1.6" stroke-dasharray="4,3"/>
+                            <circle cx="54" cy="75" r="3" fill="#4f93dd"/>
+                            <circle cx="126" cy="75" r="3" fill="#4f93dd"/>
+                            <text x="90" y="170" text-anchor="middle" font-size="9" fill="#6e6e73">la secante queda por encima del arco</text>
+                            <text x="255" y="18" text-anchor="middle" font-size="11" fill="#c0392b" font-weight="700">no convexa: varios valles</text>
+                            <path d="M190,60 Q212,135 236,88 Q260,48 284,118 Q300,150 316,95" fill="none" stroke="#c0392b" stroke-width="2.2"/>
+                            <circle cx="220" cy="118" r="3.5" fill="#c0392b"/>
+                            <circle cx="291" cy="126" r="3.5" fill="#2d2d2d"/>
+                            <text x="220" y="150" text-anchor="middle" font-size="8" fill="#c0392b">local</text>
+                            <text x="291" y="150" text-anchor="middle" font-size="8" fill="#2d2d2d">global</text>
+                            <text x="255" y="170" text-anchor="middle" font-size="9" fill="#6e6e73">bajar a ciegas puede caer en el equivocado</text>
+                        </svg>
+                    </div>
+                    <div class="content-box">
+                        <h3>Por que importa tanto</h3>
+                        <ul>
+                            <li>En una funcion convexa, todo minimo es el minimo global</li>
+                            <li>Si encontramos un fondo, es EL fondo</li>
+                            <li>Los dos problemas aplicados de hoy son convexos: podemos confiar en la respuesta</li>
+                        </ul>
+                        <p style="margin-top:8px;">El hilo con la semana 10: las condiciones KKT son esta misma idea, pero con cerca.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Ajustar la tendencia del tipo de cambio y armar una cartera son problemas convexos: tienen un unico fondo garantizado. Entrenar una red neuronal, en cambio, es no convexo, y por eso es dificil.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 INTERACTIVO: descenso de gradiente -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">Bajar la montana a pasos</h2>
+                <p class="slide-subtitle">Muevan el tamano de paso y vean converger... o rebotar</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <svg id="gd-svg" viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="20" y1="195" x2="320" y2="195" stroke="#cccccc" stroke-width="1"/>
+                        <line x1="170" y1="30" x2="170" y2="200" stroke="#eeeeee" stroke-width="1"/>
+                        <polyline id="gd-curve" points="" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                        <g id="gd-dots"></g>
+                        <text x="170" y="207" text-anchor="middle" font-size="9" fill="#6e6e73">f(x) = x&#178;   ·   el punto rojo es la posicion actual</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <label>Tamano de paso (&#951;): <span id="gd-eta-val">0.30</span></label>
+                        <input type="range" id="gd-eta" min="0.05" max="1.15" step="0.05" value="0.30">
+                        <button onclick="gdStep()">Un paso</button>
+                        <button onclick="gdAuto()">Auto</button>
+                        <button onclick="gdReset()">Reiniciar</button>
+                        <div class="widget-readout" id="gd-readout">paso 0 · x = 4.00 · f(x) = 16.00</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Con paso pequeno (0.1) baja lento pero seguro. Cerca de 0.5 llega rapido. Con paso 1 o mas se pasa del fondo y rebota, o se dispara. El tamano de paso es la decision mas delicada, y es la misma idea detras de Adam la proxima semana.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6 Caso CR: tipo de cambio -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El caso costarricense: el tipo de cambio</h2>
+                <p class="slide-subtitle">Cual es la mejor recta que describe la tendencia (datos estilo BCCR)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+rng = np.random.<span class="function">default_rng</span>(<span class="number">2026</span>)
+n = <span class="number">60</span>
+t = np.<span class="function">arange</span>(n)                    <span class="comment"># 60 meses</span>
+
+<span class="comment"># tipo de cambio venta (estilo BCCR, cod. 318)</span>
+tc = <span class="number">505</span> + <span class="number">0.6</span>*t + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">4</span>, n)
+
+plt.<span class="function">plot</span>(t, tc, <span class="string">"o"</span>, color=<span class="string">"#FF8C00"</span>, ms=<span class="number">4</span>)
+plt.<span class="function">xlabel</span>(<span class="string">"meses"</span>); plt.<span class="function">ylabel</span>(<span class="string">"CRC por USD"</span>)
+plt.<span class="function">show</span>()
+<span class="output">## tc[0] = 501.8   tc[59] = 538.2</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+                            <text x="180" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">plt.show(): la nube de datos</text>
+                            <line x1="45" y1="190" x2="325" y2="190" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="190" x2="45" y2="28" stroke="#2d2d2d" stroke-width="1"/>
+                            <g fill="#FF8C00">
+                            <circle cx="58" cy="168" r="2.4"/><circle cx="71" cy="160" r="2.4"/><circle cx="84" cy="165" r="2.4"/><circle cx="97" cy="155" r="2.4"/><circle cx="110" cy="150" r="2.4"/><circle cx="123" cy="152" r="2.4"/><circle cx="136" cy="143" r="2.4"/><circle cx="149" cy="138" r="2.4"/><circle cx="162" cy="140" r="2.4"/><circle cx="175" cy="130" r="2.4"/><circle cx="188" cy="126" r="2.4"/><circle cx="201" cy="128" r="2.4"/><circle cx="214" cy="118" r="2.4"/><circle cx="227" cy="115" r="2.4"/><circle cx="240" cy="112" r="2.4"/><circle cx="253" cy="105" r="2.4"/><circle cx="266" cy="102" r="2.4"/><circle cx="279" cy="98" r="2.4"/><circle cx="292" cy="92" r="2.4"/><circle cx="305" cy="88" r="2.4"/><circle cx="318" cy="82" r="2.4"/>
+                            </g>
+                            <text x="185" y="210" text-anchor="middle" font-size="10" fill="#6e6e73">meses &#8594;</text>
+                            <text x="26" y="110" text-anchor="middle" font-size="10" fill="#6e6e73" transform="rotate(-90 26 110)">CRC/USD</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Datos simulados con la semilla 2026, autocontenidos, para que corran igual en cualquier Colab. En el proyecto, la serie real se baja del servicio web del BCCR (codigos 317 y 318, con token gratuito). Ajustar una recta a esta nube es un problema convexo, con solucion exacta contra la cual comparar.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 Ajustar la tendencia -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Ajustar la tendencia es encontrar el fondo</h2>
+                <p class="slide-subtitle">El error cuadratico medio es un tazon convexo; el computador da su fondo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="comment"># mejor recta tc ~ intercepto + pendiente * t</span>
+<span class="comment"># minimizar el error cuadratico medio (un tazon)</span>
+A = np.<span class="function">vstack</span>([np.<span class="function">ones</span>(n), t]).T
+intercepto, pendiente = np.linalg.<span class="function">lstsq</span>(A, tc, rcond=<span class="keyword">None</span>)[<span class="number">0</span>]
+
+<span class="function">print</span>(<span class="string">"intercepto :"</span>, <span class="function">round</span>(intercepto, <span class="number">2</span>))
+<span class="function">print</span>(<span class="string">"pendiente  :"</span>, <span class="function">round</span>(pendiente, <span class="number">3</span>), <span class="string">"CRC por mes"</span>)
+
+plt.<span class="function">plot</span>(t, tc, <span class="string">"o"</span>, color=<span class="string">"#FF8C00"</span>, ms=<span class="number">4</span>)
+plt.<span class="function">plot</span>(t, intercepto + pendiente*t, color=<span class="string">"#2d2d2d"</span>)
+plt.<span class="function">show</span>()
+<span class="output">## intercepto : 504.22
+## pendiente  : 0.658 CRC por mes</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+                            <text x="180" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">La recta que mejor ajusta</text>
+                            <line x1="45" y1="190" x2="325" y2="190" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="190" x2="45" y2="28" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="55" y1="166" x2="320" y2="83" stroke="#2d2d2d" stroke-width="2.2"/>
+                            <g fill="#FF8C00">
+                            <circle cx="58" cy="168" r="2.4"/><circle cx="71" cy="160" r="2.4"/><circle cx="84" cy="165" r="2.4"/><circle cx="97" cy="155" r="2.4"/><circle cx="110" cy="150" r="2.4"/><circle cx="123" cy="152" r="2.4"/><circle cx="136" cy="143" r="2.4"/><circle cx="149" cy="138" r="2.4"/><circle cx="162" cy="140" r="2.4"/><circle cx="175" cy="130" r="2.4"/><circle cx="188" cy="126" r="2.4"/><circle cx="201" cy="128" r="2.4"/><circle cx="214" cy="118" r="2.4"/><circle cx="227" cy="115" r="2.4"/><circle cx="240" cy="112" r="2.4"/><circle cx="253" cy="105" r="2.4"/><circle cx="266" cy="102" r="2.4"/><circle cx="279" cy="98" r="2.4"/><circle cx="292" cy="92" r="2.4"/><circle cx="305" cy="88" r="2.4"/><circle cx="318" cy="82" r="2.4"/>
+                            </g>
+                            <text x="185" y="210" text-anchor="middle" font-size="10" fill="#6e6e73">meses &#8594;</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La pendiente estimada, unos 0.66 colones por mes, es la respuesta al fondo del tazon. lstsq resuelve el problema convexo de una sola vez; el descenso de gradiente del explorador anterior llegaria al mismo fondo, solo que a pasos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8 scipy comparacion de metodos -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El computador prueba distintas formas de bajar</h2>
+                <p class="slide-subtitle">Mismo problema, distintos metodos: cuenten las evaluaciones</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">from</span> scipy.optimize <span class="keyword">import</span> minimize, rosen, rosen_der
+<span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="comment"># Rosenbrock: el "valle en banana" estandar</span>
+x0 = np.<span class="function">array</span>([-<span class="number">1.2</span>, <span class="number">1.0</span>])
+
+<span class="keyword">for</span> met <span class="keyword">in</span> [<span class="string">"Nelder-Mead"</span>, <span class="string">"CG"</span>, <span class="string">"BFGS"</span>]:
+    kw = {}
+    <span class="keyword">if</span> met != <span class="string">"Nelder-Mead"</span>:
+        kw[<span class="string">"jac"</span>] = rosen_der   <span class="comment"># usa el gradiente</span>
+    r = <span class="function">minimize</span>(rosen, x0, method=met, **kw)
+    <span class="function">print</span>(<span class="string">f"{met:12s} evals={r.nfev}"</span>)
+<span class="output">## Nelder-Mead  evals=159
+## CG           evals=78
+## BFGS         evals=39</span>
+                    </div>
+                    <div class="comparison-table">
+                        <table>
+                            <thead><tr><th>Metodo</th><th>Usa</th><th>Evaluaciones</th></tr></thead>
+                            <tbody>
+                                <tr><td>Nelder-Mead</td><td>Solo f (sin gradiente)</td><td>159</td></tr>
+                                <tr><td>CG</td><td>Gradiente</td><td>78</td></tr>
+                                <tr><td>BFGS</td><td>Gradiente + curvatura</td><td>39</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Numeros reales de ejecucion. La leccion es clara: los metodos que usan el gradiente llegan al mismo optimo con muchas menos evaluaciones que Nelder-Mead, que solo mira el valor de la funcion. Regla de 2026: si tenes gradiente, usa BFGS o L-BFGS por defecto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9 La cerca -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La cerca lo cambia todo</h2>
+                <p class="slide-subtitle">Con restricciones, el optimo puede vivir en la frontera</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 230" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">El optimo se pega a la cerca</text>
+                            <circle cx="120" cy="130" r="58" fill="none" stroke="#5f9be0" stroke-width="1.8"/>
+                            <circle cx="120" cy="130" r="45" fill="none" stroke="#9dc0ec" stroke-width="1.3"/>
+                            <circle cx="120" cy="130" r="30" fill="none" stroke="#cfe0f5" stroke-width="1.3"/>
+                            <circle cx="120" cy="130" r="3" fill="#4f93dd"/>
+                            <text x="120" y="123" text-anchor="middle" font-size="8" fill="#4f93dd">optimo libre</text>
+                            <line x1="122" y1="41" x2="214" y2="173" stroke="#c0392b" stroke-width="2.4"/>
+                            <text x="228" y="70" font-size="9" fill="#c0392b" font-weight="700">restriccion</text>
+                            <circle cx="168" cy="107" r="4.5" fill="#2e8b57"/>
+                            <text x="182" y="102" font-size="9" fill="#2e8b57" font-weight="700">optimo con cerca</text>
+                            <text x="170" y="220" text-anchor="middle" font-size="8" fill="#6e6e73">la curva de nivel se vuelve tangente a la cerca</text>
+                        </svg>
+                    </div>
+                    <div class="content-box">
+                        <h3>Dos tipos de cerca</h3>
+                        <ul>
+                            <li><strong>Igualdad</strong> h(x) = 0: gastar exactamente todo el presupuesto</li>
+                            <li><strong>Desigualdad</strong> g(x) &#8804; 0: no exceder capacidad, pesos no negativos</li>
+                        </ul>
+                        <p style="margin-top:8px;">La regla de terreno plano ya no basta. Maquinaria nueva: Lagrange para igualdades, KKT para desigualdades.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Analogia de la finca: quiero el punto mas alto del cerro, pero solo puedo caminar dentro de mi propiedad. Si la cima esta afuera, el mejor punto permitido esta pegado a la cerca, no donde el terreno es plano.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10 INTERACTIVO: tangencia -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">Lagrange: mover la cerca</h2>
+                <p class="slide-subtitle">El optimo se desliza, siempre tangente a las curvas de nivel</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <svg id="tg-svg" viewBox="0 0 340 250" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="170" cy="125" r="24" fill="none" stroke="#cfe0f5" stroke-width="1.2"/>
+                        <circle cx="170" cy="125" r="48" fill="none" stroke="#cfe0f5" stroke-width="1.2"/>
+                        <circle cx="170" cy="125" r="72" fill="none" stroke="#cfe0f5" stroke-width="1.2"/>
+                        <circle id="tg-tan" cx="170" cy="125" r="34" fill="none" stroke="#5f9be0" stroke-width="1.8"/>
+                        <circle cx="170" cy="125" r="2.5" fill="#4f93dd"/>
+                        <line id="tg-line" x1="0" y1="0" x2="0" y2="0" stroke="#c0392b" stroke-width="2.2"/>
+                        <line id="tg-grad" x1="170" y1="125" x2="170" y2="125" stroke="#FF8C00" stroke-width="2"/>
+                        <circle id="tg-opt" cx="170" cy="125" r="4.5" fill="#2e8b57"/>
+                        <text x="170" y="242" text-anchor="middle" font-size="9" fill="#6e6e73">circulos = curvas de nivel de x&#178;+y&#178;   ·   linea roja = x + y = c</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <label>Lado derecho de la cerca (c): <span id="tg-c-val">1.5</span></label>
+                        <input type="range" id="tg-c" min="-3" max="3" step="0.25" value="1.5">
+                        <div class="widget-readout" id="tg-read"></div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Fijense: el punto verde (el optimo) siempre queda donde una curva de nivel apenas roza la recta. Ahi la flecha naranja (la brujula de f) es perpendicular a la cerca: los gradientes se alinean. Eso es todo lo que dice Lagrange.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11 Lagrange en cvxpy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">cvxpy resuelve y entrega el multiplicador</h2>
+                <p class="slide-subtitle">Se escribe casi como la matematica; el motor elige el solver</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="comment"># !pip install cvxpy   (v1.9.2, 2026)</span>
+<span class="keyword">import</span> cvxpy <span class="keyword">as</span> cp
+
+x = cp.<span class="function">Variable</span>(); y = cp.<span class="function">Variable</span>()
+restr = [x + y == <span class="number">1</span>]
+
+prob = cp.<span class="function">Problem</span>(cp.<span class="function">Minimize</span>(x**<span class="number">2</span> + y**<span class="number">2</span>), restr)
+prob.<span class="function">solve</span>()
+
+<span class="function">print</span>(<span class="string">"x ="</span>, <span class="function">round</span>(<span class="function">float</span>(x.value), <span class="number">3</span>),
+      <span class="string">" y ="</span>, <span class="function">round</span>(<span class="function">float</span>(y.value), <span class="number">3</span>))
+<span class="function">print</span>(<span class="string">"f* ="</span>, <span class="function">round</span>(<span class="function">float</span>(prob.value), <span class="number">3</span>))
+<span class="function">print</span>(<span class="string">"precio sombra ="</span>,
+      <span class="function">round</span>(<span class="function">abs</span>(<span class="function">float</span>(restr[<span class="number">0</span>].dual_value)), <span class="number">3</span>))
+<span class="output">## x = 0.5  y = 0.5
+## f* = 0.5
+## precio sombra = 1.0</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>Que nos dice</h4>
+                        <p>El optimo de minimizar x&#178;+y&#178; sobre la recta x+y=1 es el punto (0.5, 0.5): el punto de la recta mas cercano al origen, justo lo que mostraba el explorador. Y restr[0].dual_value es el multiplicador de Lagrange convertido en una linea de codigo.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion. No escribimos ninguna derivada: describimos el problema tal cual y cvxpy lo resuelve con el solver CLARABEL (por defecto en 2026). Guardemos ese precio sombra de valor 1: lo interpretamos en dos laminas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12 KKT cuatro condiciones -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">KKT: las reglas del optimo con cerca</h2>
+                <p class="slide-subtitle">La generalizacion de Lagrange cuando hay desigualdades</p>
+            </div>
+            <div class="slide-content">
+                <div class="four-columns">
+                    <div class="feature-card"><h4>1. Terreno plano</h4><p>Considerando las cercas, ya no hay hacia donde mejorar (estacionariedad).</p></div>
+                    <div class="feature-card"><h4>2. Respeta las cercas</h4><p>La solucion cumple todas las restricciones (factibilidad).</p></div>
+                    <div class="feature-card"><h4>3. Precios no negativos</h4><p>Los multiplicadores de desigualdad son cero o positivos.</p></div>
+                    <div class="feature-card"><h4>4. Holgura complementaria</h4><p>Cada cerca o aprieta o sobra. La idea nueva y mas importante.</p></div>
+                </div>
+                <div class="two-columns">
+                    <div class="key-point">
+                        <h4>Aprieta o sobra</h4>
+                        <p>Si una cerda esta pegada al optimo (activa), puede tener precio positivo. Si sobra (inactiva), su precio es cero. No hay termino medio.</p>
+                    </div>
+                    <div class="key-point">
+                        <h4>El puente con la semana 9</h4>
+                        <p>Si el problema es convexo, cumplir estas reglas garantiza el optimo global. Es "terreno plano mas tazon", ahora con cerca.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Metafora del presupuesto: si no lo agoto, darme mas no me sirve (precio cero). Si lo agoto por completo, cada colon adicional tiene un valor concreto (precio positivo). Eso es exactamente la holgura complementaria.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13 holgura complementaria en codigo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Holgura complementaria, en consola</h2>
+                <p class="slide-subtitle">Una cerca que aprieta y otra que sobra</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> cvxpy <span class="keyword">as</span> cp
+
+<span class="keyword">def</span> <span class="function">resolver</span>(b):
+    x = cp.<span class="function">Variable</span>(); y = cp.<span class="function">Variable</span>()
+    g = [x + y &gt;= b]
+    p = cp.<span class="function">Problem</span>(cp.<span class="function">Minimize</span>(x**<span class="number">2</span>+y**<span class="number">2</span>), g)
+    p.<span class="function">solve</span>()
+    <span class="keyword">return</span> <span class="function">float</span>(x.value), <span class="function">float</span>(y.value), <span class="function">float</span>(g[<span class="number">0</span>].dual_value)
+
+<span class="keyword">for</span> b <span class="keyword">in</span> [<span class="number">1.0</span>, -<span class="number">1.0</span>]:
+    xv, yv, lam = <span class="function">resolver</span>(b)
+    activa = <span class="function">abs</span>((xv+yv) - b) &lt; <span class="number">1e-6</span>
+    estado = <span class="string">"APRIETA"</span> <span class="keyword">if</span> activa <span class="keyword">else</span> <span class="string">"SOBRA"</span>
+    <span class="function">print</span>(<span class="string">f"b={b:+.0f}: (x,y)=({xv:.2f},{yv:.2f})"</span>
+          <span class="string">f" lambda={lam:.2f} -> {estado}"</span>)
+<span class="output">## b=+1: (x,y)=(0.50,0.50) lambda=1.00 -> APRIETA
+## b=-1: (x,y)=(0.00,0.00) lambda=0.00 -> SOBRA</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>Las dos caras</h4>
+                        <p>Con b = 1 la cerca aprieta: el optimo se pega a ella en (0.5, 0.5) y su precio es positivo. Con b = -1 la cerca sobra: el optimo libre (0, 0) ya la cumple, asi que el precio es exactamente cero. La regla se cumple en ambos casos.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion. La misma funcion, dos cercas distintas, y el codigo imprime cual manda y cual no. Esta es la demostracion mas limpia de la holgura complementaria.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14 INTERACTIVO: precio sombra -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">El precio sombra es una pendiente</h2>
+                <p class="slide-subtitle">Cuanto mejora el optimo si aflojo la cerca una unidad</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <svg id="sp-svg" viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="40" y1="195" x2="320" y2="195" stroke="#2d2d2d" stroke-width="1"/>
+                        <line x1="40" y1="195" x2="40" y2="28" stroke="#2d2d2d" stroke-width="1"/>
+                        <polyline id="sp-curve" points="" fill="none" stroke="#4f93dd" stroke-width="2.2"/>
+                        <line id="sp-tan" x1="0" y1="0" x2="0" y2="0" stroke="#FF8C00" stroke-width="2.4"/>
+                        <circle id="sp-pt" cx="0" cy="0" r="4.5" fill="#2e8b57"/>
+                        <text x="180" y="207" text-anchor="middle" font-size="9" fill="#6e6e73">c = lado derecho de la restriccion &#8594;</text>
+                        <text x="20" y="112" text-anchor="middle" font-size="9" fill="#6e6e73" transform="rotate(-90 20 112)">valor optimo p*</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <label>Lado derecho (c): <span id="sp-c-val">1.5</span></label>
+                        <input type="range" id="sp-c" min="0" max="3" step="0.1" value="1.5">
+                        <div class="widget-readout" id="sp-read"></div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La pendiente de la curva naranja en cada punto ES el precio sombra: cuanto sube el optimo por cada unidad extra de la restriccion. Donde la curva es empinada, la cerca cuesta caro; donde es plana, aflojarla apenas ayuda. Ese numero es el multiplicador que da cvxpy.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15 Markowitz setup -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El caso grande: cartera de Markowitz</h2>
+                <p class="slide-subtitle">Optimizacion con restricciones sobre fondos estilo SUGEVAL</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> numpy <span class="keyword">as</span> np, cvxpy <span class="keyword">as</span> cp
+
+<span class="comment"># parametros representativos de informes SUGEVAL</span>
+fondos = [<span class="string">"Liquidez"</span>, <span class="string">"Bonos CRC"</span>,
+          <span class="string">"Bonos USD"</span>, <span class="string">"Accionario"</span>]
+mu  = np.<span class="function">array</span>([<span class="number">.003</span>, <span class="number">.006</span>, <span class="number">.008</span>, <span class="number">.011</span>])
+vol = np.<span class="function">array</span>([<span class="number">.004</span>, <span class="number">.012</span>, <span class="number">.020</span>, <span class="number">.045</span>])
+corr = np.<span class="function">array</span>([[<span class="number">1</span>, .<span class="number">2</span>, .<span class="number">1</span>, <span class="number">0</span>],
+                 [.<span class="number">2</span>, <span class="number">1</span>, .<span class="number">5</span>, .<span class="number">2</span>],
+                 [.<span class="number">1</span>, .<span class="number">5</span>, <span class="number">1</span>, .<span class="number">3</span>],
+                 [<span class="number">0</span>, .<span class="number">2</span>, .<span class="number">3</span>, <span class="number">1</span>]], <span class="function">float</span>)
+Sigma = np.<span class="function">diag</span>(vol) @ corr @ np.<span class="function">diag</span>(vol)
+<span class="function">print</span>(<span class="string">"retornos:"</span>, mu)
+<span class="output">## retornos: [0.003 0.006 0.008 0.011]</span>
+                    </div>
+                    <div class="content-box">
+                        <h3>El problema de Markowitz</h3>
+                        <p style="text-align:center; margin:6px 0;"><span class="math-symbol">min w&#7488;&#931;w</span> (riesgo)</p>
+                        <p style="text-align:center; margin:4px 0;">sujeto a</p>
+                        <ul>
+                            <li>&#931;w&#7522; = 1 (invertir todo el capital)</li>
+                            <li>&#956;&#7488;w &#8805; R exigido (retorno minimo)</li>
+                            <li>w&#7522; &#8805; 0 (sin ventas en corto)</li>
+                        </ul>
+                        <p style="margin-top:6px;">Convexo, con igualdad y desigualdades: el escenario perfecto para KKT.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Usamos parametros deterministas estilo SUGEVAL, no acciones de la BNV: el mercado accionario local es demasiado iliquido para Markowitz. Al fijar mu y Sigma, el ejemplo corre igual siempre y se comporta de forma sensata.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16 frontera eficiente -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La frontera eficiente, dibujada</h2>
+                <p class="slide-subtitle">Barrer el retorno exigido y graficar el riesgo minimo de cada nivel</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">def</span> <span class="function">cartera</span>(Robj):
+    w = cp.<span class="function">Variable</span>(<span class="number">4</span>)
+    riesgo = cp.<span class="function">quad_form</span>(w, cp.<span class="function">psd_wrap</span>(Sigma))
+    restr = [cp.<span class="function">sum</span>(w) == <span class="number">1</span>, w &gt;= <span class="number">0</span>,
+             mu @ w &gt;= Robj]
+    p = cp.<span class="function">Problem</span>(cp.<span class="function">Minimize</span>(riesgo), restr)
+    p.<span class="function">solve</span>()
+    <span class="keyword">return</span> np.<span class="function">sqrt</span>(p.value)
+
+objs = np.<span class="function">linspace</span>(mu.<span class="function">min</span>(), mu.<span class="function">max</span>(), <span class="number">25</span>)
+frontera = [<span class="function">cartera</span>(Ro) <span class="keyword">for</span> Ro <span class="keyword">in</span> objs]
+plt.<span class="function">plot</span>(frontera, objs, color=<span class="string">"#FF8C00"</span>, lw=<span class="number">2</span>)
+plt.<span class="function">show</span>()
+<span class="output">## riesgo: de 0.0040 (min) a 0.0450 (max)</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 220" xmlns="http://www.w3.org/2000/svg">
+                            <text x="180" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Frontera eficiente</text>
+                            <line x1="50" y1="188" x2="325" y2="188" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="50" y1="188" x2="50" y2="28" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M58,178 Q66,150 82,120 Q110,80 180,58 Q250,40 315,36" fill="none" stroke="#FF8C00" stroke-width="2.6"/>
+                            <circle cx="58" cy="178" r="3.5" fill="#2e8b57"/><text x="76" y="182" font-size="8" fill="#2e8b57">min. riesgo</text>
+                            <circle cx="315" cy="36" r="3.5" fill="#c0392b"/><text x="285" y="31" font-size="8" fill="#c0392b">max. retorno</text>
+                            <text x="185" y="210" text-anchor="middle" font-size="9" fill="#6e6e73">riesgo &#8594;</text>
+                            <text x="28" y="110" text-anchor="middle" font-size="9" fill="#6e6e73" transform="rotate(-90 28 110)">retorno &#8594;</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Cada punto de la curva es una cartera optima: el menor riesgo posible para un retorno exigido. Subir por la frontera cuesta riesgo, y ese costo marginal es precisamente el precio sombra que leemos a continuacion.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 17 precio sombra cartera -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El precio sombra del retorno exigido</h2>
+                <p class="slide-subtitle">dual_value: cuanto riesgo cuesta pedir un poco mas de retorno</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box">w = cp.<span class="function">Variable</span>(<span class="number">4</span>)
+riesgo = cp.<span class="function">quad_form</span>(w, cp.<span class="function">psd_wrap</span>(Sigma))
+restr = [cp.<span class="function">sum</span>(w) == <span class="number">1</span>, w &gt;= <span class="number">0</span>,
+         mu @ w &gt;= <span class="number">0.008</span>]
+prob = cp.<span class="function">Problem</span>(cp.<span class="function">Minimize</span>(riesgo), restr)
+prob.<span class="function">solve</span>()
+
+<span class="function">print</span>(<span class="string">"pesos:"</span>,
+      <span class="function">dict</span>(<span class="function">zip</span>(fondos, np.<span class="function">round</span>(w.value, <span class="number">3</span>))))
+<span class="function">print</span>(<span class="string">"precio sombra:"</span>,
+      <span class="function">round</span>(<span class="function">float</span>(restr[<span class="number">2</span>].dual_value), <span class="number">3</span>))
+<span class="output">## pesos: {'Liquidez': 0.0, 'Bonos CRC': 0.282,
+##         'Bonos USD': 0.53, 'Accionario': 0.188}
+## precio sombra: 0.172</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>Como se lee</h4>
+                        <p>El precio sombra de 0.172 dice cuanto sube la varianza minima si exigimos una unidad mas de retorno. Es la pendiente de la frontera hecha numero. Positivo significa que la restriccion de retorno esta apretando: para ganar mas, hay que aceptar mas riesgo.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion. dual_value es el multiplicador de KKT hecho codigo, y tiene una interpretacion economica directa. Es la teoria de la semana 10 en un print.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 18 holgura complementaria en la cartera -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Holgura complementaria en la cartera</h2>
+                <p class="slide-subtitle">El fondo que queda en cero tiene su cerca apretando</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Que nos dice la solucion</h3>
+                        <ul>
+                            <li>Liquidez queda en peso 0: su restriccion w &#8805; 0 esta activa (aprieta), con precio positivo</li>
+                            <li>Los otros tres entran con peso positivo: su restriccion w &#8805; 0 sobra, con precio 0</li>
+                            <li>Es la misma regla de la lamina 13, ahora sobre cuatro activos</li>
+                        </ul>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">Pesos de la cartera optima</text>
+                            <line x1="30" y1="170" x2="320" y2="170" stroke="#2d2d2d" stroke-width="1"/>
+                            <rect x="48" y="168" width="46" height="2" fill="#c0392b"/>
+                            <text x="71" y="185" text-anchor="middle" font-size="8" fill="#6e6e73">Liquidez</text>
+                            <text x="71" y="197" text-anchor="middle" font-size="9" fill="#c0392b" font-weight="700">0.00</text>
+                            <rect x="120" y="99" width="46" height="71" fill="#FF8C00"/>
+                            <text x="143" y="185" text-anchor="middle" font-size="8" fill="#6e6e73">Bonos CRC</text>
+                            <text x="143" y="197" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="700">0.282</text>
+                            <rect x="192" y="37" width="46" height="133" fill="#FF8C00"/>
+                            <text x="215" y="185" text-anchor="middle" font-size="8" fill="#6e6e73">Bonos USD</text>
+                            <text x="215" y="197" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="700">0.53</text>
+                            <rect x="264" y="123" width="46" height="47" fill="#FF8C00"/>
+                            <text x="287" y="185" text-anchor="middle" font-size="8" fill="#6e6e73">Accionario</text>
+                            <text x="287" y="197" text-anchor="middle" font-size="9" fill="#2e8b57" font-weight="700">0.188</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La holgura complementaria no es abstracta: es la lista de activos que la cartera decide excluir. Cuando un peso es cero, la restriccion de no negatividad esta limitando, y su precio sombra nos dice cuanto "quisiera" el modelo ir en corto si le dejaramos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 19 scipy vs cvxpy -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">scipy o cvxpy: cual uso</h2>
+                <p class="slide-subtitle">Dos filosofias para resolver con restricciones</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead><tr><th>Criterio</th><th>scipy.optimize</th><th>cvxpy</th></tr></thead>
+                        <tbody>
+                            <tr><td>Como se escribe</td><td>Funcion objetivo + lista de restricciones</td><td>Declarativo, "como la matematica"</td></tr>
+                            <tr><td>Metodos con restricciones</td><td>SLSQP, trust-constr, COBYQA</td><td>El motor elige el solver</td></tr>
+                            <tr><td>Tipo de problema</td><td>General, incluso no convexo</td><td>Convexo (garantiza optimo global)</td></tr>
+                            <tr><td>Multiplicadores</td><td>En el objeto resultado</td><td>constraint.dual_value directo</td></tr>
+                            <tr><td>Ideal para</td><td>Problemas a la medida, no convexos</td><td>Carteras, LP, QP convexos</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla simple: si el problema es convexo y se puede escribir con cvxpy, usa cvxpy y no reinventes la rueda. Si es no convexo o muy a la medida, scipy.optimize con SLSQP o trust-constr es la herramienta. Para Markowitz, cvxpy gana por claridad y por el dual_value.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 20 stack 2026 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de optimizacion en 2026</h2>
+                <p class="slide-subtitle">Mas alla de scipy y cvxpy</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead><tr><th>Herramienta</th><th>Para que</th><th>Nota 2026</th></tr></thead>
+                        <tbody>
+                            <tr><td>scipy.optimize</td><td>Optimizacion general</td><td>SciPy 1.1x; HiGHS en linprog</td></tr>
+                            <tr><td>cvxpy</td><td>Convexa declarativa</td><td>1.9.2; CLARABEL por defecto</td></tr>
+                            <tr><td>JAX + Optax</td><td>Autodiff, GPU, primer orden</td><td>Base del deep learning moderno</td></tr>
+                            <tr><td>PyTorch (torch.optim)</td><td>SGD, Adam, L-BFGS</td><td>Modelos diferenciables</td></tr>
+                            <tr><td>Gurobi / OR-Tools</td><td>LP, MIP a gran escala</td><td>Industria; Gurobi gratis academico</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>La tendencia dominante de 2026 es la integracion de optimizacion con aprendizaje automatico: capas de optimizacion diferenciables y ajuste de extremo a extremo. La optimizacion es el motor comun debajo de casi todos los modelos del curso.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 21 conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexion con el proyecto integrador</h2>
+                <p class="slide-subtitle">La optimizacion aparece en varios carriles tematicos</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="app-card">
+                        <div class="app-label">Finanzas</div>
+                        <h4>Cartera de inversion</h4>
+                        <p>Markowitz con fondos SUGEVAL o el tipo de cambio del BCCR: optimizacion con restricciones y precios sombra, exactamente lo de hoy.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Energia</div>
+                        <h4>Despacho electrico</h4>
+                        <p>Minimizar costo cubriendo la demanda con capacidades por fuente (datos CENCE/ICE). Una asignacion con cercas.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Ajuste de modelos</div>
+                        <h4>Regresion y calibracion</h4>
+                        <p>Todo ajuste por minimos cuadrados es optimizacion. El descenso de gradiente es el motor detras.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>La optimizacion no es un tema aislado: es la maquinaria que hace funcionar casi todos los modelos del curso. Ajustar una regresion, calibrar un SEIR o entrenar una red es, por debajo, encontrar el fondo de un tazon, con o sin cerca.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 22 actividad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">Predecir con la intuicion, verificar en Colab</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (predecir):</strong> sin correr nada, anticipar que hara el descenso de gradiente, donde quedara el optimo sobre una cerca y si una restriccion aprieta o sobra</li>
+                        <li><strong>Parte B (verificar en Colab):</strong> correr codigo autocontenido con cvxpy y comparar con las predicciones</li>
+                        <li><strong>Parte C (reflexion):</strong> interpretar el precio sombra y ubicar la optimizacion en el proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>El notebook de Colab del grupo con kernel Python (.ipynb), con las celdas ejecutadas</li>
+                        <li>Una celda final en Markdown con la reflexion grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento esta en el campus virtual. No hay cuentas a mano: se trata de predecir con la intuicion de hoy y dejar que el computador confirme. Corran la celda de instalacion de cvxpy apenas entren a la sala. Estare rotando entre salas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 23 cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Una sola intuicion: encontrar el fondo, con o sin cerca</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point"><h4>Sin cercas: buscar el fondo</h4><p>El optimo esta donde el terreno es plano, y la curvatura dice si es tazon, domo o silla. La convexidad garantiza un unico fondo.</p></div>
+                <div class="key-point"><h4>Bajar a pasos</h4><p>El descenso de gradiente baja siguiendo la pendiente; el tamano de paso lo es todo. Con gradiente disponible, BFGS es el caballo de batalla.</p></div>
+                <div class="key-point"><h4>Con cercas: Lagrange y KKT</h4><p>El optimo se pega a la frontera. Lagrange lo reconoce por tangencia; KKT agrega que cada cerca aprieta o sobra.</p></div>
+                <div class="key-point"><h4>El multiplicador es un precio sombra</h4><p>dual_value cuantifica cuanto mejora el optimo por aflojar una unidad la restriccion. El computador lo entrega; nosotros lo interpretamos.</p></div>
+                <div class="highlight-box" style="margin-top:16px;">
+                    <p style="text-align:center; font-size:22px;">Gracias por la sesion. Recuerden el avance del proyecto y la actividad en GitHub Classroom.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&#8592; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        document.addEventListener('keydown', function(e) {
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'button' || tag === 'textarea') return;
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            else if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // ---------- Widget 1: descenso de gradiente ----------
+        let gdX = 4, gdSteps = [4], gdTimer = null;
+        function gdMapX(x){ return 170 + x*30; }
+        function gdMapY(y){ return 195 - y*6.3; }
+        function gdInit(){
+            let pts = [];
+            for (let x = -4.6; x <= 4.6; x += 0.2) pts.push(gdMapX(x) + ',' + gdMapY(x*x));
+            document.getElementById('gd-curve').setAttribute('points', pts.join(' '));
+            gdDraw();
+        }
+        function gdDraw(){
+            let html = '';
+            gdSteps.forEach((x, i) => {
+                const xc = Math.max(-5, Math.min(5, x));
+                const cx = gdMapX(xc), cy = gdMapY(Math.min(26, xc*xc));
+                const last = i === gdSteps.length - 1;
+                html += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (last?4.5:2.6) + '" fill="' + (last?'#c0392b':'#FF8C00') + '"/>';
+            });
+            document.getElementById('gd-dots').innerHTML = html;
+            const k = gdSteps.length - 1;
+            const disp = Math.abs(gdX) > 6 ? '  (se disparo)' : '';
+            document.getElementById('gd-readout').textContent = 'paso ' + k + ' \u00b7 x = ' + gdX.toFixed(2) + ' \u00b7 f(x) = ' + (gdX*gdX).toFixed(2) + disp;
+        }
+        function gdStep(){
+            const eta = parseFloat(document.getElementById('gd-eta').value);
+            gdX = gdX - eta * 2 * gdX;
+            gdSteps.push(gdX);
+            if (gdSteps.length > 40) gdSteps.shift();
+            gdDraw();
+        }
+        function gdAuto(){
+            if (gdTimer){ clearInterval(gdTimer); gdTimer = null; return; }
+            gdTimer = setInterval(() => {
+                gdStep();
+                if (Math.abs(gdX) < 1e-3 || Math.abs(gdX) > 60){ clearInterval(gdTimer); gdTimer = null; }
+            }, 260);
+        }
+        function gdReset(){
+            if (gdTimer){ clearInterval(gdTimer); gdTimer = null; }
+            gdX = 4; gdSteps = [4]; gdDraw();
+        }
+        document.getElementById('gd-eta').addEventListener('input', e => {
+            document.getElementById('gd-eta-val').textContent = parseFloat(e.target.value).toFixed(2);
+        });
+
+        // ---------- Widget 2: tangencia (Lagrange) ----------
+        function tgMap(ux, uy){ return [170 + ux*24, 125 - uy*24]; }
+        function tgDraw(){
+            const c = parseFloat(document.getElementById('tg-c').value);
+            const [x1, y1] = tgMap(-4, c + 4);
+            const [x2, y2] = tgMap(4, c - 4);
+            const line = document.getElementById('tg-line');
+            line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+            line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+            const [ox, oy] = tgMap(c/2, c/2);
+            const opt = document.getElementById('tg-opt');
+            opt.setAttribute('cx', ox); opt.setAttribute('cy', oy);
+            const r = Math.sqrt(c*c/2) * 24;
+            document.getElementById('tg-tan').setAttribute('r', r);
+            const grad = document.getElementById('tg-grad');
+            grad.setAttribute('x1', 170); grad.setAttribute('y1', 125);
+            grad.setAttribute('x2', ox); grad.setAttribute('y2', oy);
+            document.getElementById('tg-c-val').textContent = c.toFixed(2);
+            document.getElementById('tg-read').textContent =
+                'x + y = ' + c.toFixed(2) + ' \u00b7 optimo (' + (c/2).toFixed(2) + ', ' + (c/2).toFixed(2) + ') \u00b7 f* = ' + (c*c/2).toFixed(2);
+        }
+        document.getElementById('tg-c').addEventListener('input', tgDraw);
+
+        // ---------- Widget 3: precio sombra ----------
+        function spMapX(c){ return 40 + c*90; }
+        function spMapY(p){ return 195 - p*36; }
+        function spInit(){
+            let pts = [];
+            for (let c = 0; c <= 3; c += 0.1) pts.push(spMapX(c) + ',' + spMapY(c*c/2));
+            document.getElementById('sp-curve').setAttribute('points', pts.join(' '));
+            spDraw();
+        }
+        function spDraw(){
+            const c = parseFloat(document.getElementById('sp-c').value);
+            const p = c*c/2;
+            const pt = document.getElementById('sp-pt');
+            pt.setAttribute('cx', spMapX(c)); pt.setAttribute('cy', spMapY(p));
+            const c1 = Math.max(0, c - 0.5), c2 = Math.min(3, c + 0.5);
+            const p1 = p + c*(c1 - c), p2 = p + c*(c2 - c);
+            const l = document.getElementById('sp-tan');
+            l.setAttribute('x1', spMapX(c1)); l.setAttribute('y1', spMapY(p1));
+            l.setAttribute('x2', spMapX(c2)); l.setAttribute('y2', spMapY(p2));
+            document.getElementById('sp-c-val').textContent = c.toFixed(1);
+            document.getElementById('sp-read').textContent =
+                'c = ' + c.toFixed(1) + ' \u00b7 valor optimo p* = ' + p.toFixed(2) + ' \u00b7 precio sombra (pendiente) = ' + c.toFixed(2);
+        }
+        document.getElementById('sp-c').addEventListener('input', spDraw);
+
+        // ---------- init ----------
+        window.addEventListener('load', () => { gdInit(); tgDraw(); spInit(); });
+        showSlide(0);
+    </script>
+</body>
+</html>
