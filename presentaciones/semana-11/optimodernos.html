@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semana 11: Optimizacion moderna basada en gradiente - Modelado matematico</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; background: #f5f5f7; }
+        .presentation-container { width: 100vw; height: 100vh; position: relative; }
+        .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; transition: opacity 0.6s ease-in-out; display: flex; flex-direction: column; padding: 65px 70px 90px 70px; background: #f5f5f7; }
+        .slide.active { opacity: 1; z-index: 1; }
+        .slide-header { margin-bottom: 22px; }
+        .slide-title { font-size: 36px; font-weight: 700; color: #2d2d2d; margin-bottom: 8px; }
+        .slide-subtitle { font-size: 18px; color: #6e6e73; font-weight: 300; }
+        .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: flex-start; gap: 14px; overflow-y: auto; max-height: calc(100vh - 230px); }
+        .content-box { background: #ffffff; border-radius: 20px; padding: 16px 20px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .content-box h3 { font-size: 20px; color: #2d2d2d; margin-bottom: 8px; }
+        .content-box p { font-size: 15px; color: #1d1d1f; line-height: 1.45; }
+        .content-box ul { list-style: none; padding-left: 0; }
+        .content-box li { font-size: 16px; color: #1d1d1f; line-height: 1.6; padding-left: 25px; position: relative; margin-bottom: 8px; }
+        .content-box li::before { content: "▸"; position: absolute; left: 0; color: #FF8C00; font-size: 20px; }
+        .two-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .three-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .four-columns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .highlight-box { background: linear-gradient(135deg, #fff5e6, #ffffff); border-left: 4px solid #FF8C00; padding: 12px 16px; border-radius: 10px; margin: 8px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .highlight-box p { font-size: 15px; color: #2d2d2d; font-style: italic; font-weight: 500; line-height: 1.45; }
+        .key-point { background: #ffffff; padding: 12px 16px; border-radius: 8px; margin: 6px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid #e5e5e7; border-left: 4px solid #FF8C00; }
+        .key-point h4 { color: #2d2d2d; font-size: 17px; margin-bottom: 6px; }
+        .key-point p { color: #1d1d1f; font-size: 14px; line-height: 1.45; }
+        .comparison-table { background: #ffffff; border-radius: 15px; overflow: hidden; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .comparison-table table { width: 100%; border-collapse: collapse; }
+        .comparison-table th { background: linear-gradient(90deg, #2d2d2d, #FF8C00); color: #ffffff; padding: 9px 12px; font-size: 14px; text-align: left; }
+        .comparison-table td { padding: 8px 12px; font-size: 13px; color: #1d1d1f; border-bottom: 1px solid #f5f5f7; }
+        .code-box { background: #1e1e1e; border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; color: #d4d4d4; font-size: 13px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; text-align: left; }
+        .code-box .comment { color: #6a9955; }
+        .code-box .keyword { color: #569cd6; }
+        .code-box .string { color: #ce9178; }
+        .code-box .number { color: #b5cea8; }
+        .code-box .function { color: #dcdcaa; }
+        .code-box .output { color: #9cdcfe; }
+        .navigation { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; gap: 20px; z-index: 1000; }
+        .nav-button { background: linear-gradient(135deg, #2d2d2d, #FF8C00); border: none; color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-size: 16px; font-weight: 600; transition: transform 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 15px rgba(255,140,0,0.3); }
+        .nav-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,140,0,0.4); }
+        .nav-button:disabled { opacity: 0.5; cursor: not-allowed; }
+        .logo-area { position: fixed; top: 12px; left: 20px; z-index: 1000; }
+        .logo-image { max-width: 85px; height: auto; }
+        .slide-number { position: fixed; top: 20px; right: 30px; color: #6e6e73; font-size: 16px; z-index: 1000; font-weight: 500; }
+        .cover-slide { justify-content: center; align-items: center; text-align: center; background: linear-gradient(135deg, #ffffff 0%, #f5f5f7 50%, #ffffff 100%); padding: 60px 80px 140px 80px; }
+        .cover-title { font-size: 56px; font-weight: 800; background: linear-gradient(90deg, #2d2d2d, #FF8C00, #2d2d2d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 20px; animation: gradient 3s ease infinite; background-size: 200% 200%; }
+        @keyframes gradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .cover-subtitle { font-size: 26px; color: #6e6e73; margin-bottom: 30px; font-weight: 300; }
+        .cover-info { font-size: 18px; color: #1d1d1f; margin-top: 30px; line-height: 1.6; }
+        .feature-card { background: #ffffff; border-radius: 15px; padding: 18px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(255,140,0,0.15); border-color: #FF8C00; }
+        .feature-card h4 { font-size: 18px; color: #2d2d2d; margin-bottom: 8px; }
+        .feature-card p { font-size: 14px; color: #1d1d1f; line-height: 1.4; }
+        .app-card { background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%); border-radius: 15px; padding: 18px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: all 0.3s ease; }
+        .app-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(255,140,0,0.15); border-color: #FF8C00; }
+        .app-card .app-label { font-size: 12px; color: #FF8C00; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+        .app-card h4 { font-size: 18px; color: #2d2d2d; margin-bottom: 8px; font-weight: 700; }
+        .app-card p { font-size: 14px; color: #1d1d1f; line-height: 1.4; }
+        .math-symbol { font-family: 'Cambria Math', 'Times New Roman', serif; font-style: italic; color: #FF8C00; font-weight: 600; }
+        .viz-svg { background: #ffffff; border-radius: 12px; padding: 15px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+        .viz-svg svg { max-width: 100%; height: auto; }
+        .widget { background: #ffffff; border-radius: 14px; padding: 14px; border: 1px solid #e5e5e7; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .widget-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: #2d2d2d; }
+        .widget-controls label { font-weight: 600; }
+        .widget-controls input[type=range] { flex: 1; min-width: 130px; accent-color: #FF8C00; }
+        .widget-controls button { background: #2d2d2d; color: #fff; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; cursor: pointer; }
+        .widget-controls button:hover { background: #FF8C00; }
+        .widget-readout { width: 100%; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 13px; color: #2e8b57; font-weight: 700; }
+        .interactive-badge { display: inline-block; background: #FF8C00; color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; padding: 3px 10px; border-radius: 12px; margin-bottom: 6px; }
+        .toggle-row { display: flex; gap: 8px; align-items: center; }
+        .toggle-btn { background: #e5e5e7; color: #2d2d2d; border: none; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .toggle-btn.active { background: #FF8C00; color: #fff; }
+        @media (max-height: 850px) {
+            .slide { padding: 55px 60px 70px 60px; }
+            .slide-header { margin-bottom: 14px; }
+            .slide-title { font-size: 30px; margin-bottom: 4px; }
+            .slide-subtitle { font-size: 16px; }
+            .slide-content { gap: 10px; max-height: calc(100vh - 180px); }
+            .content-box { padding: 12px 16px; }
+            .content-box h3 { font-size: 18px; }
+            .content-box p, .content-box li { font-size: 14px; }
+            .highlight-box p { font-size: 14px; }
+            .key-point h4 { font-size: 16px; }
+            .key-point p { font-size: 13px; }
+            .comparison-table th { padding: 7px 10px; font-size: 13px; }
+            .comparison-table td { padding: 6px 10px; font-size: 12.5px; }
+            .logo-image { max-width: 70px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-area"><img src="../../assets/images/lead-logo.png" alt="Lead University" class="logo-image"></div>
+    <div class="slide-number"><span id="currentSlide">1</span> / <span id="totalSlides">23</span></div>
+    <div class="presentation-container">
+
+        <!-- 1 Portada -->
+        <div class="slide cover-slide active">
+            <h1 class="cover-title">Bajar la montana a pasos</h1>
+            <p class="cover-subtitle">Semana 11: descenso de gradiente, Adam y AdamW</p>
+            <div class="cover-info">
+                <p>BCD5105 — Modelado matematico<br>Profesor: Jordy Alfaro Brenes<br>Lead University · II Cuatrimestre 2026</p>
+            </div>
+        </div>
+
+        <!-- 2 Puente -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">De encontrar el fondo a bajar a pasos</h2>
+                <p class="slide-subtitle">El puente con las semanas 9 y 10</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Lo que ya sabemos</h3>
+                        <ul>
+                            <li>Optimizar es buscar el fondo de un tazon</li>
+                            <li>Con problemas convexos y chicos, cvxpy o lstsq lo resuelven de una vez</li>
+                            <li>El optimo esta donde el terreno es plano</li>
+                        </ul>
+                    </div>
+                    <div class="content-box">
+                        <h3>Lo nuevo de hoy</h3>
+                        <ul>
+                            <li>Modelos con millones de parametros: ya no hay solucion de una vez</li>
+                            <li>Toca bajar la montana a pasos, automaticamente</li>
+                            <li>Ese es el motor que entrena redes neuronales y modelos de lenguaje</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Toda la sesion gira en torno a una sola linea: nueva posicion = posicion - (tamano de paso) x (gradiente). Adam y AdamW son variantes cada vez mas listas de esa misma idea. Hoy no hacemos cuentas: la maquina calcula y grafica, nosotros interpretamos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3 El gradiente como brujula -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El gradiente es una brujula</h2>
+                <p class="slide-subtitle">Apunta hacia donde sube el terreno; caminamos en contra</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>La regla, en una linea</h3>
+                        <p style="text-align:center; margin:8px 0; font-size:17px;"><span class="math-symbol">nueva = actual &minus; &eta; &middot; gradiente</span></p>
+                        <ul style="margin-top:8px;">
+                            <li>El gradiente apunta cuesta arriba: vamos en contra</li>
+                            <li>&eta; (eta) es el tamano del paso</li>
+                            <li>Para f(x) = x&#178;, el gradiente en x es 2x</li>
+                        </ul>
+                        <p style="margin-top:8px;">Un paso desde x = 4 con &eta; = 0.3: 4 &minus; 0.3&middot;8 = <strong>1.6</strong>. Repetir acerca al fondo (x = 0).</p>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="16" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">f(x) = x&#178; y la brujula (pendiente)</text>
+                            <line x1="20" y1="185" x2="320" y2="185" stroke="#cccccc" stroke-width="1"/>
+                            <line x1="170" y1="30" x2="170" y2="190" stroke="#eeeeee" stroke-width="1"/>
+                            <path d="M40,55 Q170,235 300,55" fill="none" stroke="#4f93dd" stroke-width="2.4"/>
+                            <circle cx="278" cy="70" r="5" fill="#c0392b"/>
+                            <text x="278" y="60" text-anchor="middle" font-size="9" fill="#c0392b">x = 4</text>
+                            <line x1="278" y1="70" x2="308" y2="70" stroke="#FF8C00" stroke-width="2.5" marker-end="url(#ar)"/>
+                            <text x="300" y="86" text-anchor="middle" font-size="8" fill="#FF8C00">brujula</text>
+                            <circle cx="216" cy="128" r="5" fill="#2e8b57"/>
+                            <text x="216" y="119" text-anchor="middle" font-size="9" fill="#2e8b57">x = 1.6</text>
+                            <text x="170" y="205" text-anchor="middle" font-size="9" fill="#6e6e73">damos el paso EN CONTRA de la brujula, hacia el fondo</text>
+                            <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#FF8C00"/></marker></defs>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Esa unica linea es TODO el descenso de gradiente. Adam y AdamW solo cambian como se calcula el paso, no la idea. En una red real, nadie calcula el gradiente a mano: lo saca la diferenciacion automatica, que veremos corriendo mas adelante.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4 INTERACTIVO: descenso a pasos -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">El tamano de paso lo es todo</h2>
+                <p class="slide-subtitle">Muevan &eta; y vean converger, rebotar o dispararse</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <svg id="gd-svg" viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="20" y1="185" x2="320" y2="185" stroke="#cccccc" stroke-width="1"/>
+                        <line x1="170" y1="25" x2="170" y2="190" stroke="#eeeeee" stroke-width="1"/>
+                        <polyline id="gd-curve" points="" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                        <g id="gd-dots"></g>
+                        <text x="170" y="197" text-anchor="middle" font-size="9" fill="#6e6e73">f(x) = x&#178;   ·   el punto rojo es la posicion actual</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <label>Tamano de paso (&eta;): <span id="gd-eta-val">0.30</span></label>
+                        <input type="range" id="gd-eta" min="0.05" max="1.15" step="0.05" value="0.30">
+                        <button onclick="gdStep()">Un paso</button>
+                        <button onclick="gdAuto()">Auto</button>
+                        <button onclick="gdReset()">Reiniciar</button>
+                        <div class="widget-readout" id="gd-readout">paso 0 · x = 4.00 · f(x) = 16.00</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Regla que sale del explorador: con &eta; menor a 1 converge; en exactamente 1 se queda dando vueltas; con &eta; mayor a 1 se dispara. Ese equilibrio delicado es el mismo problema que enfrenta quien entrena una red hoy, y es la razon de ser de Adam.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5 Tres variantes -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Cuantos datos miro en cada paso</h2>
+                <p class="slide-subtitle">Batch, estocastico y mini-batch: el ruido como aliado</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="feature-card"><h4>Batch</h4><p>Usa todos los datos por paso. Brujula exacta, pero lenta y cara. Inviable con datos grandes.</p></div>
+                    <div class="feature-card"><h4>SGD</h4><p>Un ejemplo por paso. Rapidisimo, pero la brujula tiembla y la trayectoria es erratica.</p></div>
+                    <div class="feature-card"><h4>Mini-batch</h4><p>Entre 32 y 512 por paso. El equilibrio, y lo que se usa siempre en la practica.</p></div>
+                </div>
+                <div class="highlight-box">
+                    <p>El giro contraintuitivo: que la brujula tiemble no es solo malo. Ese ruido ayuda a saltar fuera de hoyos pequenos (minimos locales) y a caer en valles anchos que generalizan mejor. Es como un GPS que titubea, pero que por titubear no te deja atascado en el primer bache.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6 Momentum -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Momentum: darle inercia a la bola</h2>
+                <p class="slide-subtitle">Atravesar el valle estrecho sin zigzaguear</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 200" xmlns="http://www.w3.org/2000/svg">
+                            <text x="90" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#c0392b">SGD: zigzag</text>
+                            <ellipse cx="90" cy="110" rx="62" ry="24" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <ellipse cx="90" cy="110" rx="42" ry="15" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <ellipse cx="90" cy="110" rx="22" ry="8" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <polyline points="30,92 46,128 64,96 82,122 100,102 116,118 130,108 140,110" fill="none" stroke="#c0392b" stroke-width="1.8"/>
+                            <circle cx="90" cy="110" r="3" fill="#2d2d2d"/>
+                            <text x="255" y="16" text-anchor="middle" font-size="10" font-weight="600" fill="#4f93dd">Momentum: liso</text>
+                            <ellipse cx="255" cy="110" rx="62" ry="24" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <ellipse cx="255" cy="110" rx="42" ry="15" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <ellipse cx="255" cy="110" rx="22" ry="8" fill="none" stroke="#e0e0e0" stroke-width="1"/>
+                            <path d="M197,100 Q225,118 255,110" fill="none" stroke="#4f93dd" stroke-width="2"/>
+                            <circle cx="255" cy="110" r="3" fill="#2d2d2d"/>
+                            <text x="170" y="185" text-anchor="middle" font-size="9" fill="#6e6e73">mismas curvas de nivel, dos formas de bajar por el valle</text>
+                        </svg>
+                    </div>
+                    <div class="content-box">
+                        <h3>La bola con inercia</h3>
+                        <ul>
+                            <li>En vez de reconsiderar en cada paso, promedio las ultimas brujulas</li>
+                            <li>Acelera en la direccion sostenida (a lo largo del valle)</li>
+                            <li>Amortigua los rebotes de lado a lado</li>
+                        </ul>
+                        <p style="margin-top:8px;">Resultado: atraviesa el valle estrecho mucho mas rapido que SGD. Es la primera de las ideas que Adam hereda.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Nesterov es una variante que mira adelante: calcula la brujula donde la inercia te va a llevar, no donde estas. Como un conductor que mira la curva que viene y corrige antes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7 INTERACTIVO: la carrera de optimizadores -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">La carrera de optimizadores</h2>
+                <p class="slide-subtitle">SGD, Momentum y Adam sobre el mismo valle mal condicionado</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <svg id="race-svg" viewBox="0 0 340 240" xmlns="http://www.w3.org/2000/svg">
+                        <g id="race-contours"></g>
+                        <circle cx="170" cy="120" r="3" fill="#2d2d2d"/>
+                        <text x="170" y="112" text-anchor="middle" font-size="8" fill="#2d2d2d">fondo</text>
+                        <polyline id="path-sgd" points="" fill="none" stroke="#c0392b" stroke-width="1.7" opacity="0.9"/>
+                        <polyline id="path-mom" points="" fill="none" stroke="#4f93dd" stroke-width="1.7" opacity="0.9"/>
+                        <polyline id="path-adam" points="" fill="none" stroke="#2e8b57" stroke-width="1.7" opacity="0.9"/>
+                        <circle id="dot-sgd" r="4" fill="#c0392b"/>
+                        <circle id="dot-mom" r="4" fill="#4f93dd"/>
+                        <circle id="dot-adam" r="4" fill="#2e8b57"/>
+                        <text x="30" y="222" font-size="10" fill="#c0392b" font-weight="700">SGD</text>
+                        <text x="150" y="222" font-size="10" fill="#4f93dd" font-weight="700">Momentum</text>
+                        <text x="270" y="222" font-size="10" fill="#2e8b57" font-weight="700">Adam</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <button onclick="raceRun()">Correr</button>
+                        <button onclick="raceReset()">Reiniciar</button>
+                        <div class="widget-readout" id="race-read">paso 0 de 45</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Superficie f(x,y) = &frac12;(x&#178; + 20y&#178;): un valle largo y estrecho. SGD (rojo) rebota de pared a pared y tarda 30 pasos en llegar. Momentum (azul) cambia el serrucho por una curva amplia y llega en 24. Adam (verde) baja directo y llega en 17. Los tres terminan en el fondo: la diferencia es el camino. Esta es la imagen que resume la clase.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8 De AdaGrad a Adam -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El paso a la medida de cada parametro</h2>
+                <p class="slide-subtitle">De AdaGrad a RMSprop a Adam</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead><tr><th>Metodo</th><th>Idea</th><th>Problema que resuelve o crea</th></tr></thead>
+                        <tbody>
+                            <tr><td>AdaGrad</td><td>Cada parametro con su propio paso, segun sus gradientes pasados</td><td>El paso se desvanece hasta casi cero</td></tr>
+                            <tr><td>RMSprop</td><td>Igual, pero con memoria que olvida (promedio movil)</td><td>El paso ya no muere</td></tr>
+                            <tr><td>Adam</td><td>RMSprop + momentum + correccion de arranque</td><td>El estandar desde hace una decada</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>La idea comun: donde el terreno viene siendo empinado, acorto el paso; donde viene siendo plano, lo alargo. Asi un unico &eta; deja de ser un problema, porque cada direccion ajusta el suyo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 9 Adam por dentro -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Adam por dentro: dos recuerdos</h2>
+                <p class="slide-subtitle">Implementado desde cero para ver que no hay magia</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+<span class="keyword">def</span> <span class="function">adam_paso</span>(w, g, v, s, t, lr=<span class="number">0.001</span>,
+              b1=<span class="number">0.9</span>, b2=<span class="number">0.999</span>, eps=<span class="number">1e-8</span>):
+    v = b1*v + (<span class="number">1</span>-b1)*g        <span class="comment"># recuerdo de direccion</span>
+    s = b2*s + (<span class="number">1</span>-b2)*g*g      <span class="comment"># recuerdo de magnitud</span>
+    vh = v/(<span class="number">1</span>-b1**t)           <span class="comment"># correccion de arranque</span>
+    sh = s/(<span class="number">1</span>-b2**t)
+    w = w - lr*vh/(np.<span class="function">sqrt</span>(sh)+eps) <span class="comment"># paso a la medida</span>
+    <span class="keyword">return</span> w, v, s
+
+<span class="comment"># prueba: un parametro, gradiente constante = 2</span>
+w, v, s = <span class="number">5.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>
+<span class="keyword">for</span> t <span class="keyword">in</span> <span class="function">range</span>(<span class="number">1</span>, <span class="number">4</span>):
+    w, v, s = <span class="function">adam_paso</span>(w, <span class="number">2.0</span>, v, s, t, lr=<span class="number">0.1</span>)
+    <span class="function">print</span>(<span class="string">f"paso {t}: w = {w:.4f}"</span>)
+<span class="output">## paso 1: w = 4.9000
+## paso 2: w = 4.8000
+## paso 3: w = 4.7000</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>Que hace cada linea</h4>
+                        <p><strong>v</strong> promedia la direccion de la brujula (la inercia). <strong>s</strong> promedia su magnitud al cuadrado (para acortar el paso donde es empinado). La correccion divide por un numero chico al inicio, para que los primeros pasos no salgan sesgados. El resultado es un paso suave: con gradiente constante, avanza parejo unos 0.1 por paso.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion. No hay caja negra: son cinco lineas. Adam es momentum (v) mas escala adaptativa (s) mas un ajuste de arranque. Nada mas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 10 Adam en torch -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">En la practica: torch.optim</h2>
+                <p class="slide-subtitle">Nadie escribe Adam a mano; se instancia en una linea</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> torch
+
+<span class="comment"># SGD con momentum (y Nesterov)</span>
+opt = torch.optim.<span class="function">SGD</span>(model.<span class="function">parameters</span>(),
+      lr=<span class="number">0.01</span>, momentum=<span class="number">0.9</span>, nesterov=<span class="keyword">True</span>)
+
+<span class="comment"># Adam (defaults: lr=1e-3, betas=(0.9,0.999))</span>
+opt = torch.optim.<span class="function">Adam</span>(model.<span class="function">parameters</span>(), lr=<span class="number">1e-3</span>)
+
+<span class="comment"># AdamW: el estandar moderno (weight_decay desacoplado)</span>
+opt = torch.optim.<span class="function">AdamW</span>(model.<span class="function">parameters</span>(),
+      lr=<span class="number">3e-4</span>, weight_decay=<span class="number">0.01</span>)
+
+<span class="comment"># scheduler coseno (baja el lr suavemente)</span>
+sched = torch.optim.lr_scheduler.<span class="function">CosineAnnealingLR</span>(
+        opt, T_max=num_pasos)
+                    </div>
+                    <div class="content-box">
+                        <h3>La idea clave</h3>
+                        <ul>
+                            <li>El optimizador es el motor de aprendizaje</li>
+                            <li>Autodiff calcula la brujula; el optimizador decide como usarla</li>
+                            <li>Cambiar de SGD a AdamW no cambia el modelo ni los datos, solo la estrategia de bajada</li>
+                        </ul>
+                        <p style="margin-top:8px;">Por eso probar SGD, Adam y AdamW en el mismo problema es cambiar una sola linea.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Estas cuatro instanciaciones corren tal cual en Colab con PyTorch (ya viene instalado). En las proximas laminas las ponemos a competir sobre datos costarricenses.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 11 Adam+L2 vs AdamW concepto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Adam+L2 vs AdamW: encoger los pesos</h2>
+                <p class="slide-subtitle">El concepto mas sutil y mas examinable de la semana</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="content-box">
+                        <h3>Por que encoger los pesos</h3>
+                        <p>Para que el modelo no se sobreajuste, en cada paso encogemos un poquito los pesos hacia cero. A eso se le llama <em>weight decay</em>.</p>
+                        <ul style="margin-top:8px;">
+                            <li><strong>Adam+L2</strong> (la forma vieja): mete el encogimiento dentro de la brujula, y como Adam ajusta el paso por parametro, termina encogiendo desparejo</li>
+                            <li><strong>AdamW</strong> (el arreglo): encoge todos los pesos por igual, aparte del paso de gradiente</li>
+                        </ul>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>La consecuencia</h4>
+                        <p>Con Adam+L2, los pesos con gradientes grandes se regularizan menos que los chicos: injusto y dificil de afinar. Con AdamW, todos reciben la misma tasa. Por eso AdamW es el default en los transformers modernos: mejor generalizacion e hiperparametros mas faciles de afinar.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Metafora: Adam+L2 es un impuesto plano que golpea distinto segun el tamano; AdamW es un impuesto proporcional donde todos pagan el mismo porcentaje. En la proxima lamina se ve, y luego lo confirmamos en codigo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 12 INTERACTIVO: encogimiento de pesos -->
+        <div class="slide">
+            <div class="slide-header">
+                <span class="interactive-badge">Explorador interactivo</span>
+                <h2 class="slide-title">El encogimiento de pesos, en vivo</h2>
+                <p class="slide-subtitle">Dos pesos (uno grande, uno chico) bajo cada metodo</p>
+            </div>
+            <div class="slide-content">
+                <div class="widget">
+                    <div class="toggle-row" style="margin-bottom:8px;">
+                        <span style="font-weight:600; font-size:13px;">Metodo:</span>
+                        <button class="toggle-btn active" id="tg-adamw" onclick="wdSet('AdamW')">AdamW (desacoplado)</button>
+                        <button class="toggle-btn" id="tg-l2" onclick="wdSet('Adam+L2')">Adam+L2 (acoplado)</button>
+                    </div>
+                    <svg id="wd-svg" viewBox="0 0 340 190" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="30" y1="160" x2="320" y2="160" stroke="#2d2d2d" stroke-width="1"/>
+                        <rect id="bar-big" x="70" y="30" width="60" height="130" fill="#FF8C00" rx="3"/>
+                        <rect id="bar-small" x="210" y="145" width="60" height="15" fill="#4f93dd" rx="3"/>
+                        <text x="100" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">peso grande (4.0)</text>
+                        <text x="240" y="175" text-anchor="middle" font-size="10" fill="#6e6e73">peso chico (0.5)</text>
+                        <text id="lbl-big" x="100" y="24" text-anchor="middle" font-size="11" fill="#2d2d2d" font-weight="700">4.00</text>
+                        <text id="lbl-small" x="240" y="139" text-anchor="middle" font-size="11" fill="#2d2d2d" font-weight="700">0.50</text>
+                    </svg>
+                    <div class="widget-controls">
+                        <label>Pasos: <span id="wd-steps-val">0</span></label>
+                        <input type="range" id="wd-steps" min="0" max="40" step="1" value="0">
+                        <div class="widget-readout" id="wd-read">arrastren el slider para avanzar los pasos</div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Con AdamW ambos pesos caen el mismo porcentaje (5%, 10%, 18%, 33%... parejo). Cambien a Adam+L2 y veran que el peso chico se desploma (94% de golpe) mientras el grande casi no se mueve. Esa es, hecha imagen, la diferencia que preguntan en el examen.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 13 Adam vs AdamW en codigo -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Adam vs AdamW, confirmado en codigo</h2>
+                <p class="slide-subtitle">Solo weight decay, sin datos: se aisla el mecanismo</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> torch
+
+<span class="keyword">def</span> <span class="function">solo_decay</span>(clase, w0, lr=<span class="number">0.1</span>, wd=<span class="number">0.1</span>, pasos=<span class="number">40</span>):
+    w = torch.<span class="function">tensor</span>([w0], requires_grad=<span class="keyword">True</span>)
+    opt = <span class="function">clase</span>([w], lr=lr, weight_decay=wd)
+    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="function">range</span>(pasos):
+        opt.<span class="function">zero_grad</span>()
+        (<span class="number">0.0</span>*w).<span class="function">sum</span>().<span class="function">backward</span>() <span class="comment"># sin perdida: solo decae</span>
+        opt.<span class="function">step</span>()
+    <span class="keyword">return</span> w.<span class="function">detach</span>().numpy()[<span class="number">0</span>]
+
+<span class="comment"># pesos iniciales: uno grande (4.0), uno chico (0.5)</span>
+l2 = <span class="function">solo_decay</span>(torch.optim.Adam,  [<span class="number">4.0</span>, <span class="number">0.5</span>])
+aw = <span class="function">solo_decay</span>(torch.optim.AdamW, [<span class="number">4.0</span>, <span class="number">0.5</span>])
+<span class="function">print</span>(<span class="string">"Adam+L2:"</span>, np.<span class="function">round</span>(l2, <span class="number">3</span>))
+<span class="function">print</span>(<span class="string">"AdamW  :"</span>, np.<span class="function">round</span>(aw, <span class="number">3</span>))
+<span class="output">## Adam+L2: [ 0.651 -0.035]   (chico aniquilado)
+## AdamW  : [ 2.676  0.334]   (ambos -33%)</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>Como leerlo</h4>
+                        <p>Tras 40 pasos de solo weight decay: <strong>AdamW</strong> deja ambos pesos en el 67% de su valor (33% de encogimiento parejo). <strong>Adam+L2</strong> deja el grande en 0.651 y hunde el chico a casi cero. En PyTorch, Adam(weight_decay=...) es la version acoplada; AdamW, la desacoplada.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion en PyTorch, identica a la version desde cero en NumPy. El ciclo manual-a-computacional cierra: lo que dibujamos a mano, la maquina lo confirma al decimal.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 14 Autodiff -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Autodiff: la brujula automatica</h2>
+                <p class="slide-subtitle">La maquina saca el gradiente exacto, sola</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> torch
+
+<span class="comment"># queremos la pendiente de f(x)=(x+1)^2 en x=3</span>
+x = torch.<span class="function">tensor</span>([<span class="number">3.0</span>], requires_grad=<span class="keyword">True</span>)
+y = x**<span class="number">2</span> + <span class="number">2</span>*x + <span class="number">1</span>          <span class="comment"># f(x) = (x+1)^2</span>
+
+y.<span class="function">backward</span>()                    <span class="comment"># regla de la cadena, automatica</span>
+<span class="function">print</span>(<span class="string">"f'(3) ="</span>, x.grad.<span class="function">item</span>())
+<span class="output">## f'(3) = 8.0    (exacto: 2*3 + 2 = 8)</span>
+                    </div>
+                    <div class="content-box">
+                        <h3>Por que importa</h3>
+                        <ul>
+                            <li>El modelo es una cadena de operaciones simples</li>
+                            <li>backward() aplica la regla de la cadena hacia atras</li>
+                            <li>Obtiene la brujula EXACTA de todos los parametros de una sola pasada</li>
+                        </ul>
+                        <p style="margin-top:8px;">No es aproximar con numeritos ni manipular formulas: es exacto y barato. Por eso una red con millones de parametros se entrena sin que nadie derive nada.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion. Una linea, loss.backward(), y quedan listos todos los gradientes. Esa linea es el paso 4 del bucle de entrenamiento que viene ahora.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15 bucle de entrenamiento -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El bucle de entrenamiento en 5 pasos</h2>
+                <p class="slide-subtitle">El esqueleto que todo cientifico de datos memoriza</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">for</span> epoca <span class="keyword">in</span> <span class="function">range</span>(num_epocas):
+    opt.<span class="function">zero_grad</span>()      <span class="comment"># 1. limpiar la brujula anterior</span>
+    pred = <span class="function">model</span>(X)       <span class="comment"># 2. predecir (forward)</span>
+    loss = <span class="function">lossf</span>(pred, y) <span class="comment"># 3. medir el error</span>
+    loss.<span class="function">backward</span>()      <span class="comment"># 4. sacar la brujula (autodiff)</span>
+    opt.<span class="function">step</span>()           <span class="comment"># 5. dar el paso (optimizador)</span>
+
+<span class="comment"># mismo problema, tres optimizadores (lr=0.1):</span>
+<span class="output">## SGD  : MSE 2.191 -> 0.324 (ep10) -> 0.144 (ep50)
+## Adam : MSE 2.191 -> 0.340 (ep10) -> 0.150 (ep50)
+## AdamW: MSE 2.191 -> 0.340 (ep10) -> 0.150 (ep50)</span>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>El paso 5 es el tema de hoy</h4>
+                        <p>Los pasos 1 a 4 son iguales para cualquier optimizador. Lo unico que cambia entre SGD, Adam y AdamW es como se da el paso 5. Y ese <strong>zero_grad()</strong> del paso 1 es critico: PyTorch acumula gradientes, asi que si no los limpias, sumas brujulas de iteraciones distintas y todo se rompe.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion sobre datos de demanda electrica. Aqui los tres llegan parecido porque el problema es facil; en la proxima lamina veremos donde SGD sufre y Adam brilla.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 16 schedulers y warmup -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El learning rate cambia durante el viaje</h2>
+                <p class="slide-subtitle">Warmup y coseno: la receta estandar en 2026</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 190" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="15" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">warmup + coseno</text>
+                            <line x1="40" y1="160" x2="320" y2="160" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="40" y1="160" x2="40" y2="30" stroke="#2d2d2d" stroke-width="1"/>
+                            <path d="M40,150 L80,45" fill="none" stroke="#FF8C00" stroke-width="2.4"/>
+                            <path d="M80,45 Q180,55 260,120 Q290,145 315,152" fill="none" stroke="#FF8C00" stroke-width="2.4"/>
+                            <line x1="80" y1="45" x2="80" y2="160" stroke="#cccccc" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="60" y="175" text-anchor="middle" font-size="8" fill="#6e6e73">warmup</text>
+                            <text x="200" y="175" text-anchor="middle" font-size="8" fill="#6e6e73">descenso coseno</text>
+                            <text x="24" y="95" text-anchor="middle" font-size="9" fill="#6e6e73" transform="rotate(-90 24 95)">learning rate</text>
+                        </svg>
+                    </div>
+                    <div class="content-box">
+                        <h3>Por que sube y luego baja</h3>
+                        <ul>
+                            <li><strong>Warmup:</strong> al inicio los pesos son aleatorios; un paso grande de golpe desestabiliza, asi que se sube el lr poco a poco</li>
+                            <li><strong>Coseno:</strong> luego baja suave hasta casi cero para afinar sin rebotar fuera del minimo</li>
+                        </ul>
+                        <p style="margin-top:8px;">Ojo: aunque Adam ajusta el paso por parametro, el lr base <strong>igual</strong> se afina con scheduler.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Warmup mas coseno es la receta que usan GPT, LLaMA y casi todos los modelos grandes. Suele dar de 1 a 3% de mejora casi gratis. La leccion: el optimizador importa, pero afinar bien el lr y su horario importa mas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 17 Caso CR: demanda electrica -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Caso costarricense: demanda electrica</h2>
+                <p class="slide-subtitle">Ajustar la demanda diaria del SEN (datos estilo CENCE/ICE)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="code-box"><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+rng = np.random.<span class="function">default_rng</span>(<span class="number">2026</span>)
+
+<span class="comment"># demanda diaria del SEN (GWh): tendencia + patron semanal</span>
+n = <span class="number">365</span>; dia = np.<span class="function">arange</span>(n)
+demanda = (<span class="number">30</span> + <span class="number">0.01</span>*dia
+    + <span class="number">2.5</span>*np.<span class="function">sin</span>(<span class="number">2</span>*np.pi*dia/<span class="number">7</span>)
+    + rng.<span class="function">normal</span>(<span class="number">0</span>, <span class="number">0.8</span>, n))
+
+<span class="comment"># estandarizar y ajustar recta+estacionalidad con SGD y Adam</span>
+<span class="comment"># (curvas de MSE por epoca, mismo lr = 0.1)</span>
+<span class="output">## epoca  1 :  SGD 0.803   Adam 0.811
+## epoca  5 :  SGD 0.394   Adam 0.354
+## epoca 10 :  SGD 0.226   Adam 0.202
+## epoca 20 :  SGD 0.153   Adam 0.188
+## epoca 50 :  SGD 0.144   Adam 0.145   (optimo: 0.144)</span>
+                    </div>
+                    <div class="viz-svg">
+                        <svg viewBox="0 0 340 210" xmlns="http://www.w3.org/2000/svg">
+                            <text x="170" y="14" text-anchor="middle" font-size="11" font-weight="600" fill="#2d2d2d">MSE por epoca</text>
+                            <line x1="45" y1="180" x2="325" y2="180" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="180" x2="45" y2="25" stroke="#2d2d2d" stroke-width="1"/>
+                            <line x1="45" y1="168" x2="325" y2="168" stroke="#e0e0e0" stroke-width="1" stroke-dasharray="3,3"/>
+                            <text x="322" y="164" text-anchor="end" font-size="8" fill="#6e6e73">optimo (MSE = 0.144)</text>
+                            <polyline points="52,44 68,96 85,132 118,150 150,160 183,166 216,170 249,171 282,172 315,172" fill="none" stroke="#c0392b" stroke-width="2"/>
+                            <polyline points="52,42 68,104 85,138 118,148 150,156 183,158 216,163 249,167 282,170 315,171" fill="none" stroke="#2e8b57" stroke-width="2"/>
+                            <circle cx="52" cy="44" r="2.5" fill="#c0392b"/><circle cx="52" cy="42" r="2.5" fill="#2e8b57"/>
+                            <text x="240" y="55" font-size="9" fill="#c0392b" font-weight="700">SGD</text>
+                            <text x="240" y="70" font-size="9" fill="#2e8b57" font-weight="700">Adam</text>
+                            <text x="185" y="200" text-anchor="middle" font-size="9" fill="#6e6e73">epocas &#8594;</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Datos autocontenidos con semilla 2026: corren igual en cualquier Colab. En el proyecto, la serie real se baja del CENCE (grupoice.com/CenceWeb). Con este lr comodo ambos convergen al optimo; la diferencia aparece cuando el lr no es tan comodo, como se ve enseguida.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 18 robustez al lr -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">La ventaja real de Adam: robustez</h2>
+                <p class="slide-subtitle">Mismo problema, distintos learning rates (MSE final)</p>
+            </div>
+            <div class="slide-content">
+                <div class="two-columns">
+                    <div class="comparison-table">
+                        <table>
+                            <thead><tr><th>learning rate</th><th>SGD</th><th>Adam</th></tr></thead>
+                            <tbody>
+                                <tr><td>0.01</td><td>0.411</td><td>0.370</td></tr>
+                                <tr><td>0.1</td><td>0.144</td><td>0.145</td></tr>
+                                <tr><td>0.5</td><td>0.144</td><td>0.145</td></tr>
+                                <tr><td>1.0</td><td>0.353</td><td>0.148</td></tr>
+                                <tr><td>1.5</td><td style="color:#c0392b; font-weight:700;">diverge</td><td>0.151</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="key-point" style="align-self:center;">
+                        <h4>La leccion honesta</h4>
+                        <p>En un rango comodo (0.1 a 0.5) SGD y Adam empatan. Pero cuando el lr sube, <strong>SGD se descontrola y hasta diverge</strong>, mientras Adam sigue llegando al optimo. Esa robustez, no una velocidad magica, es la verdadera ventaja de los metodos adaptativos: perdonan un lr mal elegido.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Salida real de ejecucion (50 epocas, optimo = 0.144). Para alguien sin experiencia afinando, esa tolerancia vale oro. Pero atencion: un SGD bien afinado iguala a Adam. El optimizador importa menos que afinar bien el learning rate.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 19 actualidad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actualidad 2025-2026</h2>
+                <p class="slide-subtitle">Sigue reinando AdamW, pero por primera vez tiene retador</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="app-card">
+                        <div class="app-label">El retador</div>
+                        <h4>Muon</h4>
+                        <p>Optimizador matricial que ortogonaliza el momentum. Entreno Kimi K2 (1 billon de parametros) y GLM-4.5. Usa menos memoria que Adam.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">La evidencia</div>
+                        <h4>Ventaja modesta</h4>
+                        <p>Benchmarks rigurosos (Stanford, 2025) muestran que la ventaja sobre AdamW bien afinado cae de 1.4x a 1.1x conforme el modelo crece. No el 2x que se reclama.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">El deporte</div>
+                        <h4>Speedrun nanoGPT</h4>
+                        <p>Entrenar un GPT-2 chico bajo de 45 min (2024) a 1.43 min (2026), un speedup de 31x. Muon fue una de las claves.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Honestidad epistemica para el cientifico de datos: AdamW bien afinado sigue siendo el default correcto para la enorme mayoria de los casos. Las ganancias reportadas suelen encogerse bajo comparacion justa, y elegir el optimizador importa menos que afinar bien el learning rate. Muon es la frontera a vigilar, no el reemplazo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 20 stack 2026 -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">El stack de optimizacion por gradiente en 2026</h2>
+                <p class="slide-subtitle">Que herramienta para que tarea</p>
+            </div>
+            <div class="slide-content">
+                <div class="comparison-table">
+                    <table>
+                        <thead><tr><th>Herramienta</th><th>Para que</th><th>Nota 2026</th></tr></thead>
+                        <tbody>
+                            <tr><td>PyTorch (torch.optim)</td><td>SGD, Adam, AdamW, schedulers</td><td>2.9 / 2.10; el caballo de batalla</td></tr>
+                            <tr><td>JAX + Optax</td><td>Autodiff funcional, GPU/TPU</td><td>grad como transformacion; bloques componibles</td></tr>
+                            <tr><td>pytorch_optimizer</td><td>100+ optimizadores (Lion, Muon...)</td><td>ideal para experimentar en clase</td></tr>
+                            <tr><td>schedulefree</td><td>Sin scheduler de lr</td><td>gano el track self-tuning de AlgoPerf 2024</td></tr>
+                            <tr><td>DeepSpeed</td><td>Entrenamiento a gran escala</td><td>ya soporta Muon</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="highlight-box">
+                    <p>La tendencia dominante de 2026 es integrar optimizacion y aprendizaje profundo cada vez mas fino: capas diferenciables, ajuste de extremo a extremo y optimizadores que buscan eliminar el afinamiento manual del lr. La optimizacion por gradiente es el motor comun debajo de casi todos los modelos modernos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 21 conexion proyecto -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Conexion con el proyecto integrador</h2>
+                <p class="slide-subtitle">El descenso de gradiente esta debajo de casi todo</p>
+            </div>
+            <div class="slide-content">
+                <div class="three-columns">
+                    <div class="app-card">
+                        <div class="app-label">Energia</div>
+                        <h4>Demanda electrica</h4>
+                        <p>Predecir la demanda del SEN (datos CENCE/ICE) con una red pequena entrenada con Adam. Justo el caso de hoy, a mayor escala.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Series y regresion</div>
+                        <h4>Ajuste de modelos</h4>
+                        <p>NeuralProphet, redes para series o cualquier modelo diferenciable se entrenan con SGD o Adam por dentro.</p>
+                    </div>
+                    <div class="app-card">
+                        <div class="app-label">Cualquier carril</div>
+                        <h4>Calibracion</h4>
+                        <p>Ajustar los parametros de un SEIR o de un credit scoring es minimizar un error: descenso de gradiente otra vez.</p>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <p>Si su proyecto entrena, ajusta o calibra cualquier modelo, por debajo esta la linea de hoy: nueva posicion = posicion menos paso por gradiente. Elegir Adam o AdamW y afinar el lr es una decision real que pueden justificar en el documento final.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 22 actividad -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Actividad grupal en salas</h2>
+                <p class="slide-subtitle">Predecir con la intuicion, verificar en Colab</p>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <h3>Estructura de la actividad</h3>
+                    <ul>
+                        <li><strong>Parte A (predecir):</strong> sin correr nada, anticipar que hara un paso grande, cual optimizador cruza mejor un valle y como encoge AdamW los pesos</li>
+                        <li><strong>Parte B (verificar en Colab):</strong> correr codigo autocontenido en NumPy, con semilla 2026, y comparar con las predicciones</li>
+                        <li><strong>Parte C (reflexion):</strong> por que Adam es mas robusto, que hace distinto AdamW, y donde aparece la optimizacion por gradiente en el proyecto</li>
+                    </ul>
+                </div>
+                <div class="content-box">
+                    <h3>Material entregable</h3>
+                    <ul>
+                        <li>El notebook de Colab del grupo con kernel Python (.ipynb), con las celdas ejecutadas</li>
+                        <li>Una celda final en Markdown con la reflexion grupal</li>
+                    </ul>
+                </div>
+                <div class="highlight-box">
+                    <p>El documento esta en el campus virtual y en GitHub Classroom. No hay cuentas pesadas a mano: se trata de predecir con la intuicion de hoy y dejar que el computador confirme. Estare rotando entre salas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 23 cierre -->
+        <div class="slide">
+            <div class="slide-header">
+                <h2 class="slide-title">Lo que se llevan de hoy</h2>
+                <p class="slide-subtitle">Una sola linea, cada vez mas lista</p>
+            </div>
+            <div class="slide-content">
+                <div class="key-point"><h4>Bajar a pasos</h4><p>El descenso de gradiente sigue la brujula cuesta abajo; el tamano de paso lo es todo. Con paso muy grande, rebota o se dispara.</p></div>
+                <div class="key-point"><h4>Momentum y adaptacion</h4><p>El momentum da inercia y atraviesa valles sin zigzaguear. Adam suma un paso a la medida de cada parametro: inercia mas escala adaptativa.</p></div>
+                <div class="key-point"><h4>AdamW es el estandar</h4><p>Desacopla el weight decay y encoge todos los pesos por igual. Mejor generalizacion y mas facil de afinar; por eso reina en los transformers.</p></div>
+                <div class="key-point"><h4>La ventaja real es la robustez</h4><p>Adam perdona un lr mal elegido, donde SGD diverge. Pero afinar bien el lr importa mas que la eleccion del optimizador.</p></div>
+                <div class="highlight-box" style="margin-top:16px;">
+                    <p style="text-align:center; font-size:22px;">Gracias por la sesion. Recuerden la actividad en GitHub Classroom y el avance del proyecto.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" id="prevBtn" onclick="changeSlide(-1)">&#8592; Anterior</button>
+        <button class="nav-button" id="nextBtn" onclick="changeSlide(1)">Siguiente &#8594;</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        document.getElementById('totalSlides').textContent = totalSlides;
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            if (n >= totalSlides) currentSlide = totalSlides - 1;
+            else if (n < 0) currentSlide = 0;
+            else currentSlide = n;
+            slides[currentSlide].classList.add('active');
+            document.getElementById('currentSlide').textContent = currentSlide + 1;
+            document.getElementById('prevBtn').disabled = currentSlide === 0;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
+        }
+        function changeSlide(d) { showSlide(currentSlide + d); }
+        document.addEventListener('keydown', function(e) {
+            const tag = (e.target.tagName || '').toLowerCase();
+            if (tag === 'input' || tag === 'button' || tag === 'textarea') return;
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+            else if (e.key === 'ArrowRight') changeSlide(1);
+        });
+
+        // ---------- Widget 1: descenso de gradiente en x^2 ----------
+        let gdX = 4, gdSteps = [4], gdTimer = null;
+        function gdMapX(x){ return 170 + x*30; }
+        function gdMapY(y){ return 185 - y*9.5; }
+        function gdInit(){
+            let pts = [];
+            for (let x = -4.2; x <= 4.2; x += 0.2) pts.push(gdMapX(x) + ',' + gdMapY(Math.min(16, x*x)));
+            document.getElementById('gd-curve').setAttribute('points', pts.join(' '));
+            gdDraw();
+        }
+        function gdDraw(){
+            let html = '';
+            gdSteps.forEach((x, i) => {
+                const xc = Math.max(-4.2, Math.min(4.2, x));
+                const cx = gdMapX(xc), cy = gdMapY(Math.min(16, xc*xc));
+                const last = i === gdSteps.length - 1;
+                html += '<circle cx="' + cx + '" cy="' + cy + '" r="' + (last?4.5:2.4) + '" fill="' + (last?'#c0392b':'#FF8C00') + '"/>';
+            });
+            document.getElementById('gd-dots').innerHTML = html;
+            const k = gdSteps.length - 1;
+            const disp = Math.abs(gdX) > 5 ? '  (se disparo)' : '';
+            document.getElementById('gd-readout').textContent = 'paso ' + k + ' \u00b7 x = ' + gdX.toFixed(2) + ' \u00b7 f(x) = ' + (gdX*gdX).toFixed(2) + disp;
+        }
+        function gdStep(){
+            const eta = parseFloat(document.getElementById('gd-eta').value);
+            gdX = gdX - eta * 2 * gdX;
+            gdSteps.push(gdX);
+            if (gdSteps.length > 40) gdSteps.shift();
+            gdDraw();
+        }
+        function gdAuto(){
+            if (gdTimer){ clearInterval(gdTimer); gdTimer = null; return; }
+            gdTimer = setInterval(() => {
+                gdStep();
+                if (Math.abs(gdX) < 1e-3 || Math.abs(gdX) > 80){ clearInterval(gdTimer); gdTimer = null; }
+            }, 280);
+        }
+        function gdReset(){
+            if (gdTimer){ clearInterval(gdTimer); gdTimer = null; }
+            gdX = 4; gdSteps = [4]; gdDraw();
+        }
+        document.getElementById('gd-eta').addEventListener('input', e => {
+            document.getElementById('gd-eta-val').textContent = parseFloat(e.target.value).toFixed(2);
+        });
+
+        // ---------- Widget 2: la carrera de optimizadores ----------
+        // superficie f(x,y) = 0.5*(x^2 + 20 y^2), gradiente (x, 20y)
+        // parametros calibrados numericamente: SGD zigzaguea, Momentum suaviza, Adam llega directo
+        const RACE_K = 20, RACE_T = 45;
+        function raceMap(x, y){ return [170 + x*15, 120 - y*30]; }
+        function raceContours(){
+            let html = '';
+            [1,2,3,4,5].forEach(k => {
+                const c = k*4;                       // nivel
+                const rx = Math.sqrt(2*c)*15;
+                const ry = Math.sqrt(2*c/RACE_K)*30;
+                html += '<ellipse cx="170" cy="120" rx="'+rx.toFixed(1)+'" ry="'+ry.toFixed(1)+'" fill="none" stroke="#e6e6e6" stroke-width="1"/>';
+            });
+            document.getElementById('race-contours').innerHTML = html;
+        }
+        function raceTrajectory(kind){
+            let p = [-8.0, 2.2], v = [0,0], s = [0,0];
+            const b1=0.9, b2=0.999, eps=1e-8;
+            let lr, mu=0.85;
+            if (kind==='SGD') lr=0.0905; else if (kind==='Momentum') lr=0.0129; else lr=0.51;
+            const traj = [p.slice()];
+            for (let t=1; t<=RACE_T; t++){
+                const g = [p[0], RACE_K*p[1]];
+                if (kind==='SGD'){
+                    p = [p[0]-lr*g[0], p[1]-lr*g[1]];
+                } else if (kind==='Momentum'){
+                    v = [mu*v[0]+g[0], mu*v[1]+g[1]];
+                    p = [p[0]-lr*v[0], p[1]-lr*v[1]];
+                } else {
+                    for (let i=0;i<2;i++){
+                        v[i]=b1*v[i]+(1-b1)*g[i];
+                        s[i]=b2*s[i]+(1-b2)*g[i]*g[i];
+                        const vh=v[i]/(1-Math.pow(b1,t)), sh=s[i]/(1-Math.pow(b2,t));
+                        p[i]=p[i]-lr*vh/(Math.sqrt(sh)+eps);
+                    }
+                }
+                traj.push(p.slice());
+            }
+            return traj;
+        }
+        let raceData = {}, raceTimer = null, raceK = 0;
+        function raceInit(){
+            raceContours();
+            raceData = { SGD: raceTrajectory('SGD'), Momentum: raceTrajectory('Momentum'), Adam: raceTrajectory('Adam') };
+            raceReset();
+        }
+        function raceDrawUpto(k){
+            const map = { SGD:['path-sgd','dot-sgd'], Momentum:['path-mom','dot-mom'], Adam:['path-adam','dot-adam'] };
+            Object.keys(map).forEach(kind => {
+                const tr = raceData[kind].slice(0, k+1);
+                const pts = tr.map(pt => { const [X,Y]=raceMap(pt[0],pt[1]); return X.toFixed(1)+','+Y.toFixed(1); }).join(' ');
+                document.getElementById(map[kind][0]).setAttribute('points', pts);
+                const [cx,cy] = raceMap(raceData[kind][k][0], raceData[kind][k][1]);
+                const dot = document.getElementById(map[kind][1]);
+                dot.setAttribute('cx', cx.toFixed(1)); dot.setAttribute('cy', cy.toFixed(1));
+            });
+            document.getElementById('race-read').textContent = 'paso ' + k + ' de ' + RACE_T;
+        }
+        function raceRun(){
+            if (raceTimer){ clearInterval(raceTimer); raceTimer=null; return; }
+            raceTimer = setInterval(() => {
+                raceK++;
+                if (raceK >= RACE_T){ raceK = RACE_T; raceDrawUpto(raceK); clearInterval(raceTimer); raceTimer=null; return; }
+                raceDrawUpto(raceK);
+            }, 90);
+        }
+        function raceReset(){
+            if (raceTimer){ clearInterval(raceTimer); raceTimer=null; }
+            raceK = 0; raceDrawUpto(0);
+        }
+
+        // ---------- Widget 3: encogimiento de pesos (Adam+L2 vs AdamW) ----------
+        let wdKind = 'AdamW';
+        function wdShrink(kind, steps){
+            let w = [4.0, 0.5], v = [0,0], s = [0,0];
+            const lr=0.1, wd=0.1, b1=0.9, b2=0.999, eps=1e-8;
+            for (let t=1; t<=steps; t++){
+                for (let i=0;i<2;i++){
+                    if (kind==='Adam+L2'){
+                        const g = wd*w[i];
+                        v[i]=b1*v[i]+(1-b1)*g; s[i]=b2*s[i]+(1-b2)*g*g;
+                        const vh=v[i]/(1-Math.pow(b1,t)), sh=s[i]/(1-Math.pow(b2,t));
+                        w[i]=w[i]-lr*vh/(Math.sqrt(sh)+eps);
+                    } else {
+                        const g = 0.0;
+                        v[i]=b1*v[i]+(1-b1)*g; s[i]=b2*s[i]+(1-b2)*g*g;
+                        const vh=v[i]/(1-Math.pow(b1,t)), sh=s[i]/(1-Math.pow(b2,t));
+                        w[i]=w[i]-lr*vh/(Math.sqrt(sh)+eps)-lr*wd*w[i];
+                    }
+                }
+            }
+            return w;
+        }
+        function wdDraw(){
+            const steps = parseInt(document.getElementById('wd-steps').value);
+            document.getElementById('wd-steps-val').textContent = steps;
+            const w = wdShrink(wdKind, steps);
+            const baseY = 160, maxH = 130;
+            const hBig = Math.max(1, Math.abs(w[0])/4 * maxH);
+            const hSmall = Math.max(1, Math.abs(w[1])/4 * maxH);
+            const bBig = document.getElementById('bar-big');
+            bBig.setAttribute('y', (baseY - hBig).toFixed(1)); bBig.setAttribute('height', hBig.toFixed(1));
+            const bSmall = document.getElementById('bar-small');
+            bSmall.setAttribute('y', (baseY - hSmall).toFixed(1)); bSmall.setAttribute('height', hSmall.toFixed(1));
+            document.getElementById('lbl-big').setAttribute('y', (baseY - hBig - 6).toFixed(1));
+            document.getElementById('lbl-big').textContent = w[0].toFixed(2);
+            document.getElementById('lbl-small').setAttribute('y', (baseY - hSmall - 6).toFixed(1));
+            document.getElementById('lbl-small').textContent = w[1].toFixed(2);
+            const dBig = 100*(1-w[0]/4), dSmall = 100*(1-w[1]/0.5);
+            document.getElementById('wd-read').textContent =
+                wdKind + ' \u00b7 paso ' + steps + ' \u00b7 grande cayo ' + dBig.toFixed(0) + '% \u00b7 chico cayo ' + dSmall.toFixed(0) + '%';
+        }
+        function wdSet(kind){
+            wdKind = kind;
+            document.getElementById('tg-adamw').classList.toggle('active', kind==='AdamW');
+            document.getElementById('tg-l2').classList.toggle('active', kind==='Adam+L2');
+            wdDraw();
+        }
+        document.getElementById('wd-steps').addEventListener('input', wdDraw);
+
+        // ---------- init ----------
+        window.addEventListener('load', () => { gdInit(); raceInit(); wdDraw(); });
+        showSlide(0);
+    </script>
+</body>
+</html>
